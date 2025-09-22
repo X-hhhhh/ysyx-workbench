@@ -21,9 +21,11 @@ VERILATOR_FLAGS += --top-module $(TOPNAME)
 VERILATOR_FLAGS += --cc --exe -o $(abspath $(BIN))
 
 #search for files
-VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
-CSRCS = $(shell find $(abspath ./csrc) -name "*.c" - or -name "*.cpp")
+#VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
+#CSRCS = $(shell find $(abspath ./csrc) -name "*.c" - or -name "*.cpp")
 
+VSRCS = ./vsrc/top.v
+CSRCS = ./csrc/sim_main.cpp
 
 all:
 	@echo "Write this Makefile by your self."
