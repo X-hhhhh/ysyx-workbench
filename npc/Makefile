@@ -1,8 +1,9 @@
-all:
-	@echo "Write this Makefile by your self."
+VSRCS = ./vsrc/top.v
+CSRCS = ./csrc/sim_main.cpp
+VERILATOR_FLAGS = --cc --trace-fst --exe --build
 
 sim:
-	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	@echo "Write this Makefile by your self."
+	verilator -Wall $(VSRCS) $(CSRCS) $(VERILATOR_FLAGS) 
+	./obj_dir/Vtop
+	gtkwave ./build/logs/cpu_wave.fst
 
-include ../Makefile
