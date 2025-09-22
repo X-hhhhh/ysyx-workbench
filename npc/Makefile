@@ -7,7 +7,7 @@ VERILATOR = verilator
 BUILD_DIR = ./build/verilator
 
 #address for storing files after building
-OBJ_DIR = @(BUILD_DIR)/obj_dir
+OBJ_DIR = $(BUILD_DIR)/obj_dir
 
 #address of executable file
 BIN = $(BUILD_DIR)/$(TOPNAME)
