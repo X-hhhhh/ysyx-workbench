@@ -1,4 +1,4 @@
-TOPNAME = decode24
+TOPNAME = encode42_pri
 NXDC_FILES = constr/top.nxdc
 INC_PATH ?=
 
