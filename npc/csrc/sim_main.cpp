@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define CONFIG_FST_WAVE_TRACE 1
+#include <nvboard.h>
+
+#define CONFIG_FST_WAVE_TRACE 0
 
 VerilatedContext* contextp = new VerilatedContext;
 Vtop* top = new Vtop{contextp};
@@ -14,6 +16,23 @@ Vtop* top = new Vtop{contextp};
 #include "verilated_fst_c.h"
 VerilatedFstC *tfp = new VerilatedFstC;
 #endif
+
+static TOP_NAME dut;
+
+void nvboard_bind_all_pins(TOP_NAME* top);
+
+static void single_cycle(){
+	dut.clk = 0;
+	dut.eval();
+	dut.clk = 1;
+       	dut.eval();
+}
+
+static void reset(int n){
+	dut.rst = 1;
+	while (n-- > 0) single_cycle();
+	dut.rst = 0;
+}
 
 int main(int argc, char** argv){
 	contextp->commandArgs(argc, argv);
@@ -24,27 +43,27 @@ int main(int argc, char** argv){
 	tfp->open("build/logs/cpu_wave.fst");
 	#endif
 
-	//initialize the top port
-	top->clk = 0;
-	top->rst = 0;
+	//reset
+	reset(10);
 
 	//define the number of cycles
-	int cycle = 50;
+	//int cycle = 50;
 
-	while(cycle){
-		int a = rand() & 1;
-		int b = rand() & 1;
-		top -> a = a;
-		top -> b = b;
-		top->clk = !top->clk;
-		top->eval();
-		printf("a=%d, b=%d, f=%d\n", a, b, top->f);
+	//bind and initialize nvboard
+	nvboard_bind_all_pins(&dut);
+	nvboard_init();
+
+	while(1){
 		contextp->timeInc(1);
 
 		#if CONFIG_FST_WAVE_TRACE
 		tfp->dump(contextp->time());
 		#endif
-		cycle--;
+		//cycle--;
+		
+		//update nvboard
+		nvboard_update();
+		single_cycle();
 	}
 
 	#if CONFIG_FST_WAVE_TRACE
@@ -56,6 +75,9 @@ int main(int argc, char** argv){
 	top = nullptr;
 	delete contextp;
 	contextp = nullptr;
+
+	//destroy nvboard
+	nvboard_quit();
 
 	return 0;
 }
