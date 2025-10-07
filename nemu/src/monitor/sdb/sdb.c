@@ -73,6 +73,11 @@ static int cmd_info(char *args) {
 	return 0;
 }
 
+static int cmd_x(char *args) {
+	
+	return 0;	
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -83,7 +88,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "Execute n instructions, the default value of n is 1", cmd_si },
   { "info", "Print program status, for registers(r), for watchpoints(w)", cmd_info },
-
+  { "x", "Scan memory", cmd_x },
   /* TODO: Add more commands */
 
 };
