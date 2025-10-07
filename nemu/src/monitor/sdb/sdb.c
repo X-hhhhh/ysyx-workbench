@@ -64,6 +64,15 @@ static int cmd_si(char *args) {
 	return 0;	
 }
 
+static int cmd_info(char *args) {
+	if(strcmp(args, "r") == 0) {
+		isa_reg_display();	
+	}else if(strcmp(args, "w") == 0) {
+		
+	}
+	return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -73,6 +82,7 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "Execute n instructions, the default value of n is 1", cmd_si },
+  { "info", "Print program status, for registers(r), for watchpoints(w)", cmd_info },
 
   /* TODO: Add more commands */
 
