@@ -88,7 +88,9 @@ static int cmd_x(char *args) {
 		}else {
 			int paddr;
 			sscanf(arg, "%x", &paddr);
-			paddr_read(paddr, n);
+			for(; n > 0; n--){
+				printf("0x%x", paddr_read(paddr, 4));
+			}
 		}
 	}
 	return 0;	
