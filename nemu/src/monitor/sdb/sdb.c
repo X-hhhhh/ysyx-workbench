@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <memory/paddr.h>
 
 static int is_batch_mode = false;
 
@@ -66,17 +67,28 @@ static int cmd_si(char *args) {
 
 static int cmd_info(char *args) {
 	if(args == NULL) {
-		printf("info needs an args\n");
+		printf("cmd \"info\" needs an args\n");
 	}else if(strcmp(args, "r") == 0) {
 		isa_reg_display();	
 	}else if(strcmp(args, "w") == 0) {
-		
+		//add code for watchpoints	
 	}
 	return 0;
 }
 
 static int cmd_x(char *args) {
-	
+	char *arg = strtok(NULL, " ");
+	if(arg == NULL) {
+		printf("cmd \"x\" needs two args");
+	}else {
+		int n = atoi(arg);
+		arg = strtok(NULL, " ");
+		if(arg == NULL) {
+			printf("cmd \"x\" needs two args");
+		}else {
+			paddr_read(atoi(arg), n);
+		}
+	}
 	return 0;	
 }
 
