@@ -39,7 +39,7 @@ static struct rule {
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
-  {"\\w+", TK_DEC_INT},
+  {"[0-9]+", TK_DEC_INT},
   {"-", '-'},
   {"\\*", '*'},
   {"/", '/'},
