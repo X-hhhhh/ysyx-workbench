@@ -86,13 +86,15 @@ static int cmd_x(char *args) {
 		if(arg == NULL) {
 			printf("cmd \"x\" needs two args\n");
 		}else {
-			int paddr;
-			sscanf(arg, "%x", &paddr);
+			int paddr_b;
+			sscanf(arg, "%x", &paddr_b);
 			for(int i = 0; i < n; i++) {
+				int paddr = paddr_b + i * 4;
 				if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
 					printf("0x%x: 0x%x\n", paddr + i * 4, paddr_read(paddr + i * 4, 4));
 				}else {
-					printf("paddr out of range [80000000, 87FFFFFF]");
+					printf("paddr out of range [80000000, 87FFFFFF]\n");
+					break;
 				}
 			}
 		}
