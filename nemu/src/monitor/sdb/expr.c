@@ -155,5 +155,14 @@ word_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   TODO();
 
+  
+  for(int i = 0; i < nr_token; i++) {
+  	printf("tokens[%d].type=%d, str=%s", i, tokens[i].type, tokens[i].str);
+  }
+
+
+
+
+
   return 0;
 }
