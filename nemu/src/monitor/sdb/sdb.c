@@ -93,7 +93,7 @@ static int cmd_x(char *args) {
 				if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
 					printf("0x%x: 0x%x\n", paddr, paddr_read(paddr, 4));
 				}else {
-					printf("paddr out of range [80000000, 87FFFFFF]\n");
+					printf("paddr:0x%x out of range [80000000, 87FFFFFF]\n", paddr);
 					break;
 				}
 			}
