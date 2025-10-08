@@ -86,7 +86,9 @@ static int cmd_x(char *args) {
 		if(arg == NULL) {
 			printf("cmd \"x\" needs two args");
 		}else {
-			paddr_read(atoi(arg), n);
+			int paddr;
+			sscanf(arg, "%x", &paddr);
+			paddr_read(paddr, n);
 		}
 	}
 	return 0;	
