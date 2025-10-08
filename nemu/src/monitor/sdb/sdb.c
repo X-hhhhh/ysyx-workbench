@@ -79,17 +79,17 @@ static int cmd_info(char *args) {
 static int cmd_x(char *args) {
 	char *arg = strtok(NULL, " ");
 	if(arg == NULL) {
-		printf("cmd \"x\" needs two args");
+		printf("cmd \"x\" needs two args\n");
 	}else {
 		int n = atoi(arg);
 		arg = strtok(NULL, " ");
 		if(arg == NULL) {
-			printf("cmd \"x\" needs two args");
+			printf("cmd \"x\" needs two args\n");
 		}else {
 			int paddr;
 			sscanf(arg, "%x", &paddr);
-			for(; n > 0; n--){
-				printf("0x%x", paddr_read(paddr, 4));
+			for(int i = 0; i < n; i++){
+				printf("0x%x", paddr_read(paddr + i * 4, 4));
 			}
 		}
 	}
