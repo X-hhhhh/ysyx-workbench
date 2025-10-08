@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 #endif
 
   	bool success;
-	expr(" 1 + 1", &success);
+	expr("1 + 1", &success);
 
 
 
