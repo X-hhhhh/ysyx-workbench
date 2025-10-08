@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_EQ, TK_DEC_INT
 
   /* TODO: Add more token types */
 
@@ -39,6 +39,12 @@ static struct rule {
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
+  {"-", '-'},
+  {"\\*", '*'},
+  {"/", '/'},
+  {"\\(", '('},
+  {"\\)", ')'},
+  {"\\d+", TK_DEC_INT},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -95,8 +101,36 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          default: TODO();
+		case '+':
+			tokens[nr_token].type = '+';
+			break;
+		case '-':
+			tokens[nr_token].type = '-';
+			break;
+		case TK_EQ:
+			tokens[nr_token].type = TK_EQ;
+			break;
+		case '*':
+			tokens[nr_token].type = '*';
+			break;
+		case '/':
+			tokens[nr_token].type = '/';
+			break;
+		case '(':
+			tokens[nr_token].type = '(';
+			break;
+		case ')':
+			tokens[nr_token].type = ')';
+			break;
+		case TK_DEC_INT:
+			tokens[nr_token].type = TK_DEC_INT;
+			strncpy(tokens[nr_token].str, substr_start, substr_len);	//record data values
+			tokens[nr_token].str[substr_len] = '\0';			//add '\0' to make sure it is a string
+			break;
+		default: TODO();
         }
+	
+	nr_token++;
 
         break;
       }
