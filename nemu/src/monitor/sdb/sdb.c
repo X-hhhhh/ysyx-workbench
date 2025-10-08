@@ -89,7 +89,11 @@ static int cmd_x(char *args) {
 			int paddr;
 			sscanf(arg, "%x", &paddr);
 			for(int i = 0; i < n; i++) {
-				printf("0x%x: 0x%x\n", paddr + i * 4, paddr_read(paddr + i * 4, 4));
+				if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
+					printf("0x%x: 0x%x\n", paddr + i * 4, paddr_read(paddr + i * 4, 4));
+				}else {
+					printf("paddr out of range [80000000, 87FFFFFF]");
+				}
 			}
 		}
 	}
