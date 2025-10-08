@@ -127,10 +127,13 @@ static bool make_token(char *e) {
 			strncpy(tokens[nr_token].str, substr_start, substr_len);	//record data values
 			tokens[nr_token].str[substr_len] = '\0';			//add '\0' to make sure it is a string
 			break;
-		default: TODO();
+		default:
+
         }
 	
-	nr_token++;
+	if(rules[i].token_type != TK_NOTYPE) {
+		nr_token++;
+	}
 
         break;
       }
