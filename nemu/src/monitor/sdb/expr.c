@@ -181,17 +181,18 @@ static int check_parentheses(int p, int q) {
 			return 1;	//not matched and valid expression
 		}
 	}else {
-		return -1;	//invalid expression
+		return -1;		//invalid expression
 	}
 }
-/*
-static uint32_t eval(int p, int q) {
+
+static uint32_t eval(int p, int q, bool *valid) {
+	*valid = true;
 	if(p > q) {
 		return 0;		
 	}else if (p == q) {
 		return atoi(tokens[p].str);
 	}else if(check_parentheses(p, q) > 0) {
-		return eval(p + 1, q - 1);	
+		return eval(p + 1, q - 1, valid);	
 	}else {
 		int par_num = 0;
 		int main_op_pos = 0;
@@ -220,19 +221,20 @@ static uint32_t eval(int p, int q) {
 			}
 		}
 		
-		uint32_t val1 = eval(p, main_op_pos - 1);
-		uint32_t val2 = eval(main_op_pos + 1, q);
-		
+		bool valid_t;
+		uint32_t val1 = eval(p, main_op_pos - 1, valid); 
+		uint32_t val2 = eval(main_op_pos + 1, q, &valid_t);
+		*valid = (*valid) ? valid_t : false;
+
 		switch(tokens[main_op_pos].type) {
 			case '+': return val1 + val2; break;
 			case '-': return val1 - val2; break;
 			case '*': return val1 * val2; break;
 			case '/': return val1 / val2; break;
-			default: break;
+			default: return -1; break;
 		}
 	}
 }
-*/
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -247,8 +249,11 @@ word_t expr(char *e, bool *success) {
   	printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
   }
 
-	printf("res=%d\n", check_parentheses(0, nr_token - 1));
+	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
 
+	bool valid;
+	eval(0, nr_token - 1, &valid);
+	printf("valid=%d\n", valid);
 
 
   return 0;
