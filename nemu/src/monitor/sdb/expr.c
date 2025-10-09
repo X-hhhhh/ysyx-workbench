@@ -166,7 +166,10 @@ static int check_parentheses(int p, int q) {
 		}else if(tokens[i].type == ')') {
 			if(top != -1) {
 				char ch = stack[top];
-				if(ch == '(') {top--;}
+				if(ch == '(') {
+					top--;
+				}
+				else {break;}
 			}else {break;}
 		}
 	}
