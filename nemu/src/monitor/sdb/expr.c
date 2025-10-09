@@ -254,7 +254,7 @@ word_t expr(char *e, bool *success) {
 	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
 
 	bool valid;
-	eval(0, nr_token - 1, &valid);
+	printf("expr=%d", eval(0, nr_token - 1, &valid));
 	printf("valid=%d\n", valid);
 
 
