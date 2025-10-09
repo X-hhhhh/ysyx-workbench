@@ -245,7 +245,7 @@ word_t expr(char *e, bool *success) {
   	printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
   }
 
-	check_parentheses(0, nr_token - 1);
+	printf("res=%d", check_parentheses(0, nr_token - 1));
 
 
 

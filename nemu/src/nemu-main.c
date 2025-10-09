@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 #endif
 
   	bool success;
-	expr("++ 5== -", &success);
+	expr("2 + (2 + 3) * 2", &success);
 
 
 
