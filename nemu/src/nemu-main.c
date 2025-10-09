@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 #endif
 
   	//char str[32] = "(20 - (2 + 1) * (2) + 2)";
-	char str[32] = "(2 + (2+ (1)))";
+	char str[32] = "(2 + (2 * (1)))";
   	bool success;
 
 	printf("str=%s\n", str);
