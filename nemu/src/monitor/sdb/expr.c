@@ -152,9 +152,10 @@ static bool make_token(char *e) {
 }
 
 static int check_parentheses(int p, int q) {
-	uint8_t matched = 0;
+	bool matched1 = false;
+	bool matched2 = false;
 	if(tokens[p].type == '(' && tokens[q].type == ')') {
-		matched++;		//parentheses matched
+		matched1 = true;		//parentheses matched
 	}
 	
 	char stack[32] = {0};
@@ -167,7 +168,7 @@ static int check_parentheses(int p, int q) {
 			if(top != -1) {
 				char ch = stack[top];
 				if(ch == '(') {
-					if(top == 0) {matched++;}
+					if(top == 0) {matched2 = true;}
 					top--;
 				}
 				else {break;}
@@ -176,7 +177,7 @@ static int check_parentheses(int p, int q) {
 	}
 
 	if(top == -1) {
-		if(matched == 2) {
+		if(matched1 == true && matched2 == true) {
 			return 0;	//matched and valid expression
 		}else {
 			return 1;	//not matched and valid expression
