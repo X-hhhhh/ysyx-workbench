@@ -100,6 +100,9 @@ static bool make_token(char *e) {
          * of tokens, some extra actions should be performed.
          */
 
+	// if substr is longer than 32 bytes, add code..
+
+
         switch (rules[i].token_type) {
 		case '+':
 			tokens[nr_token].type = '+';
@@ -148,6 +151,86 @@ static bool make_token(char *e) {
   return true;
 }
 
+static int check_parentheses(int p, int q) {
+	bool matched = false;
+	if(tokens[p].type == '(' && tokens[q].type == ')') {
+		matched = true;		//parentheses matched
+	}
+	
+	char stack[32] = {0};
+	int top = 0;
+	
+	stack[0] = '(';
+	for(int i = p + 1; i <= q; i++) {
+		if(tokens[i].type == '(') {
+			stack[++top] = '(';
+		}else if(tokens[i].type == ')') {
+			if(top != -1) {
+				char ch = stack[top];
+				if(ch == '(') {top--;}
+			}else {break;}
+		}
+	}
+
+	if(top == -1) {
+		if(matched == true) {
+			return 0;	//matched and valid expression
+		}else {
+			return 1;	//not matched and valid expression
+		}
+	}else {
+		return -1;	//invalid expression
+	}
+}
+/*
+static uint32_t eval(int p, int q) {
+	if(p > q) {
+		return 0;		
+	}else if (p == q) {
+		return atoi(tokens[p].str);
+	}else if(check_parentheses(p, q) > 0) {
+		return eval(p + 1, q - 1);	
+	}else {
+		int par_num = 0;
+		int main_op_pos = 0;
+		for(int i = p; i <= q; i++) {
+			switch(tokens[i].type) {
+				case '(': 
+					par_num++;
+					break;
+				case ')':
+					par_num--;
+					break;
+				case '+':
+				case '-':
+					if(par_num == 0) {
+						main_op_pos = i;
+					}
+					break;
+				case '*':
+				case '/':
+					if(par_num == 0 && tokens[main_op_pos].type != '+' &&
+						tokens[main_op_pos].type != '-') {
+						main_op_pos = i;
+					}
+					break;
+				default: break;
+			}
+		}
+		
+		uint32_t val1 = eval(p, main_op_pos - 1);
+		uint32_t val2 = eval(main_op_pos + 1, q);
+		
+		switch(tokens[main_op_pos].type) {
+			case '+': return val1 + val2; break;
+			case '-': return val1 - val2; break;
+			case '*': return val1 * val2; break;
+			case '/': return val1 / val2; break;
+			default: break;
+		}
+	}
+}
+*/
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -162,7 +245,7 @@ word_t expr(char *e, bool *success) {
   	printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
   }
 
-
+	check_parentheses(0, nr_token - 1);
 
 
 
