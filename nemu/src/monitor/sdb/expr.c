@@ -158,7 +158,7 @@ static int check_parentheses(int p, int q) {
 		matched1 = true;		//parentheses matched
 	}
 	
-	char stack[32] = {0};
+	char stack[32];
 	int top = -1;
 	
 	for(int i = p; i <= q; i++) {
@@ -171,7 +171,7 @@ static int check_parentheses(int p, int q) {
 					if(top == 0) {matched2 = true;}
 					top--;
 				}
-				else {break;}
+				else {return -1;}
 			}else {return -1;}
 		}
 	}
