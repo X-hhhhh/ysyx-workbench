@@ -32,8 +32,11 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
+  	char str[32] = "2 + (2 + 3) * 2";
   	bool success;
-	expr("2 + (2 + 3) * 2", &success);
+
+	printf("str=%s\n", str);
+	expr(str, &success);
 
 
 
