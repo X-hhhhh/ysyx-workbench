@@ -191,7 +191,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 		return 0;		
 	}else if (p == q) {
 		return atoi(tokens[p].str);
-	}else if(check_parentheses(p, q) > 0) {
+	}else if(check_parentheses(p, q) == 0) {
 		return eval(p + 1, q - 1, valid);	
 	}else {
 		int par_num = 0;
