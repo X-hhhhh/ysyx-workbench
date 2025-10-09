@@ -170,7 +170,7 @@ static int check_parentheses(int p, int q) {
 					top--;
 				}
 				else {break;}
-			}else {break;}
+			}else {return -1;}
 		}
 	}
 
