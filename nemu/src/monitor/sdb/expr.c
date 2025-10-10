@@ -196,8 +196,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 	if(p > q) {
 		*valid = false;
 		return -1;		
-	}else if (p == q) {
-		
+	}else if (p == q) {	
 		return atoi(tokens[p].str);
 	}else if(check_parentheses(p, q) == 0) {
 		return eval(p + 1, q - 1, valid);	
@@ -207,6 +206,8 @@ static uint32_t eval(int p, int q, bool *valid) {
 	}else {
 		int par_num = 0;
 		int main_op_pos = -1;
+		
+		//search for the positon of main operation
 		for(int i = p; i <= q; i++) {
 			switch(tokens[i].type) {
 				case '(': 
@@ -228,15 +229,24 @@ static uint32_t eval(int p, int q, bool *valid) {
 						main_op_pos = i;
 					}
 					break;
+				case TK_NEG:
+					if(main_op_pos == -1) {
+						main_op_pos = i;
+					}
 				default: break;
 			}
 		}
 
 		if(main_op_pos == -1) {*valid = false; return -1;}
-		
+	
+		uint32_t val1 = 0;
+		uint32_t val2 = 0;
+
 		bool valid_t;
-		uint32_t val1 = eval(p, main_op_pos - 1, valid); 
-		uint32_t val2 = eval(main_op_pos + 1, q, &valid_t);
+		if(tokens[main_op_pos].type != TK_NEG) {
+			val1 = eval(p, main_op_pos - 1, valid);
+		}	
+		val2 = eval(main_op_pos + 1, q, &valid_t);
 		*valid = (*valid) ? valid_t : false;
 
 		switch(tokens[main_op_pos].type) {
@@ -244,6 +254,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 			case '-': return val1 - val2; break;
 			case '*': return val1 * val2; break;
 			case '/': return val1 / val2; break;
+			case TK_NEG: return -val2; break;
 			default: 
 				  *valid = false;
 				  return -1;
