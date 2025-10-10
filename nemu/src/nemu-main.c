@@ -47,9 +47,12 @@ int main(int argc, char *argv[]) {
 	}
 
 	int cycle = 100;
+	int space_flag = 0;
 	char ch = fgetc(fp);
 	while(!feof(fp) && cycle) {
-		if(ch == ' ') {printf("\n");}
+		if(ch == ' ') {space_flag = 1;}
+		if(ch == '\n') {space_flag = 0;}
+		if(space_flag == 1 && ch == ' ') {printf("\n");}
 		printf("%c", ch);
 		ch = fgetc(fp);
 		cycle--;
