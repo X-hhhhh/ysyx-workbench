@@ -160,7 +160,8 @@ static int check_parentheses(int p, int q) {
 	
 	char stack[32];
 	int top = -1;
-	
+	int first_par_exi = 1;
+
 	for(int i = p; i <= q; i++) {
 		if(tokens[i].type == '(') {
 			stack[++top] = '(';
@@ -168,7 +169,10 @@ static int check_parentheses(int p, int q) {
 			if(top != -1) {
 				char ch = stack[top];
 				if(ch == '(') {
-					if(top == 0) {matched2 = true;}
+					if(i == q && first_par_exi == 1) {matched2 = true;}
+					if(top == 0) {
+						first_par_exi = 0;
+					}
 					top--;
 				}
 				else {return -1;}
