@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 	*/
 
 
-	FILE * fp = fopen("", "r");
+	FILE * fp = fopen("tools/gen-expr/input", "r");
 	if(fp == NULL) {
 		printf("error opening file");
 		return 1;
