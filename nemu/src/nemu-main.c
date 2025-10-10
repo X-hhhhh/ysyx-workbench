@@ -46,15 +46,18 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	int cycle = 300;
-	int space_flag = 0;
-	char ch = fgetc(fp);
+	int res;
+	int r;
+	//char buf_str[200];
+	int cycle = 1;
+	//char ch = fgetc(fp);
 	while(!feof(fp) && cycle) {
-		if(space_flag == 0 && ch == ' ') {printf("\n");}
-		if(ch == ' ') {space_flag = 1;}
-		if(ch == '\n') {space_flag = 0;}
-		printf("%c", ch);
-		ch = fgetc(fp);
+		r = fscanf(fp, "%d", &res);	
+		if(r != EOF) {}	
+		printf("%d", res);
+
+
+		//ch = fgetc(fp);
 		cycle--;
 	}
 
