@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
 	char ch = fgetc(fp);
 	while(!feof(fp) && cycle) {
 		printf("%c", ch);
+		ch = fgetc(fp);
 		cycle--;
 	}
 
