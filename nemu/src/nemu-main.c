@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	int cycle = 100;
+	int cycle = 300;
 	int space_flag = 0;
 	char ch = fgetc(fp);
 	while(!feof(fp) && cycle) {
