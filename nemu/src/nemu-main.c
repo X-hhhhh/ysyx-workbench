@@ -48,16 +48,19 @@ int main(int argc, char *argv[]) {
 
 	int res;
 	int r;
-	//char buf_str[200];
+	char buf_str[200];
 	int cycle = 1;
-	//char ch = fgetc(fp);
+	//char ch;
 	while(!feof(fp) && cycle) {
 		r = fscanf(fp, "%d", &res);	
 		if(r != EOF) {}	
-		printf("%d", res);
+		
+		r = fscanf(fp, "%s", buf_str);
+		
+		printf("%s", buf_str);
+		
 
 
-		//ch = fgetc(fp);
 		cycle--;
 	}
 
