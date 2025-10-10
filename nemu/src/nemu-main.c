@@ -32,8 +32,7 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
-  	//char str[32] = "(20 - (2 + 1) * (2) + 2)";	
-	char str[32] = "((2+3) * (1 +3*(2)))";
+  	char str[32] = "(20 - (2 + 1) * (2) + 2)";	
   	bool success;
 
 	printf("str=%s\n", str);
