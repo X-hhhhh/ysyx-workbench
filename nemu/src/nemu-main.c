@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 		exp = expr(buf_str, &success);
 		
 		printf("exp=%d, res=%d\n", exp, res);
-		assert(exp == res);
+		Assert(exp == res, "%d\n", 2000 - cycle);
 
 		cycle--;
 	}
