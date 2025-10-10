@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 	int r1;
 	char *r2;
 	char buf_str[1000];
-	int cycle = 5;
+	int cycle = 100;
 	bool success;
 	while(!feof(fp) && cycle) {
 		r1 = fscanf(fp, "%d", &res);	
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
 		
 		exp = expr(buf_str, &success);
 		
-		printf("exp=%d, res=%d", exp, res);
+		printf("exp=%d, res=%d\n", exp, res);
 
 
 		cycle--;
