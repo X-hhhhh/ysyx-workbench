@@ -204,7 +204,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 		return -1;
 	}else {
 		int par_num = 0;
-		int main_op_pos = 0;
+		int main_op_pos = -1;
 		for(int i = p; i <= q; i++) {
 			switch(tokens[i].type) {
 				case '(': 
@@ -229,6 +229,8 @@ static uint32_t eval(int p, int q, bool *valid) {
 				default: break;
 			}
 		}
+
+		if(main_op_pos == -1) {valid = false; return -1;}
 		
 		bool valid_t;
 		uint32_t val1 = eval(p, main_op_pos - 1, valid); 
