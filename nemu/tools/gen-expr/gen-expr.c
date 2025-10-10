@@ -50,13 +50,13 @@ static void gen_rand_expr(char *buf, int max_depth) {
 			sprintf(buf, "%d", rand() % 10 + 1);
 			break;
 		case 1:
-			char buf_t[500];
+			char buf_t[1000];
 			gen_rand_expr(buf_t, max_depth - 1);
 			sprintf(buf, "(%s)", buf_t);
 			break;
 		default:
-			char left[500];
-			char right[500];
+			char left[1000];
+			char right[1000];
 			char op = gen_operator();
 			
 			if(op == '+' || op == '*'){
