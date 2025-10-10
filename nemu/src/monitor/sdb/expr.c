@@ -226,11 +226,11 @@ static uint32_t eval(int p, int q, bool *valid) {
 						main_op_pos = i;
 					}
 					break;
-				default: continue;
+				default: break;
 			}
 		}
 
-		if(main_op_pos == -1) {valid = false; return -1;}
+		if(main_op_pos == -1) {*valid = false; return -1;}
 		
 		bool valid_t;
 		uint32_t val1 = eval(p, main_op_pos - 1, valid); 
@@ -243,7 +243,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 			case '*': return val1 * val2; break;
 			case '/': return val1 / val2; break;
 			default: 
-				  valid = false;
+				  *valid = false;
 				  return -1;
 		}
 	}
