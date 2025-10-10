@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 		r = fscanf(fp, "%d", &res);	
 		if(r != EOF) {}	
 		
-		r = fscanf(fp, "%s", buf_str);
+		r = fscanf(fp, "%s\n", buf_str);
 		
 		printf("%s", buf_str);
 		
