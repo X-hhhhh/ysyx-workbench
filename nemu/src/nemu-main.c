@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
-  	char str[32] = "--1";	
+  	char str[32] = "-1 + -1";	
   	bool success;
 
 	printf("str=%s\n", str);
