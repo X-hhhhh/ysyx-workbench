@@ -49,6 +49,7 @@ int main(int argc, char *argv[]) {
 	int cycle = 100;
 	char ch = fgetc(fp);
 	while(!feof(fp) && cycle) {
+		if(ch == ' ') {printf("\n");}
 		printf("%c", ch);
 		ch = fgetc(fp);
 		cycle--;
