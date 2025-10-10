@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_DEC_INT
+  TK_NOTYPE = 256, TK_EQ, TK_DEC_INT, TK_NEG
 
   /* TODO: Add more token types */
 
@@ -197,6 +197,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 		*valid = false;
 		return -1;		
 	}else if (p == q) {
+		
 		return atoi(tokens[p].str);
 	}else if(check_parentheses(p, q) == 0) {
 		return eval(p + 1, q - 1, valid);	
@@ -258,8 +259,16 @@ word_t expr(char *e, bool *success) {
 
   /* TODO: Insert codes to evaluate the expression. */
 
+  int i;
+  for(i = 0; i < nr_token; i++) {
+  	if(tokens[i].type == '-' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
+		tokens[i].type = TK_NEG;
+	}
+ }
   
-  for(int i = 0; i < nr_token; i++) {
+
+  
+  for(i = 0; i < nr_token; i++) {
   	printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
   }
 
