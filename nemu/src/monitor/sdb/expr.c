@@ -73,7 +73,7 @@ typedef struct token {
   char str[32];
 } Token;
 
-static Token tokens[32] __attribute__((used)) = {};
+static Token tokens[512] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -90,8 +90,9 @@ static bool make_token(char *e) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
-        Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
+        /*Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
             i, rules[i].regex, position, substr_len, substr_len, substr_start);
+		*/
 
         position += substr_len;
 
@@ -266,11 +267,11 @@ word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
     return 0;
-  }
+  }  
 
   /* TODO: Insert codes to evaluate the expression. */
 
-  int i;
+ /* int i;
   for(i = 0; i < nr_token; i++) {
   	if(tokens[i].type == '-' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
 		tokens[i].type = TK_NEG;
@@ -288,6 +289,18 @@ word_t expr(char *e, bool *success) {
 	bool valid;
 	printf("expr=%d", eval(0, nr_token - 1, &valid));
 	printf("valid=%d\n", valid);
+	*/
+
+
+	
+	bool valid;
+	return eval(0, nr_token - 1, &valid);
+	*success = valid;
+
+
+
+
+
 
 
   return 0;

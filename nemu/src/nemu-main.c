@@ -32,14 +32,40 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
-  	char str[32] = "-(-1 + ---1) * -3";	
-  	bool success;
+  	/* test
+	FILE * fp = fopen("tools/gen-expr/input", "r");
+	if(fp == NULL) {
+		printf("error opening file");
+		return 1;
+	}
 
-	printf("str=%s\n", str);
-	expr(str, &success);
+	int res;
+	int exp;
+	int r1;
+	char *r2;
+	char buf_str[1000];
+	int cycle = 2000;
+	bool success;
+	while(!feof(fp) && cycle) {
+		r1 = fscanf(fp, "%d", &res);	
+		if(r1 == EOF) {break;}	
+		
+		r2 = fgets(buf_str, 1000, fp);	
+		if(r2 == NULL) {break;}
 
+		buf_str[strcspn(buf_str, "\n")] = '\0';
+		
+		exp = expr(buf_str, &success);
+		
+		printf("exp=%d, res=%d\n", exp, res);
+		Assert(exp == res, "%d\n", 2000 - cycle);
 
+		cycle--;
+	}
 
+	fclose(fp);
+	fp = NULL;
+	*/
 
   /* Start engine. */
   engine_start();
