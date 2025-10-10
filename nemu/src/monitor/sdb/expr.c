@@ -266,11 +266,11 @@ word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
     return 0;
-  }
+  }  
 
   /* TODO: Insert codes to evaluate the expression. */
 
-  int i;
+ /* int i;
   for(i = 0; i < nr_token; i++) {
   	if(tokens[i].type == '-' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
 		tokens[i].type = TK_NEG;
@@ -288,6 +288,18 @@ word_t expr(char *e, bool *success) {
 	bool valid;
 	printf("expr=%d", eval(0, nr_token - 1, &valid));
 	printf("valid=%d\n", valid);
+	*/
+
+
+	
+	bool valid;
+	return eval(0, nr_token - 1, &valid);
+	*success = valid;
+
+
+
+
+
 
 
   return 0;

@@ -31,8 +31,52 @@ static char *code_format =
 "  return 0; "
 "}";
 
-static void gen_rand_expr() {
-  buf[0] = '\0';
+static char gen_operator() {
+	char operators[] = {'+', '-', '*', '/'};
+	return operators[rand() % 4];
+}
+
+static int gen_operand(int min, int max) {
+	return rand() % (max - min + 1) + min;	//generate num between min and max
+}
+
+static void gen_rand_expr(char *buf, int max_depth) {
+	if(max_depth <= 0) {
+		sprintf(buf, "%d", rand() % 10 + 1);
+		return;
+	}
+	switch(rand() % 10) {
+		case 0:
+			sprintf(buf, "%d", rand() % 10 + 1);
+			break;
+		case 1:
+			char buf_t[500];
+			gen_rand_expr(buf_t, max_depth - 1);
+			sprintf(buf, "(%s)", buf_t);
+			break;
+		default:
+			char left[500];
+			char right[500];
+			char op = gen_operator();
+			
+			if(op == '+' || op == '*'){
+				gen_rand_expr(left, max_depth - 1);
+				gen_rand_expr(right, max_depth - 1);
+				sprintf(buf, "%s %c %s", left, op, right);
+			}else if(op == '-'){
+				sprintf(left, "%d", gen_operand(10, 20));
+				sprintf(right, "%d", gen_operand(1, 9));
+				sprintf(buf, "(%s %c %s)", left, op, right);
+			}else {
+				sprintf(left, "%d", gen_operand(10, 20));
+				sprintf(right, "%d", gen_operand(1, 9));	
+				sprintf(buf, "(%s %c %s)", left, op, right);
+			}
+
+			break;
+	}
+
+	return;
 }
 
 int main(int argc, char *argv[]) {
@@ -44,7 +88,7 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
-    gen_rand_expr();
+    gen_rand_expr(buf, 15);
 
     sprintf(code_buf, code_format, buf);
 

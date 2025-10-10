@@ -32,13 +32,29 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
-  	char str[32] = "-(-1 + ---1) * -3";	
+  	/*char str[32] = "-(-1 + ---1) * -3";	
   	bool success;
 
 	printf("str=%s\n", str);
 	expr(str, &success);
+	*/
 
 
+	FILE * fp = fopen("", "r");
+	if(fp == NULL) {
+		printf("error opening file");
+		return 1;
+	}
+
+	int cycle = 100;
+	char ch = fgetc(fp);
+	while(!feof(fp) && cycle) {
+		printf("%c", ch);
+		cycle--;
+	}
+
+	fclose(fp);
+	fp = NULL;
 
 
   /* Start engine. */
