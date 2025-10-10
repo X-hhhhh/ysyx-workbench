@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_EQ, TK_DEC_INT, TK_NEG
 
   /* TODO: Add more token types */
 
@@ -39,6 +39,12 @@ static struct rule {
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
+  {"[0-9]+", TK_DEC_INT},
+  {"-", '-'},
+  {"\\*", '*'},
+  {"/", '/'},
+  {"\\(", '('},
+  {"\\)", ')'},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -94,9 +100,43 @@ static bool make_token(char *e) {
          * of tokens, some extra actions should be performed.
          */
 
+	// if substr is longer than 32 bytes, add code..
+
+
         switch (rules[i].token_type) {
-          default: TODO();
+		case '+':
+			tokens[nr_token].type = '+';
+			break;
+		case '-':
+			tokens[nr_token].type = '-';
+			break;
+		case TK_EQ:
+			tokens[nr_token].type = TK_EQ;
+			break;
+		case '*':
+			tokens[nr_token].type = '*';
+			break;
+		case '/':
+			tokens[nr_token].type = '/';
+			break;
+		case '(':
+			tokens[nr_token].type = '(';
+			break;
+		case ')':
+			tokens[nr_token].type = ')';
+			break;
+		case TK_DEC_INT:
+			tokens[nr_token].type = TK_DEC_INT;
+			strncpy(tokens[nr_token].str, substr_start, substr_len);	//record data values
+			tokens[nr_token].str[substr_len] = '\0';			//add '\0' to make sure it is a string
+			break;
+		default: 
+			break;
         }
+	
+	if(rules[i].token_type != TK_NOTYPE) {
+		nr_token++;
+	}
 
         break;
       }
@@ -111,6 +151,116 @@ static bool make_token(char *e) {
   return true;
 }
 
+static int check_parentheses(int p, int q) {
+	bool matched1 = false;
+	bool matched2 = false;
+	if(tokens[p].type == '(' && tokens[q].type == ')') {
+		matched1 = true;		//parentheses matched
+	}
+	
+	char stack[32];
+	int top = -1;
+	int first_par_exi = 1;
+
+	for(int i = p; i <= q; i++) {
+		if(tokens[i].type == '(') {
+			stack[++top] = '(';
+		}else if(tokens[i].type == ')') {
+			if(top != -1) {
+				char ch = stack[top];
+				if(ch == '(') {
+					if(i == q && first_par_exi == 1) {matched2 = true;}
+					if(top == 0) {
+						first_par_exi = 0;
+					}
+					top--;
+				}
+				else {return -1;}
+			}else {return -1;}
+		}
+	}
+
+	if(top == -1) {
+		if(matched1 == true && matched2 == true) {
+			return 0;	//matched and valid expression
+		}else {
+			return 1;	//not matched and valid expression
+		}
+	}else {
+		return -1;		//invalid expression
+	}
+}
+
+static uint32_t eval(int p, int q, bool *valid) {
+	*valid = true;
+	if(p > q) {
+		*valid = false;
+		return -1;		
+	}else if (p == q) {	
+		return atoi(tokens[p].str);
+	}else if(check_parentheses(p, q) == 0) {
+		return eval(p + 1, q - 1, valid);	
+	}else if(check_parentheses(p, q) == -1){
+		*valid = false;
+		return -1;
+	}else {
+		int par_num = 0;
+		int main_op_pos = -1;
+		
+		//search for the positon of main operation
+		for(int i = p; i <= q; i++) {
+			switch(tokens[i].type) {
+				case '(': 
+					par_num++;
+					break;
+				case ')':
+					par_num--;
+					break;
+				case '+':
+				case '-':
+					if(par_num == 0) {
+						main_op_pos = i;
+					}
+					break;
+				case '*':
+				case '/':
+					if(par_num == 0 && tokens[main_op_pos].type != '+' &&
+						tokens[main_op_pos].type != '-') {
+						main_op_pos = i;
+					}
+					break;
+				case TK_NEG:
+					if(main_op_pos == -1) {
+						main_op_pos = i;
+					}
+				default: break;
+			}
+		}
+
+		if(main_op_pos == -1) {*valid = false; return -1;}
+	
+		uint32_t val1 = 0;
+		uint32_t val2 = 0;
+
+		bool valid_t;
+		if(tokens[main_op_pos].type != TK_NEG) {
+			val1 = eval(p, main_op_pos - 1, valid);
+		}	
+		val2 = eval(main_op_pos + 1, q, &valid_t);
+		*valid = (*valid) ? valid_t : false;
+
+		switch(tokens[main_op_pos].type) {
+			case '+': return val1 + val2; break;
+			case '-': return val1 - val2; break;
+			case '*': return val1 * val2; break;
+			case '/': return val1 / val2; break;
+			case TK_NEG: return -val2; break;
+			default: 
+				  *valid = false;
+				  return -1;
+		}
+	}
+}
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -119,7 +269,26 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
+
+  int i;
+  for(i = 0; i < nr_token; i++) {
+  	if(tokens[i].type == '-' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
+		tokens[i].type = TK_NEG;
+	}
+ }
+  
+
+  
+  for(i = 0; i < nr_token; i++) {
+  	printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
+  }
+
+	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
+
+	bool valid;
+	printf("expr=%d", eval(0, nr_token - 1, &valid));
+	printf("valid=%d\n", valid);
+
 
   return 0;
 }

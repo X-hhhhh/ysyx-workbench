@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <memory/paddr.h>
 
 static int is_batch_mode = false;
 
@@ -47,12 +48,59 @@ static int cmd_c(char *args) {
   return 0;
 }
 
-
 static int cmd_q(char *args) {
+  //add next line
+  nemu_state.state = NEMU_QUIT;
   return -1;
 }
 
 static int cmd_help(char *args);
+
+static int cmd_si(char *args) {
+	if(args == NULL) {
+		cpu_exec(1);
+	}else {
+  		cpu_exec(atoi(args));
+	}
+	return 0;	
+}
+
+static int cmd_info(char *args) {
+	if(args == NULL) {
+		printf("cmd \"info\" needs an args\n");
+	}else if(strcmp(args, "r") == 0) {
+		isa_reg_display();	
+	}else if(strcmp(args, "w") == 0) {
+		//add code for watchpoints	
+	}
+	return 0;
+}
+
+static int cmd_x(char *args) {
+	char *arg = strtok(NULL, " ");
+	if(arg == NULL) {
+		printf("cmd \"x\" needs two args\n");
+	}else {
+		int n = atoi(arg);
+		arg = strtok(NULL, " ");
+		if(arg == NULL) {
+			printf("cmd \"x\" needs two args\n");
+		}else {
+			int paddr_b;
+			sscanf(arg, "%x", &paddr_b);
+			for(int i = 0; i < n; i++) {
+				int paddr = paddr_b + i * 4;
+				if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
+					printf("0x%x: 0x%x\n", paddr, paddr_read(paddr, 4));
+				}else {
+					printf("paddr:0x%x out of range [80000000, 87FFFFFF]\n", paddr);
+					break;
+				}
+			}
+		}
+	}
+	return 0;	
+}
 
 static struct {
   const char *name;
@@ -62,7 +110,9 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
+  { "si", "Execute n instructions, the default value of n is 1", cmd_si },
+  { "info", "Print program status, for registers(r), for watchpoints(w)", cmd_info },
+  { "x", "Scan memory", cmd_x },
   /* TODO: Add more commands */
 
 };

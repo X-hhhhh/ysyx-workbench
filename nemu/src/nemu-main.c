@@ -15,6 +15,10 @@
 
 #include <common.h>
 
+
+#include "monitor/sdb/sdb.h"
+
+
 void init_monitor(int, char *[]);
 void am_init_monitor();
 void engine_start();
@@ -27,6 +31,15 @@ int main(int argc, char *argv[]) {
 #else
   init_monitor(argc, argv);
 #endif
+
+  	char str[32] = "-(-1 + ---1) * -3";	
+  	bool success;
+
+	printf("str=%s\n", str);
+	expr(str, &success);
+
+
+
 
   /* Start engine. */
   engine_start();
