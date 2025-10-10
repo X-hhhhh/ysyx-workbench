@@ -48,17 +48,18 @@ int main(int argc, char *argv[]) {
 
 	int res;
 	int r;
-	char buf_str[200];
+	char *rr;
+	char buf_str[1000];
 	int cycle = 1;
 	//char ch;
 	while(!feof(fp) && cycle) {
 		r = fscanf(fp, "%d", &res);	
 		if(r != EOF) {}	
 		
-		r = fscanf(fp, "%s\n", buf_str);
-		
+		rr = fgets(buf_str, 1000, fp);	
+		if(rr != NULL) {}
+		buf_str[strcspn(buf_str, "\n")] = '\0';
 		printf("%s", buf_str);
-		
 
 
 		cycle--;
