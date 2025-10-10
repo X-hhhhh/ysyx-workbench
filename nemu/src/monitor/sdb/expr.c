@@ -226,7 +226,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 						main_op_pos = i;
 					}
 					break;
-				default: break;
+				default: continue;
 			}
 		}
 
