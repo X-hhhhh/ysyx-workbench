@@ -47,19 +47,24 @@ int main(int argc, char *argv[]) {
 	}
 
 	int res;
-	int r;
-	char *rr;
+	int exp;
+	int r1;
+	char *r2;
 	char buf_str[1000];
-	int cycle = 1;
-	//char ch;
+	int cycle = 5;
+	bool success;
 	while(!feof(fp) && cycle) {
-		r = fscanf(fp, "%d", &res);	
-		if(r != EOF) {}	
+		r1 = fscanf(fp, "%d", &res);	
+		if(r1 == EOF) {break;}	
 		
-		rr = fgets(buf_str, 1000, fp);	
-		if(rr != NULL) {}
+		r2 = fgets(buf_str, 1000, fp);	
+		if(r2 == NULL) {break;}
+
 		buf_str[strcspn(buf_str, "\n")] = '\0';
-		printf("%s", buf_str);
+		
+		exp = expr(buf_str, &success);
+		
+		printf("exp=%d, res=%d", exp, res);
 
 
 		cycle--;
