@@ -194,7 +194,8 @@ static int check_parentheses(int p, int q) {
 static uint32_t eval(int p, int q, bool *valid) {
 	*valid = true;
 	if(p > q) {
-		return 0;		
+		*valid = false;
+		return -1;		
 	}else if (p == q) {
 		return atoi(tokens[p].str);
 	}else if(check_parentheses(p, q) == 0) {
