@@ -46,6 +46,7 @@ static struct rule {
   {"/", '/'},
   {"\\(", '('},
   {"\\)", ')'},
+  {"\\$[A-Za-z]+"},
 };
 
 #define NR_REGEX ARRLEN(rules)
