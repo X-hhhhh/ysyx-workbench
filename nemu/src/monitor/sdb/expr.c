@@ -206,7 +206,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 	}else if (p == q) {	
 		if(tokens[p].type == TK_REG) {
 			return isa_reg_str2val(tokens[p].str, valid);
-		}else if(tokens[p].type == TK_DEC_INT || tokens[p].type == TK_HEX_INT) {
+		}else if(tokens[p].type == TK_DEC_INT) {
 			return atoi(tokens[p].str);
 		}else if(tokens[p].type == TK_HEX_INT) {
 			uint32_t val = 0;	
