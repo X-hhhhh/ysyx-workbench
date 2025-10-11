@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 
 	bool success;
 	char str[32] = "---1";
-	uint32_t exp = expr(str, &success);
+	int exp = expr(str, &success);
 	printf("exp=%u, success=%d", exp, success);
 
 
