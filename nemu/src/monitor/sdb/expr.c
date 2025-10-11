@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_DEC_INT, TK_NEG, TK_DEREF
+  TK_NOTYPE = 256, TK_EQ, TK_DEC_INT, TK_NEG, TK_DEREF, TK_HEX_INT, TK_REG, TK_NEQ, TK_AND
 
   /* TODO: Add more token types */
 
@@ -273,7 +273,8 @@ word_t expr(char *e, bool *success) {
 
   int i;
   for(i = 0; i < nr_token; i++) {
-  	if(tokens[i].type == '-' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
+  	if(tokens[i].type == '-' && (i == 0 || (tokens[i - 1].type != TK_DEC_INT && tokens[i - 1].type != TK_HEX_INT &&
+			tokens[i - 1].type != TK_REG && tokens[i - 1].type != ')' && tokens[i - 1].type != TK_DEREF))) {
 		tokens[i].type = TK_NEG;
 	}
 	if(tokens[i].type == '*' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
