@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 	*/
 
 	bool success;
-	char str[32] = "$ra $0 $s11 $";
+	char str[32] = "$ra $0 $s11";
 	int exp = expr(str, &success);
 	printf("exp=%d, success=%d", exp, success);
 
