@@ -208,6 +208,10 @@ static uint32_t eval(int p, int q, bool *valid) {
 			return isa_reg_str2val(tokens[p].str, valid);
 		}else if(tokens[p].type == TK_DEC_INT || tokens[p].type == TK_HEX_INT) {
 			return atoi(tokens[p].str);
+		}else if(tokens[p].type == TK_HEX_INT) {
+			uint32_t val = 0;
+			sscanf(tokens[p].str, "%x", &val);
+			return val;
 		}else {
 			*valid = false;
 			return -1;
