@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 	*/
 
 	bool success;
-	char str[32] = "---1";
+	char str[32] = "8**800";
 	int exp = expr(str, &success);
 	printf("exp=%d, success=%d", exp, success);
 
