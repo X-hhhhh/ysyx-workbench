@@ -136,6 +136,7 @@ static bool make_token(char *e) {
 			tokens[nr_token].type = TK_HEX_INT;
 			strncpy(tokens[nr_token].str, substr_start + 2, substr_len - 2);
 			tokens[nr_token].str[substr_len - 2] = '\0';
+			break;
 		default: 
 			break;
         }
