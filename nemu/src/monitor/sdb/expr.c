@@ -284,13 +284,14 @@ word_t expr(char *e, bool *success) {
 			tokens[i - 1].type != TK_REG && tokens[i - 1].type != ')' && tokens[i - 1].type != TK_DEREF))) {
 		tokens[i].type = TK_NEG;
 	}
-	if(tokens[i].type == '*' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
+	if(tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != TK_DEC_INT && tokens[i - 1].type != TK_HEX_INT && 
+			tokens[i - 1].type != TK_REG && tokens[i - 1].type != ')'))) {
 		tokens[i].type = TK_DEREF;
 	}
  }
   
 
- 	/* test 
+ 	 
   	for(i = 0; i < nr_token; i++) {
   		printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
   	}
@@ -298,18 +299,20 @@ word_t expr(char *e, bool *success) {
 	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
 
 	bool valid;
-	printf("expr=%d", eval(0, nr_token - 1, &valid));
+	word_t expr = eval(0, nr_token - 1, &valid);
+	printf("expr=%d", expr);
 	printf("valid=%d\n", valid);
-	*/
-
-
 	
+
+
+	/*	
 	bool valid;
 	word_t val;
 	val = eval(0, nr_token - 1, &valid);
 	*success = valid;
-	
-	return val;
+	*/
+
+	return expr;
 
 
 
