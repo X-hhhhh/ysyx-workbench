@@ -17,6 +17,8 @@
 
 
 #include "monitor/sdb/sdb.h"
+#include "isa.h"
+
 
 
 void init_monitor(int, char *[]);
@@ -66,6 +68,11 @@ int main(int argc, char *argv[]) {
 	fclose(fp);
 	fp = NULL;
 	*/
+
+  	bool success;
+	isa_reg_str2val("ra", &success);
+	
+
 
   /* Start engine. */
   engine_start();
