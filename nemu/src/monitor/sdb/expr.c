@@ -45,6 +45,7 @@ static struct rule {
   {"/", '/'},
   {"\\(", '('},
   {"\\)", ')'},
+  {"0x[0-9]+"},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -280,10 +281,13 @@ word_t expr(char *e, bool *success) {
 
   int i;
   for(i = 0; i < nr_token; i++) {
+	//identify the attribute of -
   	if(tokens[i].type == '-' && (i == 0 || (tokens[i - 1].type != TK_DEC_INT && tokens[i - 1].type != TK_HEX_INT &&
 			tokens[i - 1].type != TK_REG && tokens[i - 1].type != ')' && tokens[i - 1].type != TK_DEREF))) {
 		tokens[i].type = TK_NEG;
 	}
+
+	//identify the attribute of *
 	if(tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != TK_DEC_INT && tokens[i - 1].type != TK_HEX_INT && 
 			tokens[i - 1].type != TK_REG && tokens[i - 1].type != ')'))) {
 		tokens[i].type = TK_DEREF;
@@ -305,18 +309,5 @@ word_t expr(char *e, bool *success) {
 	
 
 
-	/*	
-	bool valid;
-	word_t val;
-	val = eval(0, nr_token - 1, &valid);
-	*success = valid;
-	*/
-
 	return expr;
-
-
-
-
-
-
 }
