@@ -69,9 +69,14 @@ int main(int argc, char *argv[]) {
 	fp = NULL;
 	*/
 
-  	bool success;
-	printf("%x\n", isa_reg_str2val("ra", &success));
-	
+	bool success;
+	char str[32] = "(4) - (3)";
+	uint32_t exp = expr(str, &success);
+	printf("exp=%u, success=%d", exp, success);
+
+
+
+
 
 
   /* Start engine. */

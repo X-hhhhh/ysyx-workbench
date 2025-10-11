@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_DEC_INT, TK_NEG
+  TK_NOTYPE = 256, TK_EQ, TK_DEC_INT, TK_NEG, TK_DEREF
 
   /* TODO: Add more token types */
 
@@ -271,18 +271,21 @@ word_t expr(char *e, bool *success) {
 
   /* TODO: Insert codes to evaluate the expression. */
 
- /* int i;
+  int i;
   for(i = 0; i < nr_token; i++) {
   	if(tokens[i].type == '-' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
 		tokens[i].type = TK_NEG;
 	}
+	if(tokens[i].type == '*' && (i == 0 || tokens[i - 1].type != TK_DEC_INT)) {
+		tokens[i].type = TK_DEREF;
+	}
  }
   
 
-  
-  for(i = 0; i < nr_token; i++) {
-  	printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
-  }
+ 	/* test 
+  	for(i = 0; i < nr_token; i++) {
+  		printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
+  	}
 
 	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
 
@@ -294,14 +297,15 @@ word_t expr(char *e, bool *success) {
 
 	
 	bool valid;
-	return eval(0, nr_token - 1, &valid);
+	word_t val;
+	val = eval(0, nr_token - 1, &valid);
 	*success = valid;
+	
+	return val;
 
 
 
 
 
 
-
-  return 0;
 }
