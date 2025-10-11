@@ -70,9 +70,11 @@ int main(int argc, char *argv[]) {
 	*/
 
   	cpu.gpr[1] = 1;
+  	cpu.gpr[2] = 1;
+  	cpu.gpr[3] = 1;
 
 	bool success;
-	char str[32] = "$t0 + $0 + $s11";
+	char str[32] = "$ra + $0 + $sp";
 	int exp = expr(str, &success);
 	printf("exp=%d, success=%d", exp, success);
 
