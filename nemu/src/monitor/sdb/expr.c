@@ -198,7 +198,14 @@ static uint32_t eval(int p, int q, bool *valid) {
 		*valid = false;
 		return -1;		
 	}else if (p == q) {	
-		return atoi(tokens[p].str);
+		if(tokens[p].type == TK_REG) {
+			return isa_reg_str2val(tokens[p].str, valid);
+		}else if(tokens[p].type == TK_DEC_INT || tokens[p].type == TK_HEX_INT) {
+			return atoi(tokens[p].str);
+		}else {
+			*valid = false;
+			return -1;
+		}
 	}else if(check_parentheses(p, q) == 0) {
 		return eval(p + 1, q - 1, valid);	
 	}else if(check_parentheses(p, q) == -1){
