@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 	*/
 
   	bool success;
-	isa_reg_str2val("ra", &success);
+	printf("%x\n", isa_reg_str2val("ra", &success));
 	
 
 
