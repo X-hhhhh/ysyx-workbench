@@ -69,7 +69,12 @@ int main(int argc, char *argv[]) {
 	fp = NULL;
 	*/
 
+  	cpu.gpr[1] = 1;
 
+	bool success;
+	char str[32] = "$t0 + $0 + $s11";
+	int exp = expr(str, &success);
+	printf("exp=%d, success=%d", exp, success);
 
 
 
@@ -77,10 +82,6 @@ int main(int argc, char *argv[]) {
 
   /* Start engine. */
   engine_start();
-	bool success;
-	char str[32] = "$t0 + $0 + $s11";
-	int exp = expr(str, &success);
-	printf("exp=%d, success=%d", exp, success);
 
   return is_exit_status_bad();
 }
