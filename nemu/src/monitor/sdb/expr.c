@@ -211,7 +211,6 @@ static uint32_t eval(int p, int q, bool *valid) {
 		}else if(tokens[p].type == TK_HEX_INT) {
 			uint32_t val = 0;	
 			sscanf(tokens[p].str, "%x", &val);
-			printf("%d", val);
 			return val;
 		}else {
 			*valid = false;
