@@ -46,7 +46,7 @@ static struct rule {
   {"/", '/'},
   {"\\(", '('},
   {"\\)", ')'},
-  {"\\$[A-Za-z]+"},
+  {"\\$[A-Za-z]+", TK_REG},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -138,6 +138,14 @@ static bool make_token(char *e) {
 			strncpy(tokens[nr_token].str, substr_start + 2, substr_len - 2);
 			tokens[nr_token].str[substr_len - 2] = '\0';
 			break;
+		case TK_REG:
+			tokens[nr_token].type = TK_REG;
+			if(strcmp(tokens[nr_token].str, "$0") == 0) {
+				strcpy(tokens[nr_token].str, "$0");
+			}else {
+				strncpy(tokens[nr_token].str, substr_start + 1, substr_len - 1);
+				tokens[nr_token].str[substr_len - 1] = '\0';
+			}
 		default: 
 			break;
         }
