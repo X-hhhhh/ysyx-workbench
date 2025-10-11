@@ -39,13 +39,13 @@ static struct rule {
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
+  {"^0x[0-9A-Fa-f]+$"},
   {"[0-9]+", TK_DEC_INT},
   {"-", '-'},
   {"\\*", '*'},
   {"/", '/'},
   {"\\(", '('},
   {"\\)", ')'},
-  {"^0x[0-9A-Fa-f]+$"},
 };
 
 #define NR_REGEX ARRLEN(rules)
