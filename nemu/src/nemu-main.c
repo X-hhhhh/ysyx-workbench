@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 	*/
 
 	bool success;
-	char str[32] = "0x800 + (2 + 0x2) ";
+	char str[32] = "0x800 + *0x30 -(2 - (0x90)) ";
 	int exp = expr(str, &success);
 	printf("exp=%d, success=%d", exp, success);
 
