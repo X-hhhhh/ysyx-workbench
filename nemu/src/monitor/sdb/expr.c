@@ -274,8 +274,10 @@ static uint32_t eval(int p, int q, bool *valid) {
 					}else {
 						if(compare_priority(tokens[i].type, tokens[main_op_pos].type) == 1) {
 							switch(tokens[i].type) {
-								case '+': case '-': case '*': case '/': case TK_EQ:
+								//combining from left to right
+								case '+': case '-': case '*': case '/': case TK_EQ: case TK_NEQ:
 									main_op_pos = i; break;
+								//combining from right to left
 								case TK_NEG: case TK_DEREF:
 									if(tokens[main_op_pos].type != TK_NEG && tokens[main_op_pos].type != TK_DEREF) {
 										main_op_pos = i;
@@ -335,7 +337,8 @@ static uint32_t eval(int p, int q, bool *valid) {
 			case '-': return val1 - val2; break;
 			case '*': return val1 * val2; break;
 			case '/': return val1 / val2; break;
-			case TK_EQ: return val1 == val2; break;
+			case TK_EQ: return val1 == val2; break;	
+			case TK_NEQ: return val1 != val2; break;
 			case TK_NEG: return -val2; break;
 			default: 
 				  *valid = false;
