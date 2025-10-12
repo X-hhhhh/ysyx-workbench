@@ -80,23 +80,25 @@ static int cmd_x(char *args) {
 	char *arg = strtok(NULL, " ");
 	if(arg == NULL) {
 		printf("cmd \"x\" needs two args\n");
-	}else {
-		int n = atoi(arg);
-		arg = strtok(NULL, " ");
-		if(arg == NULL) {
-			printf("cmd \"x\" needs two args\n");
+		return 1;
+	}
+
+	int n = atoi(arg);
+	arg = strtok(NULL, " ");
+	if(arg == NULL) {
+		printf("cmd \"x\" needs two args\n");
+		return 1;
+	}
+
+	int paddr_b;
+	sscanf(arg, "%x", &paddr_b);
+	for(int i = 0; i < n; i++) {
+		int paddr = paddr_b + i * 4;
+		if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
+			printf("0x%x: 0x%x\n", paddr, paddr_read(paddr, 4));
 		}else {
-			int paddr_b;
-			sscanf(arg, "%x", &paddr_b);
-			for(int i = 0; i < n; i++) {
-				int paddr = paddr_b + i * 4;
-				if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
-					printf("0x%x: 0x%x\n", paddr, paddr_read(paddr, 4));
-				}else {
-					printf("paddr:0x%x out of range [80000000, 87FFFFFF]\n", paddr);
-					break;
-				}
-			}
+			printf("paddr:0x%x out of range [80000000, 87FFFFFF]\n", paddr);
+			break;
 		}
 	}
 	return 0;	
