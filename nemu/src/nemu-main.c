@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
   	cpu.gpr[2] = 2;
 
 	bool success;
-	char str[32] = "--- 1";
+	char str[32] = "($ra + 1 * ($)) ";
 	int exp = expr(str, &success);
 	printf("exp=%d, success=%d", exp, success);
 
