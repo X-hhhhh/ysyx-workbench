@@ -47,6 +47,7 @@ static struct rule {
   {"\\(", '('},
   {"\\)", ')'},
   {"\\$[0-9A-Za-z]+", TK_REG},
+
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -204,6 +205,35 @@ static int check_parentheses(int p, int q) {
 	}
 }
 
+static int get_op_priority(int op) {
+	switch(op) {
+		case TK_NEG: case TK_DEREF:
+			return 2;
+		case '*': case '/':
+			return 3;
+		case '+': case '-':
+			return 4;
+		case TK_EQ: case TK_NEQ:
+			return 7;
+		case TK_AND:
+			return 11;
+		default:
+			return -1;
+	}
+}
+
+static int compare_priority(int op1, int op2) {
+	int op1_priority = get_op_priority(op1);
+	int op2_priority = get_op_priority(op2);
+
+	//if the op is invalid ,return -1
+	if(op1 == -1 || op2 == -1) {return -1;}
+
+	//if the priority of op1 is lower than op2 or equal to op2, return 1
+	if(op1_priority <= op2_priority) {return 1;}
+	else {return 0;}	
+}
+
 static uint32_t eval(int p, int q, bool *valid) {
 	*valid = true;
 	if(p > q) {
@@ -233,7 +263,34 @@ static uint32_t eval(int p, int q, bool *valid) {
 		
 		//search for the positon of main operation
 		for(int i = p; i <= q; i++) {
-			switch(tokens[i].type) {
+			if(tokens[i].type == '(') {
+				par_num++;
+			}else if(tokens[i].type == ')') {
+				par_num--;
+			}else if(par_num == 0){
+				if(get_op_priority(tokens[i].type) != -1) {	//if it is an operator
+					if (main_op_pos == -1) {
+						main_op_pos = i;
+					}else {
+						if(compare_priority(tokens[i].type, tokens[main_op_pos].type) == 1) {
+							switch(tokens[i].type) {
+								case '+': case '-': case '*': case '/':
+									main_op_pos = i; break;
+								case TK_NEG: case TK_DEREF:
+									if(tokens[main_op_pos].type != TK_NEG && tokens[main_op_pos].type != TK_DEREF) {
+										main_op_pos = i;
+									}
+									break;
+								default: break;
+							}
+						}
+					}
+				}
+			}
+
+
+
+			/*switch(tokens[i].type) {
 				case '(': 
 					par_num++;
 					break;
@@ -258,7 +315,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 						main_op_pos = i;
 					}
 				default: break;
-			}
+			}*/
 		}
 
 		if(main_op_pos == -1) {*valid = false; return -1;}
@@ -318,11 +375,11 @@ word_t expr(char *e, bool *success) {
 	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
 
 	bool valid;
-	word_t expr = eval(0, nr_token - 1, &valid);
-	printf("expr=%d", expr);
+	word_t exp = eval(0, nr_token - 1, &valid);
+	printf("exp=%d", exp);
 	printf("valid=%d\n", valid);
 	
 
 
-	return expr;
+	return exp;
 }
