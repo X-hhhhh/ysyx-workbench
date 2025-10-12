@@ -102,27 +102,27 @@ void test() {
 	init_wp_pool();
 	print_node(free_);
 
-	new_wp();
+	WP *wp1 = new_wp();
 	print_node(head);
 	print_node(free_);
 
-	new_wp();
+	WP *wp2 = new_wp();
 	print_node(head);
 	print_node(free_);
 
-	WP *wp = new_wp();
+	WP *wp3 = new_wp();
 	print_node(head);
 	print_node(free_);
 
-	free_wp(wp);
+	free_wp(wp3);
 	print_node(head);
 	print_node(free_);
 	
-	free_wp(wp);
+	free_wp(wp1);
 	print_node(head);
 	print_node(free_);
 
-	free_wp(wp);
+	free_wp(wp2);
 	print_node(head);
 	print_node(free_);
 }
