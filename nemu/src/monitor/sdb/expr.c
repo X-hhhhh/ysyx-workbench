@@ -294,7 +294,15 @@ static uint32_t eval(int p, int q, bool *valid) {
 			case TK_NEQ: return val1 != val2; break;
 			case TK_NEG: return -val2; break;
 			case TK_AND: return val1 && val2; break;
-			case TK_DEREF: return paddr_read(val2, 4);
+			case TK_DEREF: 
+				     if(val2 >= 0x80000000 && val2 <= 0x87FFFFFF) {
+				     	return paddr_read(val2, 4);
+				     }else {
+					printf("paddr is out of range[80000000, 87FFFFFF]");
+					*valid = false;
+					return -1;
+				     }
+				     break;
 			default: 
 				  *valid = false;
 				  return -1;
