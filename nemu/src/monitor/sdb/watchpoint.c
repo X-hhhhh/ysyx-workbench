@@ -118,6 +118,13 @@ void test() {
 	print_node(head);
 	print_node(free_);
 	
+	free_wp(wp);
+	print_node(head);
+	print_node(free_);
+
+	free_wp(wp);
+	print_node(head);
+	print_node(free_);
 }
 
 
