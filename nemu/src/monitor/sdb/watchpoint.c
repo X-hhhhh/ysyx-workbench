@@ -94,13 +94,16 @@ void print_node(WP *w) {
 		printf("0x%p->", node);
 		node = node -> next;
 	}
+	printf("\n");
 }
 
 void test() {
 	init_wp_pool();
 	print_node(free_);
-	printf("\n");
 
+	new_wp();
+	print_node(head);
+	print_node(free_);
 }
 
 
