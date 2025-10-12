@@ -53,9 +53,10 @@ WP* new_wp() {
 		return head;
 	}
 
+	WP *new_w = free_;
+
 	free_ = free_ -> next;
 	
-	WP *new_w = free_;
 	new_w -> next = head;
 	new_w -> enabled = true;
 	head = new_w;
