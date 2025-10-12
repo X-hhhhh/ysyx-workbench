@@ -267,7 +267,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 				par_num++;
 			}else if(tokens[i].type == ')') {
 				par_num--;
-			}else if(par_num == 0){
+			}else if(par_num == 0) {
 				if(get_op_priority(tokens[i].type) != -1) {	//if it is an operator
 					if (main_op_pos == -1) {
 						main_op_pos = i;
