@@ -334,13 +334,13 @@ word_t expr(char *e, bool *success) {
  }
   
 
- 	 
-  /*	for(i = 0; i < nr_token; i++) {
+ 	/* test 
+  	for(i = 0; i < nr_token; i++) {
   		printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
-  	}*/
+  	}
 
 	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
-
+	*/
 
 
 

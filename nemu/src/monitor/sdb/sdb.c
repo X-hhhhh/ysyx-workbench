@@ -104,6 +104,20 @@ static int cmd_x(char *args) {
 	return 0;	
 }
 
+static int cmd_p(char *args) {
+	if(args == NULL) {
+		printf("cmd \"p\" needs an expression\n");
+		return 1;
+	}
+	bool success;
+	word_t exp = expr(args, &success);
+	if(success == false) {
+		printf("There are errors in the expression\n");
+		return 1;
+	}
+	return exp;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -115,6 +129,7 @@ static struct {
   { "si", "Execute n instructions, the default value of n is 1", cmd_si },
   { "info", "Print program status, for registers(r), for watchpoints(w)", cmd_info },
   { "x", "Scan memory", cmd_x },
+  { "p", "Evaluate expressions", cmd_p},
   /* TODO: Add more commands */
 
 };
