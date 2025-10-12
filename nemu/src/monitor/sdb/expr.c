@@ -109,31 +109,7 @@ static bool make_token(char *e) {
 
 
         switch (rules[i].token_type) {
-		/*case '+':
-			tokens[nr_token].type = '+';
-			break;
-		case '-':
-			tokens[nr_token].type = '-';
-			break;
-		case TK_EQ:
-			tokens[nr_token].type = TK_EQ;
-			break;
-		case TK_NEQ:
-			tokens[nr_token].type = TK_NEQ;
-			break;
-		case '*':
-			tokens[nr_token].type = '*';
-			break;
-		case '/':
-			tokens[nr_token].type = '/';
-			break;
-		case '(':
-			tokens[nr_token].type = '(';
-			break;
-		case ')':
-			tokens[nr_token].type = ')';
-			break;*/
-		case '+': case '-': case '*': case '/': case '(': case ')': case TK_EQ: case TK_NEQ:
+		case '+': case '-': case '*': case '/': case '(': case ')': case TK_EQ: case TK_NEQ: case TK_AND:
 			tokens[nr_token].type = rules[i].token_type;
 			break;
 		case TK_DEC_INT:
@@ -282,7 +258,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 						if(compare_priority(tokens[i].type, tokens[main_op_pos].type) == 1) {
 							switch(tokens[i].type) {
 								//combining from left to right
-								case '+': case '-': case '*': case '/': case TK_EQ: case TK_NEQ:
+								case '+': case '-': case '*': case '/': case TK_EQ: case TK_NEQ: case TK_AND:
 									main_op_pos = i; break;
 								//combining from right to left
 								case TK_NEG: case TK_DEREF:
@@ -347,6 +323,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 			case TK_EQ: return val1 == val2; break;	
 			case TK_NEQ: return val1 != val2; break;
 			case TK_NEG: return -val2; break;
+			case TK_AND: return val1 && val2; break;
 			default: 
 				  *valid = false;
 				  return -1;
