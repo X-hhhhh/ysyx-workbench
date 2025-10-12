@@ -230,7 +230,7 @@ static int compare_priority(int op1, int op2) {
 	if(op1 == -1 || op2 == -1) {return -1;}
 
 	//if the priority of op1 is lower than op2 or equal to op2, return 1
-	if(op1_priority <= op2_priority) {return 1;}
+	if(op1_priority >= op2_priority) {return 1;}
 	else {return 0;}	
 }
 
