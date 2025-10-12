@@ -255,53 +255,22 @@ static uint32_t eval(int p, int q, bool *valid) {
 				if(get_op_priority(tokens[i].type) != -1) {	//if it is an operator
 					if (main_op_pos == -1) {
 						main_op_pos = i;
-					}else {
-						if(compare_priority(tokens[i].type, tokens[main_op_pos].type) == 1) {
-							switch(tokens[i].type) {
-								//combining from left to right
-								case '+': case '-': case '*': case '/': case TK_EQ: case TK_NEQ: case TK_AND:
-									main_op_pos = i; break;
-								//combining from right to left
-								case TK_NEG: case TK_DEREF:
-									if(tokens[main_op_pos].type != TK_NEG && tokens[main_op_pos].type != TK_DEREF) {
-										main_op_pos = i;
-									}
-									break;
-								default: break;
-							}
+					}else if(compare_priority(tokens[i].type, tokens[main_op_pos].type) == 1) {
+						switch(tokens[i].type) {
+							//combining from left to right
+							case '+': case '-': case '*': case '/': case TK_EQ: case TK_NEQ: case TK_AND:
+								main_op_pos = i; break;
+							//combining from right to left
+							case TK_NEG: case TK_DEREF:
+								if(tokens[main_op_pos].type != TK_NEG && tokens[main_op_pos].type != TK_DEREF) {
+									main_op_pos = i;
+								}
+								break;
+							default: break;
 						}
 					}
 				}
 			}
-
-
-
-			/*switch(tokens[i].type) {
-				case '(': 
-					par_num++;
-					break;
-				case ')':
-					par_num--;
-					break;
-				case '+':
-				case '-':
-					if(par_num == 0) {
-						main_op_pos = i;
-					}
-					break;
-				case '*':
-				case '/':
-					if(par_num == 0 && tokens[main_op_pos].type != '+' &&
-						tokens[main_op_pos].type != '-') {
-						main_op_pos = i;
-					}
-					break;
-				case TK_NEG:
-					if(main_op_pos == -1) {
-						main_op_pos = i;
-					}
-				default: break;
-			}*/
 		}
 
 		if(main_op_pos == -1) {*valid = false; return -1;}
