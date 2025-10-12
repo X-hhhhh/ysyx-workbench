@@ -89,6 +89,7 @@ void free_wp(WP* wp) {
 }
 
 void test() {
+	init_wp_pool();
 	WP * node = free_;
 	while(node != NULL) {
 		printf("0x%p -> ", node);
