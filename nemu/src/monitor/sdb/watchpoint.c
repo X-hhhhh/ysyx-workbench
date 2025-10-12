@@ -71,22 +71,22 @@ void free_wp(WP* wp) {
 		wp -> next = free_;
 		wp -> enabled = false;
 		free_ = wp;
+	}else {
+		WP *node = head;
+		WP *free_node;
+
+		//search for the node before wp
+		while(node -> next != wp) {
+			node = node -> next;
+		}
+		free_node = node -> next;
+
+		node -> next = wp -> next;
+
+		free_node -> next = free_;
+		free_node -> enabled = false;
+		free_ = free_node;
 	}
-	
-	WP *node = head;
-	WP *free_node;
-
-	//search for the node before wp
-	while(node -> next != wp) {
-		node = node -> next;
-	}
-	free_node = node -> next;
-
-	node -> next = wp -> next;
-
-	free_node -> next = free_;
-	free_node -> enabled = false;
-	free_ = free_node;
 }
 
 void print_node(WP *w) {
