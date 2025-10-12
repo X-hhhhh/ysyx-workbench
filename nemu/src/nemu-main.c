@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
-  	/* test
+  	
 	FILE * fp = fopen("tools/gen-expr/input", "r");
 	if(fp == NULL) {
 		printf("error opening file");
@@ -65,10 +65,12 @@ int main(int argc, char *argv[]) {
 		cycle--;
 	}
 
+
 	fclose(fp);
 	fp = NULL;
-	*/
+	
 
+  	/*
   	cpu.gpr[1] = 1;
   	cpu.gpr[2] = 2;
 
@@ -76,7 +78,7 @@ int main(int argc, char *argv[]) {
 	char str[32] = "($ra) + -$0 + $sp * $ra";
 	int exp = expr(str, &success);
 	printf("exp=%d, success=%d", exp, success);
-
+	*/
 
 
 
