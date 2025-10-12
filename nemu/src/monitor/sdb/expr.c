@@ -298,7 +298,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 				     if(val2 >= 0x80000000 && val2 <= 0x87FFFFFF) {
 				     	return paddr_read(val2, 4);
 				     }else {
-					printf("paddr is out of range[80000000, 87FFFFFF]");
+					printf("deref(*) operator is out of range[80000000, 87FFFFFF]\n");
 					*valid = false;
 					return -1;
 				     }
