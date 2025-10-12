@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 
 	bool success;
 	//char str[64] = "($ra + 3 * ($sp) - --2 /2 + 0xA) ";
-	char str[64] = "(2 * 3 == 2 + 4 +3)";
+	char str[64] = "(2 * 3 == 2 * $sp + $sp )";
 	int exp = expr(str, &success);
 	printf("exp=%d, success=%d", exp, success);
 
