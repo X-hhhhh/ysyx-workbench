@@ -368,16 +368,14 @@ word_t expr(char *e, bool *success) {
   
 
  	 
-  	for(i = 0; i < nr_token; i++) {
+  /*	for(i = 0; i < nr_token; i++) {
   		printf("tokens[%d].type=%d, str=%s\n", i, tokens[i].type, tokens[i].str);
-  	}
+  	}*/
 
 	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
 
 	bool valid;
 	word_t exp = eval(0, nr_token - 1, &valid);
-	printf("exp=%d", exp);
-	printf("valid=%d\n", valid);
 	
 
 
