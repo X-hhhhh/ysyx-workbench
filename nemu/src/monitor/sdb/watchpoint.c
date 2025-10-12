@@ -93,6 +93,7 @@ void test() {
 	WP * node = free_;
 	while(node != NULL) {
 		printf("0x%p -> ", node);
+		node = node -> next;
 	}
 	printf("\n");
 
