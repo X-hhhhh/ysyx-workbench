@@ -88,13 +88,17 @@ void free_wp(WP* wp) {
 	free_ = free_node;
 }
 
-void test() {
-	init_wp_pool();
-	WP * node = free_;
+void print_node(WP *w) {
+	WP *node = w;
 	while(node != NULL) {
-		printf("0x%p -> ", node);
+		printf("0x%p->", node);
 		node = node -> next;
 	}
+}
+
+void test() {
+	init_wp_pool();
+	print_node(free_);
 	printf("\n");
 
 }
