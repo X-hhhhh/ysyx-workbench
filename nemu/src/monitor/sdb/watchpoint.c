@@ -19,6 +19,7 @@
 
 typedef struct watchpoint {
   int NO;
+  bool enabled;
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
@@ -32,13 +33,14 @@ void init_wp_pool() {
   int i;
   for (i = 0; i < NR_WP; i ++) {
     wp_pool[i].NO = i;
+    wp_pool[i].enabled = false;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
 
   head = NULL;
   free_ = wp_pool;
 }
-/*
+
 WP* new_wp() {
 	if(free_ == NULL) {
 		return NULL;
@@ -46,37 +48,54 @@ WP* new_wp() {
 	if(head == NULL) {
 		head = free_;
 		free_ = free_ -> next;
+		head -> next = NULL;
+		head -> enabled = true;
 		return head;
 	}
 
-	WP *new_w = head;
+	free_ = free_ -> next;
 	
-	//
-	while(new_w -> next != NULL) {
-		new_w = new_w -> next;
-	}
+	WP *new_w = free_;
+	new_w -> next = head;
+	new_w -> enabled = true;
+	head = new_w;
 
-	
-
-} */
-
-void free_wp(WP* wp) {
-	
+	return new_w;
 }
 
+void free_wp(WP* wp) {
+	if(wp == NULL || wp -> enabled == false) {return;}
+	if(wp == head) {
+		head = head -> next;
+		wp -> next = free_;
+		wp -> enabled = false;
+		free_ = wp;
+	}
+	
+	WP *node = head;
+	WP *free_node;
 
+	//search for the node before wp
+	while(node -> next != wp) {
+		node = node -> next;
+	}
+	free_node = node -> next;
 
+	node -> next = wp -> next;
 
+	free_node -> next = free_;
+	free_node -> enabled = false;
+	free_ = free_node;
+}
 
+void test() {
+	WP * node = free_;
+	while(node != NULL) {
+		printf("0x%p -> ", node);
+	}
+	printf("\n");
 
-
-
-
-
-
-
-
-
+}
 
 
 /* TODO: Implement the functionality of watchpoint */

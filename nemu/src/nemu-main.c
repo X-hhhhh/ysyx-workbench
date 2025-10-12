@@ -80,6 +80,15 @@ int main(int argc, char *argv[]) {
 	*/
 
 
+	test();
+
+
+
+
+
+
+
+
 
 
   /* Start engine. */
