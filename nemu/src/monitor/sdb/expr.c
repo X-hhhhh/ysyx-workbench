@@ -341,10 +341,12 @@ word_t expr(char *e, bool *success) {
 
 	printf("check_parentheses=%d\n", check_parentheses(0, nr_token - 1));
 
+
+
+
 	bool valid;
 	word_t exp = eval(0, nr_token - 1, &valid);
 	*success = valid;	
-
 
 	return exp;
 }
