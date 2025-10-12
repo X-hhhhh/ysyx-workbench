@@ -113,9 +113,8 @@ void test() {
 	WP *wp = new_wp();
 	print_node(head);
 	print_node(free_);
-	printf("%p\n", wp);
 
-	//free_wp(wp);
+	free_wp(wp);
 	print_node(head);
 	print_node(free_);
 	
