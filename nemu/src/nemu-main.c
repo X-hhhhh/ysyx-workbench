@@ -71,8 +71,8 @@ int main(int argc, char *argv[]) {
   	cpu.gpr[2] = 2;
 
 	bool success;
-	char str[64] = "($ra + 3 * ($sp) - --2 /2 + 0xA) ";
-	//char str[64] = "*80000000";
+	//char str[64] = "($ra + 3 * ($sp) - --2 /2 + 0xA) ";
+	char str[64] = "*80000000";
 	int exp = expr(str, &success);
 	printf("exp=%x, success=%d", exp, success);
 
