@@ -48,6 +48,7 @@ static struct rule {
   {"\\)", ')'},
   {"\\$[0-9A-Za-z]+", TK_REG},
   {"!=", TK_NEQ},
+  {"&&", TK_AND},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -108,7 +109,7 @@ static bool make_token(char *e) {
 
 
         switch (rules[i].token_type) {
-		case '+':
+		/*case '+':
 			tokens[nr_token].type = '+';
 			break;
 		case '-':
@@ -131,6 +132,9 @@ static bool make_token(char *e) {
 			break;
 		case ')':
 			tokens[nr_token].type = ')';
+			break;*/
+		case '+': case '-': case '*': case '/': case '(': case ')': case TK_EQ: case TK_NEQ:
+			tokens[nr_token].type = rules[i].token_type;
 			break;
 		case TK_DEC_INT:
 			tokens[nr_token].type = TK_DEC_INT;
