@@ -376,7 +376,7 @@ word_t expr(char *e, bool *success) {
 
 	bool valid;
 	word_t exp = eval(0, nr_token - 1, &valid);
-	
+	*success = valid;	
 
 
 	return exp;
