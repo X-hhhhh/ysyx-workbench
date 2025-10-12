@@ -335,6 +335,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 			case '-': return val1 - val2; break;
 			case '*': return val1 * val2; break;
 			case '/': return val1 / val2; break;
+			case TK_EQ: return val1 == val2; break;
 			case TK_NEG: return -val2; break;
 			default: 
 				  *valid = false;
