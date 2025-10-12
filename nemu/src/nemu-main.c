@@ -14,12 +14,8 @@
 ***************************************************************************************/
 
 #include <common.h>
-
-
 #include "monitor/sdb/sdb.h"
 #include "isa.h"
-
-
 
 void init_monitor(int, char *[]);
 void am_init_monitor();
@@ -76,7 +72,7 @@ int main(int argc, char *argv[]) {
 
 	bool success;
 	//char str[64] = "($ra + 3 * ($sp) - --2 /2 + 0xA) ";
-	char str[64] = "-1 == -1 && 1 == 2 != 0";
+	char str[64] = "*0x80000000";
 	int exp = expr(str, &success);
 	printf("exp=%d, success=%d", exp, success);
 

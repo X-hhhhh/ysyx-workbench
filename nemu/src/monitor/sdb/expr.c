@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include <isa.h>
+#include <memory/paddr.h>
 
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
@@ -309,7 +310,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 		uint32_t val2 = 0;
 
 		bool valid_t;
-		if(tokens[main_op_pos].type != TK_NEG) {
+		if(tokens[main_op_pos].type != TK_NEG && tokens[main_op_pos].type != TK_DEREF) {
 			val1 = eval(p, main_op_pos - 1, valid);
 		}	
 		val2 = eval(main_op_pos + 1, q, &valid_t);
@@ -324,6 +325,7 @@ static uint32_t eval(int p, int q, bool *valid) {
 			case TK_NEQ: return val1 != val2; break;
 			case TK_NEG: return -val2; break;
 			case TK_AND: return val1 && val2; break;
+			case TK_DEREF: return paddr_read(val2, 4);
 			default: 
 				  *valid = false;
 				  return -1;
