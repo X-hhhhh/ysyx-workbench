@@ -41,14 +41,14 @@ int main(int argc, char *argv[]) {
 	int exp;
 	int r1;
 	char *r2;
-	char buf_str[1000];
+	char buf_str[2000];
 	int cycle = 2000;
 	bool success;
 	while(!feof(fp) && cycle) {
 		r1 = fscanf(fp, "%d", &res);	
 		if(r1 == EOF) {break;}	
 		
-		r2 = fgets(buf_str, 1000, fp);	
+		r2 = fgets(buf_str, 2000, fp);	
 		if(r2 == NULL) {break;}
 
 		buf_str[strcspn(buf_str, "\n")] = '\0';
