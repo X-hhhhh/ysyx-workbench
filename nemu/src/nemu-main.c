@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	//char str[64] = "($ra + 3 * ($sp) - --2 /2 + 0xA) ";
 	char str[64] = "*0x80000000";
 	int exp = expr(str, &success);
-	printf("exp=%d, success=%d", exp, success);
+	printf("exp=%x, success=%d", exp, success);
 
 
 
