@@ -115,7 +115,8 @@ static int cmd_p(char *args) {
 		printf("There are errors in the expression\n");
 		return 1;
 	}
-	return exp;
+	printf("=%d\n", exp);
+	return 0;
 }
 
 static struct {
