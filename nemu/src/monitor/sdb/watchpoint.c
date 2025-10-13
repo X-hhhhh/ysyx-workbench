@@ -74,6 +74,7 @@ void free_wp(int NO) {
 		wp = wp -> next;
 	}
 
+	//watchpoint NO isn't exist
 	if(wp == NULL) {return;}
 
 	if(wp == head) {
