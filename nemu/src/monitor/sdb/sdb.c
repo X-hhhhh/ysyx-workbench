@@ -67,7 +67,7 @@ static int cmd_si(char *args) {
 
 static int cmd_info(char *args) {
 	if(args == NULL) {
-		printf("cmd \"info\" needs an args\n");
+		printf("cmd \"info\" needs an argument\n");
 	}else if(strcmp(args, "r") == 0) {
 		isa_reg_display();	
 	}else if(strcmp(args, "w") == 0) {
@@ -79,17 +79,22 @@ static int cmd_info(char *args) {
 static int cmd_x(char *args) {
 	char *arg = strtok(NULL, " ");
 	if(arg == NULL) {
-		printf("cmd \"x\" needs two args\n");
+		printf("cmd \"x\" needs two arguments\n");
 		return 1;
 	}
 
 	int n = atoi(arg);
-	arg = strtok(NULL, " ");
-	if(arg == NULL) {
-		printf("cmd \"x\" needs two args\n");
+	if(n == 0) {
+		printf("The first argument must be an integer\n");
 		return 1;
 	}
-
+	arg = strtok(NULL, " ");
+	if(arg == NULL) {
+		printf("cmd \"x\" needs two arguments\n");
+		return 1;
+	}
+	
+	//expr
 	int paddr_b;
 	sscanf(arg, "%x", &paddr_b);
 	for(int i = 0; i < n; i++) {
@@ -140,6 +145,21 @@ static int cmd_w(char *args) {
 	return 0;
 }
 
+static int cmd_d(char *args) {
+	if(args == NULL) {
+		printf("cmd \"d\" needs an argument\n");
+		return 1;
+	}
+
+	int NO = atoi(args);
+	if(NO == 0 && args[0] != '0') {
+		printf("cmd \"d\" needs an integer");
+		return 1;
+	}
+	free_wp(NO);
+	return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -153,6 +173,7 @@ static struct {
   { "x", "Scan memory", cmd_x },
   { "p", "Evaluate expressions", cmd_p},
   { "w", "Set up a watchpoint", cmd_w},
+  { "d", "Delete a watchpoint", cmd_d},
   /* TODO: Add more commands */
 
 };
