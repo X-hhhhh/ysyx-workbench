@@ -45,6 +45,7 @@ int new_wp(char *expr) {
 	if(free_ == NULL) {
 		return -1;
 	}
+
 	if(head == NULL) {
 		head = free_;
 		free_ = free_ -> next;
@@ -101,49 +102,6 @@ void test() {
 	init_wp_pool();
 	print_node(free_);
 
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
-	new_wp("1");
 	new_wp("1");
 	print_node(head);
 	print_node(free_);
