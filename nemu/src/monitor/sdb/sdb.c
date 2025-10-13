@@ -94,9 +94,12 @@ static int cmd_x(char *args) {
 		return 1;
 	}
 	
-	//expr
-	int paddr_b;
-	sscanf(arg, "%x", &paddr_b);
+	bool success;
+	word_t paddr_b = expr(arg, &success);
+	if(success == false) {
+		printf("There are errors in the expression");
+		return 1;
+	}
 	for(int i = 0; i < n; i++) {
 		int paddr = paddr_b + i * 4;
 		if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
@@ -154,7 +157,7 @@ static int cmd_d(char *args) {
 
 	int NO = atoi(args);
 	if(NO == 0 && args[0] != '0') {
-		printf("cmd \"d\" needs an integer");
+		printf("cmd \"d\" needs an integer\n");
 		return 1;
 	}
 	free_wp(NO);
