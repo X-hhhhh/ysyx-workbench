@@ -20,6 +20,9 @@
 
 word_t expr(char *e, bool *success);
 
+int new_wp(char *expr);
+void free_wp(int NO);
+
 void test();
 
 #endif

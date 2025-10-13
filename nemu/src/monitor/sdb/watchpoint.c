@@ -19,7 +19,6 @@
 
 typedef struct watchpoint {
   int NO;
-  bool enabled;
   char *expr;
   struct watchpoint *next;
 
@@ -34,7 +33,6 @@ void init_wp_pool() {
   int i;
   for (i = 0; i < NR_WP; i ++) {
     wp_pool[i].NO = i;
-    wp_pool[i].enabled = false;
     wp_pool[i].expr = NULL;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
@@ -43,16 +41,16 @@ void init_wp_pool() {
   free_ = wp_pool;
 }
 
-WP* new_wp() {
+int new_wp(char *expr) {
 	if(free_ == NULL) {
-		return NULL;
+		return -1;
 	}
 	if(head == NULL) {
 		head = free_;
 		free_ = free_ -> next;
 		head -> next = NULL;
-		head -> enabled = true;
-		return head;
+		head -> expr = expr;
+		return head -> NO;
 	}
 
 	WP *new_w = free_;
@@ -60,34 +58,32 @@ WP* new_wp() {
 	free_ = free_ -> next;
 	
 	new_w -> next = head;
-	new_w -> enabled = true;
+	new_w -> expr = expr;
 	head = new_w;
 
-	return new_w;
+	return new_w -> NO;
 }
 
-void free_wp(WP* wp) {
-	if(wp == NULL || wp -> enabled == false) {return;}
+void free_wp(int NO) {
+	if(NO < 0 || NO >= NR_WP) {return;}
+	
+	WP *wp = head;
+	WP *node = NULL;	//node before wp
+	while(wp -> NO != NO && wp != NULL) {
+		node = wp;
+		wp = wp -> next;
+	}
+
+	if(wp == NULL) {return;}
+
 	if(wp == head) {
 		head = head -> next;
 		wp -> next = free_;
-		wp -> enabled = false;
 		free_ = wp;
 	}else {
-		WP *node = head;
-		WP *free_node;
-
-		//search for the node before wp
-		while(node -> next != wp) {
-			node = node -> next;
-		}
-		free_node = node -> next;
-
 		node -> next = wp -> next;
-
-		free_node -> next = free_;
-		free_node -> enabled = false;
-		free_ = free_node;
+		wp -> next = free_;
+		free_ = wp;
 	}
 }
 
@@ -104,27 +100,27 @@ void test() {
 	init_wp_pool();
 	print_node(free_);
 
-	WP *wp1 = new_wp();
+	new_wp("1");
 	print_node(head);
 	print_node(free_);
 
-	WP *wp2 = new_wp();
+	new_wp("2");
 	print_node(head);
 	print_node(free_);
 
-	WP *wp3 = new_wp();
+	new_wp("3");
 	print_node(head);
 	print_node(free_);
 
-	free_wp(wp3);
+	free_wp(1);
 	print_node(head);
 	print_node(free_);
 	
-	free_wp(wp1);
+	free_wp(0);
 	print_node(head);
 	print_node(free_);
 
-	free_wp(wp2);
+	free_wp(2);
 	print_node(head);
 	print_node(free_);
 }

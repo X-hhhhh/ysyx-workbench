@@ -119,8 +119,23 @@ static int cmd_p(char *args) {
 	return 0;
 }
 
-static int cmd_w() {
-	TODO();
+static int cmd_w(char *args) {
+	if(args == NULL) {
+		printf("cmd \"w\" needs an expression\n");
+		return 1;
+	}
+
+	bool success;
+	expr(args, &success);
+	if(success == false) {
+		printf("There are errors in the expression\n");
+		return 1;
+	}
+
+	//new_wp();
+	
+
+	return 0;
 }
 
 static struct {
