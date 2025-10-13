@@ -137,11 +137,12 @@ static int cmd_w(char *args) {
 		return 1;
 	}
 
-	if(new_wp(args) == -1) {
+	int NO = new_wp(args);
+	if(NO == -1) {
 		printf("The number of watchpoints has reached the maximum limit\n");
 		return 1;
 	}
-
+	printf("watchpoint:%d\n", NO);
 	return 0;
 }
 
