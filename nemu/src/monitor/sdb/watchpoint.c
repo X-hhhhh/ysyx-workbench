@@ -19,7 +19,7 @@
 
 typedef struct watchpoint {
   int NO;
-  char *expr;
+  char expr[128];
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
@@ -33,7 +33,6 @@ void init_wp_pool() {
   int i;
   for (i = 0; i < NR_WP; i ++) {
     wp_pool[i].NO = i;
-    wp_pool[i].expr = NULL;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
 
@@ -50,7 +49,7 @@ int new_wp(char *expr) {
 		head = free_;
 		free_ = free_ -> next;
 		head -> next = NULL;
-		head -> expr = expr;
+		strcpy(head -> expr, expr);
 		return head -> NO;
 	}
 
@@ -59,7 +58,7 @@ int new_wp(char *expr) {
 	free_ = free_ -> next;
 	
 	new_w -> next = head;
-	new_w -> expr = expr;
+	strcpy(new_w -> expr, expr);
 	head = new_w;
 
 	return new_w -> NO;
