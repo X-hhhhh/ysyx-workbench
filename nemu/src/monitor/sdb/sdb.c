@@ -119,6 +119,10 @@ static int cmd_p(char *args) {
 	return 0;
 }
 
+static int cmd_w() {
+	TODO();
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -131,6 +135,7 @@ static struct {
   { "info", "Print program status, for registers(r), for watchpoints(w)", cmd_info },
   { "x", "Scan memory", cmd_x },
   { "p", "Evaluate expressions", cmd_p},
+  { "w", "Set up a watchpoint", cmd_w},
   /* TODO: Add more commands */
 
 };

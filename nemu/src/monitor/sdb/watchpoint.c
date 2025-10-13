@@ -20,6 +20,7 @@
 typedef struct watchpoint {
   int NO;
   bool enabled;
+  char *expr;
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
@@ -34,6 +35,7 @@ void init_wp_pool() {
   for (i = 0; i < NR_WP; i ++) {
     wp_pool[i].NO = i;
     wp_pool[i].enabled = false;
+    wp_pool[i].expr = NULL;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
 
