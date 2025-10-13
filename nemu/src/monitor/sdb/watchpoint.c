@@ -69,7 +69,7 @@ void free_wp(int NO) {
 	
 	WP *wp = head;
 	WP *node = NULL;	//node before wp
-	while(wp -> NO != NO && wp != NULL) {
+	while(wp != NULL && wp -> NO != NO) {
 		node = wp;
 		wp = wp -> next;
 	}
