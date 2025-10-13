@@ -102,6 +102,49 @@ void test() {
 	print_node(free_);
 
 	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
+	new_wp("1");
 	print_node(head);
 	print_node(free_);
 
@@ -124,6 +167,7 @@ void test() {
 	free_wp(2);
 	print_node(head);
 	print_node(free_);
+
 	free_wp(1);
 	free_wp(2);
 	free_wp(3);
