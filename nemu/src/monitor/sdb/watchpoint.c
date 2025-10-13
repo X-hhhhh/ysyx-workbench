@@ -97,6 +97,7 @@ void display_wp() {
 		printf("Num	What\n");
 		while(wp != NULL){
 			printf("%d	%s\n", wp -> NO, wp -> expr);
+			wp = wp -> next;
 		}
 	}
 }
