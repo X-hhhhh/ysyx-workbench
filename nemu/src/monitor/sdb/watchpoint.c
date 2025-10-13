@@ -125,7 +125,7 @@ void scan_wp() {
 			}
 		}else {
 			printf("Watchpoint %d: %s evaluation falied, but the value of variable changed\n", wp -> NO, wp -> expr);
-			printf("Old_value: 0x%x", wp -> val_old);
+			printf("Old_value: 0x%x\n", wp -> val_old);
 		}
 
 		wp = wp -> next;
