@@ -20,6 +20,7 @@
 typedef struct watchpoint {
   int NO;
   char expr[128];
+  word_t val_old;
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
@@ -40,16 +41,19 @@ void init_wp_pool() {
   free_ = wp_pool;
 }
 
-int new_wp(char *expr) {
-	if(free_ == NULL) {
-		return -1;
-	}
+int new_wp(char *expression) {
+	if(free_ == NULL) {return -1;}
+
+	bool success;
+	word_t val = expr(expression, &success);
+	if(success == false) {return -2;}
 
 	if(head == NULL) {
 		head = free_;
 		free_ = free_ -> next;
 		head -> next = NULL;
-		strcpy(head -> expr, expr);
+		strcpy(head -> expr, expression);
+		head -> val_old = val;
 		return head -> NO;
 	}
 
@@ -58,7 +62,9 @@ int new_wp(char *expr) {
 	free_ = free_ -> next;
 	
 	new_w -> next = head;
-	strcpy(new_w -> expr, expr);
+	strcpy(new_w -> expr, expression);
+	new_w -> val_old = val;
+
 	head = new_w;
 
 	return new_w -> NO;
@@ -102,7 +108,22 @@ void display_wp() {
 }
 
 void scan_wp() {
-	
+	if(head == NULL) {return;}
+
+	WP *wp = head;
+	bool success;
+	word_t val_new;
+	while(wp != NULL) {
+		val_new = expr(wp -> expr, &success);
+		if(success == true) {
+			if(val_new != wp -> val_old) {
+				
+			}
+		}
+
+
+		wp = wp -> next;
+	}
 }
 
 /*void print_node(WP *w) {

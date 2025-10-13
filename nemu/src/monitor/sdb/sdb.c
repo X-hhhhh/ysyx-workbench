@@ -133,16 +133,13 @@ static int cmd_w(char *args) {
 		return 1;
 	}
 
-	bool success;
-	expr(args, &success);
-	if(success == false) {
-		printf("There are errors in the expression\n");
-		return 1;
-	}
-
 	int NO = new_wp(args);
 	if(NO == -1) {
 		printf("The number of watchpoints has reached the maximum limit\n");
+		return 1;
+	}
+	if(NO == -2) {
+		printf("There are errors in the expression\n");
 		return 1;
 	}
 	printf("watchpoint:%d\n", NO);
