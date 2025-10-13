@@ -122,6 +122,7 @@ void scan_wp() {
 				printf("New_value: 0x%x\n\n", val_new);
 
 				wp -> val_old = val_new;
+				//sy or nsy?
 			}
 		}else {
 			printf("Watchpoint %d: %s evaluation falied, but the value of variable changed\n", wp -> NO, wp -> expr);
