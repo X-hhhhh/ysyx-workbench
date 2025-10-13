@@ -94,8 +94,9 @@ void display_wp() {
 	if(head == NULL) {
 		printf("There are no watchpoints\n");
 	}else {
-		while(wp != NULL) {
-			printf(" ");
+		printf("Num	What\n");
+		while(wp != NULL){
+			printf("%d	%s\n", wp -> NO, wp -> expr);
 		}
 	}
 }
