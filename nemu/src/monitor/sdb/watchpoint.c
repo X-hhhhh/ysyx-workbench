@@ -101,6 +101,10 @@ void display_wp() {
 	}
 }
 
+void scan_wp() {
+	
+}
+
 /*void print_node(WP *w) {
 	WP *node = w;
 	while(node != NULL) {
