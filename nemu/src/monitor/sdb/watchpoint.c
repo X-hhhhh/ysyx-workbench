@@ -125,6 +125,8 @@ void test() {
 	print_node(head);
 	print_node(free_);
 	free_wp(1);
+	free_wp(2);
+	free_wp(3);
 }
 
 
