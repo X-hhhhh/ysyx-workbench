@@ -88,7 +88,7 @@ static int cmd_x(char *args) {
 		printf("The first argument must be an integer\n");
 		return 1;
 	}
-	arg = strtok(NULL, " ");
+	arg = strtok(NULL, "\0");
 	if(arg == NULL) {
 		printf("cmd \"x\" needs two arguments\n");
 		return 1;
