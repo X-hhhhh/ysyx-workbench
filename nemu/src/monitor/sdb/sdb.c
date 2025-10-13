@@ -97,7 +97,7 @@ static int cmd_x(char *args) {
 	bool success;
 	word_t paddr_b = expr(arg, &success);
 	if(success == false) {
-		printf("There are errors in the expression");
+		printf("There are errors in the expression\n");
 		return 1;
 	}
 	for(int i = 0; i < n; i++) {
