@@ -89,7 +89,18 @@ void free_wp(int NO) {
 	}
 }
 
-void print_node(WP *w) {
+void display_wp() {
+	WP *wp = head;
+	if(head == NULL) {
+		printf("There are no watchpoints\n");
+	}else {
+		while(wp != NULL) {
+			printf(" ");
+		}
+	}
+}
+
+/*void print_node(WP *w) {
 	WP *node = w;
 	while(node != NULL) {
 		printf("0x%p->", node);
@@ -129,7 +140,7 @@ void test() {
 	free_wp(1);
 	free_wp(2);
 	free_wp(3);
-}
+}*/
 
 
 /* TODO: Implement the functionality of watchpoint */

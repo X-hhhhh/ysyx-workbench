@@ -71,7 +71,7 @@ static int cmd_info(char *args) {
 	}else if(strcmp(args, "r") == 0) {
 		isa_reg_display();	
 	}else if(strcmp(args, "w") == 0) {
-		//add code for watchpoints	
+		
 	}
 	return 0;
 }
@@ -133,7 +133,7 @@ static int cmd_w(char *args) {
 	}
 
 	if(new_wp(args) == -1) {
-		printf("The number of watchpoints has reached the maximum limit");
+		printf("The number of watchpoints has reached the maximum limit\n");
 		return 1;
 	}
 
