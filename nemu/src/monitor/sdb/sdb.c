@@ -67,11 +67,11 @@ static int cmd_si(char *args) {
 
 static int cmd_info(char *args) {
 	if(args == NULL) {
-		printf("cmd \"info\" needs an args\n");
+		printf("cmd \"info\" needs an argument\n");
 	}else if(strcmp(args, "r") == 0) {
 		isa_reg_display();	
 	}else if(strcmp(args, "w") == 0) {
-		//add code for watchpoints	
+		display_wp();
 	}
 	return 0;
 }
@@ -79,27 +79,86 @@ static int cmd_info(char *args) {
 static int cmd_x(char *args) {
 	char *arg = strtok(NULL, " ");
 	if(arg == NULL) {
-		printf("cmd \"x\" needs two args\n");
-	}else {
-		int n = atoi(arg);
-		arg = strtok(NULL, " ");
-		if(arg == NULL) {
-			printf("cmd \"x\" needs two args\n");
+		printf("cmd \"x\" needs two arguments\n");
+		return 1;
+	}
+
+	int n = atoi(arg);
+	if(n == 0) {
+		printf("The first argument must be an integer\n");
+		return 1;
+	}
+	arg = strtok(NULL, "\0");
+	if(arg == NULL) {
+		printf("cmd \"x\" needs two arguments\n");
+		return 1;
+	}
+	
+	bool success;
+	word_t paddr_b = expr(arg, &success);
+	if(success == false) {
+		printf("There are errors in the expression\n");
+		return 1;
+	}
+	for(int i = 0; i < n; i++) {
+		int paddr = paddr_b + i * 4;
+		if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
+			printf("0x%x: 0x%x\n", paddr, paddr_read(paddr, 4));
 		}else {
-			int paddr_b;
-			sscanf(arg, "%x", &paddr_b);
-			for(int i = 0; i < n; i++) {
-				int paddr = paddr_b + i * 4;
-				if(paddr >= 0x80000000 && paddr <= 0x87FFFFFF) {
-					printf("0x%x: 0x%x\n", paddr, paddr_read(paddr, 4));
-				}else {
-					printf("paddr:0x%x out of range [80000000, 87FFFFFF]\n", paddr);
-					break;
-				}
-			}
+			printf("paddr:0x%x out of range [80000000, 87FFFFFF]\n", paddr);
+			break;
 		}
 	}
 	return 0;	
+}
+
+static int cmd_p(char *args) {
+	if(args == NULL) {
+		printf("cmd \"p\" needs an expression\n");
+		return 1;
+	}
+	bool success;
+	word_t exp = expr(args, &success);
+	if(success == false) {
+		printf("There are errors in the expression\n");
+		return 1;
+	}
+	printf("=%d\n", exp);
+	return 0;
+}
+
+static int cmd_w(char *args) {
+	if(args == NULL) {
+		printf("cmd \"w\" needs an expression\n");
+		return 1;
+	}
+
+	int NO = new_wp(args);
+	if(NO == -1) {
+		printf("The number of watchpoints has reached the maximum limit\n");
+		return 1;
+	}
+	if(NO == -2) {
+		printf("There are errors in the expression\n");
+		return 1;
+	}
+	printf("watchpoint:%d\n", NO);
+	return 0;
+}
+
+static int cmd_d(char *args) {
+	if(args == NULL) {
+		printf("cmd \"d\" needs an argument\n");
+		return 1;
+	}
+
+	int NO = atoi(args);
+	if(NO == 0 && args[0] != '0') {
+		printf("cmd \"d\" needs an integer\n");
+		return 1;
+	}
+	free_wp(NO);
+	return 0;
 }
 
 static struct {
@@ -113,6 +172,9 @@ static struct {
   { "si", "Execute n instructions, the default value of n is 1", cmd_si },
   { "info", "Print program status, for registers(r), for watchpoints(w)", cmd_info },
   { "x", "Scan memory", cmd_x },
+  { "p", "Evaluate expressions", cmd_p},
+  { "w", "Set up a watchpoint", cmd_w},
+  { "d", "Delete a watchpoint", cmd_d},
   /* TODO: Add more commands */
 
 };

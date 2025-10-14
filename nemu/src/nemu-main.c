@@ -14,10 +14,8 @@
 ***************************************************************************************/
 
 #include <common.h>
-
-
 #include "monitor/sdb/sdb.h"
-
+#include "isa.h"
 
 void init_monitor(int, char *[]);
 void am_init_monitor();
@@ -32,7 +30,7 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
-  	/* test
+	/* test
 	FILE * fp = fopen("tools/gen-expr/input", "r");
 	if(fp == NULL) {
 		printf("error opening file");
@@ -43,14 +41,14 @@ int main(int argc, char *argv[]) {
 	int exp;
 	int r1;
 	char *r2;
-	char buf_str[1000];
+	char buf_str[2000];
 	int cycle = 2000;
 	bool success;
 	while(!feof(fp) && cycle) {
 		r1 = fscanf(fp, "%d", &res);	
 		if(r1 == EOF) {break;}	
 		
-		r2 = fgets(buf_str, 1000, fp);	
+		r2 = fgets(buf_str, 2000, fp);	
 		if(r2 == NULL) {break;}
 
 		buf_str[strcspn(buf_str, "\n")] = '\0';
@@ -63,9 +61,32 @@ int main(int argc, char *argv[]) {
 		cycle--;
 	}
 
+
 	fclose(fp);
 	fp = NULL;
 	*/
+
+
+
+ 	/*
+  	cpu.gpr[1] = 1;
+  	cpu.gpr[2] = 2;
+
+	bool success;
+	//char str[64] = "($ra + 3 * ($sp) - --2 /2 + 0xA) ";
+	char str[64] = "*(0x80000000 + $ra * 4)";
+	int exp = expr(str, &success);
+	printf("exp=%x, success=%d", exp, success);
+	*/
+
+
+
+	
+
+
+
+
+
 
   /* Start engine. */
   engine_start();

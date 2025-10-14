@@ -31,9 +31,11 @@ static char *code_format =
 "  return 0; "
 "}";
 
-static char gen_operator() {
-	char operators[] = {'+', '-', '*', '/'};
-	return operators[rand() % 4];
+enum {OP_EQ = 256, OP_NEQ, OP_AND};
+
+static int gen_operator() {
+	int operators[] = {'+', '-', '*', '/', OP_EQ, OP_NEQ, OP_AND};
+	return operators[rand() % 7];
 }
 
 static int gen_operand(int min, int max) {
@@ -57,20 +59,28 @@ static void gen_rand_expr(char *buf, int max_depth) {
 		default:
 			char left[1000];
 			char right[1000];
-			char op = gen_operator();
+			int op = gen_operator();
 			
-			if(op == '+' || op == '*'){
-				gen_rand_expr(left, max_depth - 1);
-				gen_rand_expr(right, max_depth - 1);
-				sprintf(buf, "%s %c %s", left, op, right);
-			}else if(op == '-'){
+			if(op == '-' || op == '/'){
 				sprintf(left, "%d", gen_operand(10, 20));
 				sprintf(right, "%d", gen_operand(1, 9));
 				sprintf(buf, "(%s %c %s)", left, op, right);
+			}else if(op == OP_EQ) {
+				gen_rand_expr(left, max_depth - 1);
+				gen_rand_expr(right, max_depth - 1);
+				sprintf(buf, "%s == %s", left, right);
+			}else if(op == OP_NEQ){
+				gen_rand_expr(left, max_depth - 1);
+				gen_rand_expr(right, max_depth - 1);
+				sprintf(buf, "%s != %s", left, right);
+			}else if(op == OP_AND){
+				gen_rand_expr(left, max_depth - 1);
+				gen_rand_expr(right, max_depth - 1);
+				sprintf(buf, "%s && %s", left, right);
 			}else {
-				sprintf(left, "%d", gen_operand(10, 20));
-				sprintf(right, "%d", gen_operand(1, 9));	
-				sprintf(buf, "(%s %c %s)", left, op, right);
+				gen_rand_expr(left, max_depth - 1);
+				gen_rand_expr(right, max_depth - 1);
+				sprintf(buf, "%s %c %s", left, op, right);
 			}
 
 			break;
@@ -88,7 +98,7 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
-    gen_rand_expr(buf, 15);
+    gen_rand_expr(buf, 10);
 
     sprintf(code_buf, code_format, buf);
 
