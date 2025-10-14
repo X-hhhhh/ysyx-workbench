@@ -107,11 +107,12 @@ void display_wp() {
 	}
 }
 
-void scan_wp() {
-	if(head == NULL) {return;}
+bool scan_wp() {
+	if(head == NULL) {return false;}
 
 	WP *wp = head;
 	bool success;
+	bool triggered = false;
 	word_t val_new;
 	while(wp != NULL) {
 		val_new = expr(wp -> expr, &success);
@@ -122,7 +123,7 @@ void scan_wp() {
 				printf("New_value: 0x%x\n\n", val_new);
 
 				wp -> val_old = val_new;
-				//sy or nsy?
+				triggered = true;
 			}
 		}else {
 			printf("Watchpoint %d: %s evaluation falied, but the value of variable changed\n", wp -> NO, wp -> expr);
@@ -131,6 +132,7 @@ void scan_wp() {
 
 		wp = wp -> next;
 	}
+	return triggered;
 }
 
 /*void print_node(WP *w) {
