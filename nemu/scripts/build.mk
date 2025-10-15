@@ -33,8 +33,9 @@ $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 	
-	@$(CC) $(CFLAGS) -E -o $(@:.o=.i) $<
-	#cat monitor.i
+	//enable generating pre-processing files
+	#@$(CC) $(CFLAGS) -E -o $(@:.o=.i) $<
+	
 	
 	$(call call_fixdep, $(@:.o=.d), $@)
 
