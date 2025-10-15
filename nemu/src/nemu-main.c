@@ -80,8 +80,6 @@ int main(int argc, char *argv[]) {
 	*/
 
 
-	int arr[2] = {};
-	printf("%d", arr[2]);	
 
 	
 
