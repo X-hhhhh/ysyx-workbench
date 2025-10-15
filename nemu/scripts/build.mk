@@ -34,6 +34,7 @@ $(OBJ_DIR)/%.o: %.c
 	@$(CC) $(CFLAGS) -c -o $@ $<
 	
 	@$(CC) $(CFLAGS) -E -o $@ $(@:.o=.i)
+	cat monitor.i
 	
 	$(call call_fixdep, $(@:.o=.d), $@)
 
