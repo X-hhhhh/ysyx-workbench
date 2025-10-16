@@ -32,6 +32,11 @@ $(OBJ_DIR)/%.o: %.c
 	@echo + CC $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
+	
+	#enable generating pre-processing files
+	#$(CC) $(CFLAGS) -E -o $(@:.o=.i) $<
+	
+	
 	$(call call_fixdep, $(@:.o=.d), $@)
 
 $(OBJ_DIR)/%.o: %.cc
