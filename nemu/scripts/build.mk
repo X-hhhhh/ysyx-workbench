@@ -34,7 +34,7 @@ $(OBJ_DIR)/%.o: %.c
 	@$(CC) $(CFLAGS) -c -o $@ $<
 	
 	#enable generating pre-processing files
-	@$(CC) $(CFLAGS) -E -o $(@:.o=.i) $<
+	#$(CC) $(CFLAGS) -E -o $(@:.o=.i) $<
 	
 	
 	$(call call_fixdep, $(@:.o=.d), $@)
