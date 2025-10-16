@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 	printf("exp=%x, success=%d", exp, success);
 	*/
 
-	printf("%lx", SEXT(0x80001, 20));
+	printf("%x", (uint32_t)SEXT(0x80001, 20));
 
 
 
