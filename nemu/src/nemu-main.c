@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 	printf("exp=%x, success=%d", exp, success);
 	*/
 
-	printf("%lx", SEXT(0xFFFFF, 20));
+	printf("%lx", SEXT(0xF0001, 32));
 
 
 
