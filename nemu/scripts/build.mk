@@ -33,8 +33,8 @@ $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 	
-	//enable generating pre-processing files
-	#@$(CC) $(CFLAGS) -E -o $(@:.o=.i) $<
+	#enable generating pre-processing files
+	@$(CC) $(CFLAGS) -E -o $(@:.o=.i) $<
 	
 	
 	$(call call_fixdep, $(@:.o=.d), $@)

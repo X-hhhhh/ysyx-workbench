@@ -79,8 +79,10 @@ int main(int argc, char *argv[]) {
 	printf("exp=%x, success=%d", exp, success);
 	*/
 
-
-
+	#define TEST_MAC 1
+	#define TEST_MAC_TRUE
+  	#define TEST_MAC_FALSE
+  	MUXDEF(TEST_MAC, TEST_MAC_TRUE, TEST_MAC_FALSE);
 	
 
 
