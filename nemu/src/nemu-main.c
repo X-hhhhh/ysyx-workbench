@@ -79,7 +79,6 @@ int main(int argc, char *argv[]) {
 	printf("exp=%x, success=%d", exp, success);
 	*/
 
-	printf("%d", 3 % -2);
 
 
 
