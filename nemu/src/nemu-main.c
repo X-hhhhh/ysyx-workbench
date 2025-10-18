@@ -79,8 +79,6 @@ int main(int argc, char *argv[]) {
 	printf("exp=%x, success=%d", exp, success);
 	*/
 
-	//printf("%x", (uint32_t)SEXT(0x10001, 20));
-
 
 
 
