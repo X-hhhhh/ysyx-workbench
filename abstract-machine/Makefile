@@ -5,7 +5,7 @@ html:
 	cat Makefile | sed 's/^\([^#]\)/    \1/g' | markdown_py > Makefile.html
 .PHONY: html
 
-CONFIG_TARGET_AM = 1
+CONFIG_TARGET_AM = y
 
 ## 1. Basic Setup and Checks
 
