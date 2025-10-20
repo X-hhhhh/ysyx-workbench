@@ -80,6 +80,9 @@ int main(int argc, char *argv[]) {
 	*/
 
 
+	#define CONFIG_TARGET_AM 1
+
+
 
 
 
