@@ -47,4 +47,6 @@ typedef uintptr_t PTE;
 
 #define PGSIZE    4096
 
+#define CONFIG_TARGET_AM 1
+
 #endif
