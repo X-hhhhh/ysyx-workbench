@@ -26,7 +26,7 @@
  */
 #define MAX_INST_TO_PRINT 10
 
-#define MAX_IRINGBUF 50
+#define MAX_IRINGBUF 20
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
@@ -35,7 +35,7 @@ static bool g_print_step = false;
 
 static struct Iringbuf {
 	word_t buf[MAX_IRINGBUF];
-	char *disam_buf[MAX_IRINGBUF];
+	char disam_buf[MAX_IRINGBUF][50];
 	int p;
 } Irb = {
 	.buf = {0},
