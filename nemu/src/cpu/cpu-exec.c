@@ -26,7 +26,7 @@
  */
 #define MAX_INST_TO_PRINT 10
 
-#define MAX_IRINGBUF 20
+#define MAX_IRINGBUF 50
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
@@ -88,7 +88,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
 #endif
-//	strcpy(Irb.disam_buf[Irb.p++], p);
+	strcpy(Irb.disam_buf[Irb.p++], p);
   	if(Irb.p >= MAX_IRINGBUF) {Irb.p = 0;} 
 }
 
