@@ -46,8 +46,7 @@ int sprintf(char *out, const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
 	int perc = 0;
-	int count = 0;
-	int i = 0;
+	int i, count = 0;
 	char buf[50];
 	for(; *fmt != '\0'; fmt++) {
 		if(perc == 1) {
@@ -73,6 +72,7 @@ int sprintf(char *out, const char *fmt, ...) {
 			out[count++] = *fmt;
 		}
 	}
+	out[count] = '\0';
 	va_end(args);	
 	return count;	
 }
