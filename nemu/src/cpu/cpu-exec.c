@@ -114,9 +114,7 @@ static void statistic() {
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 }
 
-void assert_fail_msg() {
-  	isa_reg_display();
-	
+static void fail_report() {
 	char p[50];
 	word_t last_inst = inst_fetch(&Irb.pc_buf[Irb.p], 4);
   	void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
@@ -128,7 +126,13 @@ void assert_fail_msg() {
 		       	continue;
 		}
 		printf("    %10x  %s\n", Irb.pc_buf[i], Irb.disam_buf[i]);
-	}
+	}	
+}
+
+void assert_fail_msg() {
+  	isa_reg_display();
+	
+	fail_report();
 
   	statistic();
 }
