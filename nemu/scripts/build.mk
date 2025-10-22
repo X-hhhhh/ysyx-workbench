@@ -33,7 +33,7 @@ $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 	
-	#enable generating pre-processing files
+	@#enable generating pre-processing files
 	#$(CC) $(CFLAGS) -E -o $(@:.o=.i) $<
 	
 	
