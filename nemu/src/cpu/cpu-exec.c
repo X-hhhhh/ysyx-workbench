@@ -26,10 +26,20 @@
  */
 #define MAX_INST_TO_PRINT 10
 
+#define MAX_IRINGBUF 20
+
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
+
+static struct Iringbuf {
+	word_t buf[MAX_IRINGBUF];
+	int p;
+} Irb = {
+	.buf = {0},
+	.p = 0,
+};
 
 void device_update();
 
@@ -75,6 +85,9 @@ static void exec_once(Decode *s, vaddr_t pc) {
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
 #endif
+
+  	Irb.buf[Irb.p++] = s -> isa.inst;	//Save the just executed instruction
+	if(Irb.p >= MAX_IRINGBUF) {Irb.p = 0;}
 }
 
 static void execute(uint64_t n) {
@@ -99,6 +112,12 @@ static void statistic() {
 
 void assert_fail_msg() {
   isa_reg_display();
+
+	for(int i = 0; i < MAX_IRINGBUF; i++) {
+		if(i == Irb.p - 1) {printf("-->");}
+		printf("%x\n", Irb.buf[i]);
+	}
+
   statistic();
 }
 
