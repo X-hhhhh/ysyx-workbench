@@ -113,8 +113,8 @@ static void statistic() {
 void assert_fail_msg() {
   	isa_reg_display();
 	for(int i = 0; i < MAX_IRINGBUF; i++) {
-		if(i == Irb.p - 1) {printf("-->");}
-		printf("%10x\n", Irb.buf[i]);
+		if(i == Irb.p - 1) {printf("-->%x\n", Irb.buf[i]); continue;}
+		printf("   %x\n", Irb.buf[i]);
 	}
 
   	statistic();
