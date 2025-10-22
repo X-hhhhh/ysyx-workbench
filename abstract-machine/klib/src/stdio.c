@@ -54,13 +54,13 @@ int sprintf(char *out, const char *fmt, ...) {
 				case 'd': 
 					int2char(va_arg(args, int), buf);
 					for(i = 0; buf[i] != '\0'; i++) {
-						out[count++] = buf[i++];
+						out[count++] = buf[i];
 					}
 					break;
 				case 's': 
 					strcpy(buf, va_arg(args, char*));
 					for(i = 0; buf[i] != '\0'; i++) {
-						out[count++] = buf[i++];
+						out[count++] = buf[i];
 					} 
 					break;
 				default: break;
