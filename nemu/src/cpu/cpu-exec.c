@@ -116,7 +116,7 @@ void assert_fail_msg() {
   	isa_reg_display();
 	for(int i = 0; i < MAX_IRINGBUF; i++) {
 		if(i == Irb.p - 1) {printf("--> %x\n", Irb.buf[i]); continue;}
-		printf("    %x\n", Irb.buf[i]);
+		printf("    %x  %s\n", Irb.buf[i], Irb.disam_buf[i]);
 	}
 
   	statistic();
