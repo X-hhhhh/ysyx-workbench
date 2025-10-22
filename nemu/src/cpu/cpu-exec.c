@@ -18,6 +18,7 @@
 #include <cpu/difftest.h>
 #include <locale.h>
 #include <../src/monitor/sdb/sdb.h>
+#include <cpu/ifetch.h>
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -34,11 +35,11 @@ static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
 static struct Iringbuf {
-	word_t buf[MAX_IRINGBUF];
+	word_t pc_buf[MAX_IRINGBUF];
 	char disam_buf[MAX_IRINGBUF][50];
 	int p;
 } Irb = {
-	.buf = {0},
+	.pc_buf = {0},
 	.p = 0,
 };
 
@@ -58,7 +59,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 }
 
 static void exec_once(Decode *s, vaddr_t pc) {
-  Irb.buf[Irb.p] = pc;	//Save pc
+  Irb.pc_buf[Irb.p] = pc;	//Save pc to iringbuf
 	
   s->pc = pc;
   s->snpc = pc;
@@ -88,6 +89,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
 #endif
+	//save disassembled infomation to iringbuf
 	strcpy(Irb.disam_buf[Irb.p++], p);
   	if(Irb.p >= MAX_IRINGBUF) {Irb.p = 0;} 
 }
@@ -114,12 +116,18 @@ static void statistic() {
 
 void assert_fail_msg() {
   	isa_reg_display();
+	
+	char p[50];
+	word_t last_inst = inst_fetch(&Irb.pc_buf[Irb.p], 4);
+  	void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
+	disassemble(p, 50, Irb.pc_buf[Irb.p], (uint8_t*)&last_inst, 4);
+	
 	for(int i = 0; i < MAX_IRINGBUF; i++) {
 		if(i == Irb.p) {
-			printf("--> %10x  %s\n", Irb.buf[i], Irb.disam_buf[i]);
+			printf("--> %10x  %s\n", Irb.pc_buf[i], p);
 		       	continue;
 		}
-		printf("    %10x  %s\n", Irb.buf[i], Irb.disam_buf[i]);
+		printf("    %10x  %s\n", Irb.pc_buf[i], Irb.disam_buf[i]);
 	}
 
   	statistic();
