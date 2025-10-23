@@ -19,6 +19,7 @@
 #include <locale.h>
 #include <../src/monitor/sdb/sdb.h>
 #include <cpu/ifetch.h>
+#include <memory/paddr.h>
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -126,7 +127,8 @@ static void fail_report() {
 		       	continue;
 		}
 		printf("    %10x  %s\n", Irb.pc_buf[i], Irb.disam_buf[i]);
-	}	
+	}
+	Mtrace_report();	
 }
 
 void assert_fail_msg() {
