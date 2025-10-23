@@ -117,9 +117,10 @@ static void statistic() {
 
 static void fail_report() {
 	char p[50];
-	word_t last_inst = inst_fetch(&Irb.pc_buf[Irb.p], 4);
+	uint32_t pc_t = Irb.pc_buf[Irb.p];
+	word_t last_inst = inst_fetch(&pc_t, 4);
   	void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-	disassemble(p, 50, Irb.pc_buf[Irb.p], (uint8_t*)&last_inst, 4);
+	disassemble(p, 50, pc_t, (uint8_t*)&last_inst, 4);
 	
 	for(int i = 0; i < MAX_IRINGBUF; i++) {
 		if(i == Irb.p) {
