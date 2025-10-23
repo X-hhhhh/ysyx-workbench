@@ -50,9 +50,9 @@ void Mtrace_report() {
 	printf("R/W   pmem_addr   len\n");
 	for(int i = 0; i < Mt.count; i++) {
 		if(Mt.rw_flag[i] == 0) {
-			printf("Rd  %10x  %d\n", Mt.mem_buf[i], Mt.data_len[i]);
+			printf("Rd  %10x    %d\n", Mt.mem_buf[i], Mt.data_len[i]);
 		}else {
-			printf("Wr  %10x  %d\n", Mt.mem_buf[i], Mt.data_len[i]);
+			printf("Wr  %10x    %d\n", Mt.mem_buf[i], Mt.data_len[i]);
 		}
 	}
 	if(Mt.count == MAX_Mtrace) {
