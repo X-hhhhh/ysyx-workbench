@@ -128,6 +128,7 @@ static void fail_report() {
 		}
 		printf("    %10x  %s\n", Irb.pc_buf[i], Irb.disam_buf[i]);
 	}
+	printf("\n");
 	Mtrace_report();	
 }
 

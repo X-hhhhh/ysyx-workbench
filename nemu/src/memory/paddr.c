@@ -27,7 +27,7 @@ static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #define MAX_Mtrace 1000
 
 static struct Mtrace_info {
-	int mem_buf[MAX_Mtrace];
+	paddr_t mem_buf[MAX_Mtrace];
 	uint8_t data_len[MAX_Mtrace];
 	uint8_t rw_flag[MAX_Mtrace];	//1:write, 0: read
 	int count;
@@ -47,7 +47,7 @@ static void Mtrace(paddr_t addr, int len, uint8_t rw_flag) {
 }
 
 void Mtrace_report() {
-	printf("RW  pmem_addr\n  len");
+	printf("RW     pmem_addr   len\n");
 	for(int i = 0; i < Mt.count; i++) {
 		if(Mt.rw_flag[i] == 0) {
 			printf("Rd  %10d  %d\n", Mt.mem_buf[i], Mt.data_len[i]);
