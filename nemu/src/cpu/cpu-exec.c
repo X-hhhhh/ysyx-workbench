@@ -61,7 +61,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 
 static void exec_once(Decode *s, vaddr_t pc) {
   Irb.pc_buf[Irb.p] = pc;	//Save pc to iringbuf
-	
+	printf("pc = %x\n", pc);
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
@@ -122,10 +122,10 @@ static void fail_report() {
 	disassemble(p, 50, Irb.pc_buf[Irb.p], (uint8_t*)&last_inst, 4);
 	
 	for(int i = 0; i < MAX_IRINGBUF; i++) {
-	//	if(i == Irb.p) {
-	//		printf("--> %10x  %s\n", Irb.pc_buf[i], p);
-	//	       	continue;
-	//	}
+		if(i == Irb.p) {
+			printf("--> %10x  %s\n", Irb.pc_buf[i], p);
+		       	continue;
+		}
 		printf("    %10x  %s\n", Irb.pc_buf[i], Irb.disam_buf[i]);
 	}
 	printf("\n");
