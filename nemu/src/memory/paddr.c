@@ -47,6 +47,7 @@ static void Mtrace(paddr_t addr, int len, uint8_t rw_flag) {
 }
 
 void Mtrace_report() {
+	printf("Mtrace Information:\n");
 	printf("R/W   pmem_addr   len\n");
 	for(int i = 0; i < Mt.count; i++) {
 		if(Mt.rw_flag[i] == 0) {
