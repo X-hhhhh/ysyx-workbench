@@ -122,7 +122,7 @@ static void fail_report() {
 	disassemble(p, 50, Irb.pc_buf[Irb.p], (uint8_t*)&last_inst, 4);
 	
 	for(int i = 0; i < MAX_IRINGBUF; i++) {
-		if(i == Irb.p) {
+		if(i == Irb.p - 1) {
 			printf("--> %10x  %s\n", Irb.pc_buf[i], p);
 		       	continue;
 		}
