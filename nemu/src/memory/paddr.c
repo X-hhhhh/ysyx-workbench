@@ -25,7 +25,7 @@ static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #endif
 
 #define MAX_Mtrace 1000
-
+#ifdef CONFIG_MTRACE
 static struct Mtrace_info {
 	paddr_t mem_buf[MAX_Mtrace];
 	uint8_t data_len[MAX_Mtrace];
@@ -60,6 +60,7 @@ void Mtrace_report() {
 		printf("The Mtrace record is full, there may be data that has not been recorded\n");
 	}
 }
+#endif
 
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }
 paddr_t host_to_guest(uint8_t *haddr) { return haddr - pmem + CONFIG_MBASE; }
@@ -88,7 +89,9 @@ void init_mem() {
 }
 
 word_t paddr_read(paddr_t addr, int len) {
+#ifdef CONFIG_MTRACE
   Mtrace(addr, len, 0);
+#endif
 
   if (likely(in_pmem(addr))) return pmem_read(addr, len);
   IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
@@ -97,8 +100,10 @@ word_t paddr_read(paddr_t addr, int len) {
 }
 
 void paddr_write(paddr_t addr, int len, word_t data) {
+#ifdef CONFIG_MTRACE
   Mtrace(addr, len, 1);
-	
+#endif
+
   if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
   IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
   out_of_bound(addr);

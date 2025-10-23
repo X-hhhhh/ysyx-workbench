@@ -61,7 +61,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 
 static void exec_once(Decode *s, vaddr_t pc) {
   Irb.pc_buf[Irb.p] = pc;	//Save pc to iringbuf
-	printf("pc_buf = %x\n", Irb.pc_buf[Irb.p]);
+  
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
@@ -130,7 +130,10 @@ static void fail_report() {
 		printf("    %10x  %s\n", Irb.pc_buf[i], Irb.disam_buf[i]);
 	}
 	printf("\n");
+
+#ifdef CONFIG_MTRACE
 	Mtrace_report();	
+#endif
 }
 
 void assert_fail_msg() {
