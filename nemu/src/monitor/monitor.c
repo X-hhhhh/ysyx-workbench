@@ -131,8 +131,6 @@ static int parse_args(int argc, char *argv[]) {
         exit(0);
     }
   }
-	analyze_elf();
-
   return 0;
 }
 
@@ -170,6 +168,9 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Display welcome message. */
   welcome();
+
+	analyze_elf();
+
 }
 #else // CONFIG_TARGET_AM
 static long load_img() {
