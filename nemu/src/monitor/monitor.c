@@ -92,9 +92,15 @@ static int analyze_elf() {
 		return 1;
 	}
 
-	
+	//analyze section header
+	ret = fseek(fp, ehdr.e_shoff, 0);
+	if(ret == -1) return 1;
+	//Elf64_Shdr shdr;
 
-
+	printf("shnum=%d\n", ehdr.e_shnum);
+	//for(int i = 0; i < ehdr.e_shnum; i++) {
+	//	ret = fread(&shdr, sizeof(Elf64_shdr), 1, fp);
+	//}
 
 
 
