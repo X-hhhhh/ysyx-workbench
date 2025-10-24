@@ -69,6 +69,38 @@ static long load_img() {
   return size;
 }
 
+static int analyze_elf() {
+	if(elf_file == NULL) {
+        	Log("No elf_file is given. Function trace is disabled.");
+		return 0;
+	}
+
+	FILE *fp = fopen(elf_file, "rb");
+	Assert(fp, "Can not open '%s'", elf_file);
+
+	struct Elf_info {
+		uint32_t mag0_3;
+		uint8_t shoff;		//Section header offset
+		//uint8_t 
+		
+	}elf_info;
+
+	int ret;
+	ret = fread(&elf_info.mag0_3, 4, 1, fp);
+	if(ret == 0);
+	
+	printf("%x", elf_info.mag0_3);
+
+
+
+
+
+
+	fclose(fp);
+	fp = NULL;
+	return 0;
+}
+
 static int parse_args(int argc, char *argv[]) {
   const struct option table[] = {
     {"batch"    , no_argument      , NULL, 'b'},
@@ -86,7 +118,7 @@ static int parse_args(int argc, char *argv[]) {
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
       case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
-      case 'f': elf_file = optarg;printf("elf=%s", elf_file); break;
+      case 'f': elf_file = optarg; break;
       case 1: img_file = optarg; return 0;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
@@ -94,10 +126,13 @@ static int parse_args(int argc, char *argv[]) {
         printf("\t-l,--log=FILE           output log to FILE\n");
         printf("\t-d,--diff=REF_SO        run DiffTest with reference REF_SO\n");
         printf("\t-p,--port=PORT          run DiffTest with port PORT\n");
+	printf("\t-f,--ftrace=ELF_FILE    include elf file ELF_FILE to enable function trace\n");
         printf("\n");
         exit(0);
     }
   }
+	analyze_elf();
+
   return 0;
 }
 
