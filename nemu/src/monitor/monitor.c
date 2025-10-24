@@ -15,6 +15,7 @@
 
 #include <isa.h>
 #include <memory/paddr.h>
+#include <elf.h>
 
 void init_rand();
 void init_log(const char *log_file);
@@ -78,19 +79,26 @@ static int analyze_elf() {
 	FILE *fp = fopen(elf_file, "rb");
 	Assert(fp, "Can not open '%s'", elf_file);
 
-
-	struct Elf_info {
-		uint32_t mag0_3;
-		uint8_t shoff;		//Section header offset
-		//uint8_t 
-		
-	}elf_info;
-
 	int ret;
-	ret = fread(&elf_info.mag0_3, 4, 1, fp);
-	if(ret == 0);
+
+	//analyze elf header
+	Elf64_Ehdr ehdr;
+	ret = fread(&ehdr, sizeof(Elf64_Ehdr), 1, fp);
+	if(ret != 1) return 1;
 	
-	printf("%x\n\n\n", elf_info.mag0_3);
+	//check if it is an elf file
+	if(ehdr.e_ident[0] != 0x7f || ehdr.e_ident[1] != 'E' || ehdr.e_ident[2] != 'L' || ehdr.e_ident[3] != 'F') {
+		printf("Please make sure it is an elf file\n");
+		return 1;
+	}
+
+	
+
+
+
+
+
+	//printf("%x\n\n\n",);
 
 
 
