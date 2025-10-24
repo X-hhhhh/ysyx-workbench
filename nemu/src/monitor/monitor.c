@@ -68,7 +68,7 @@ static long load_img() {
   fclose(fp);
   return size;
 }
-
+/*
 static int analyze_elf() {
 	if(elf_file == NULL) {
         	Log("No elf_file is given. Function trace is disabled.");
@@ -99,7 +99,7 @@ static int analyze_elf() {
 	fclose(fp);
 	fp = NULL;
 	return 0;
-}
+}*/
 
 static int parse_args(int argc, char *argv[]) {
   const struct option table[] = {
@@ -118,7 +118,7 @@ static int parse_args(int argc, char *argv[]) {
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
       case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
-      case 'f': elf_file = optarg; analyze_elf(); break;
+      case 'f': elf_file = optarg; break;
       case 1: img_file = optarg; return 0;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
