@@ -95,16 +95,17 @@ static int analyze_elf() {
 	//analyze section header
 	ret = fseek(fp, ehdr.e_shoff, SEEK_SET);
 	if(ret == -1) return 1;
-	//Elf64_Shdr shdr;
-
-	printf("shnum=%d\n", ehdr.e_shnum);
+	Elf32_Shdr shdr;
+	//Elf32_Off symtab_offset, strtab_offset;
 	//for(int i = 0; i < ehdr.e_shnum; i++) {
-	//	ret = fread(&shdr, sizeof(Elf64_shdr), 1, fp);
+		ret = fread(&shdr, sizeof(Elf32_Shdr), 1, fp);
+	//	if(ret != 1) return 1;
+	//	if(shdr.sh_name == )
 	//}
 
 
 
-	//printf("%x\n\n\n",);
+	printf("%x", shdr.sh_name);
 
 
 
