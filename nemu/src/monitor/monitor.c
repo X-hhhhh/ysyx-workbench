@@ -93,7 +93,7 @@ static int analyze_elf() {
 	}
 
 	//analyze section header
-	ret = fseek(fp, ehdr.e_shoff, 0);
+	ret = fseek(fp, ehdr.e_shoff, SEEK_SET);
 	printf("%d", ret);
 	printf("shoff=%lx\n", ehdr.e_shoff);
 	if(ret == -1) return 1;
