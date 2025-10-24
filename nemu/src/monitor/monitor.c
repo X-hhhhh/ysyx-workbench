@@ -76,7 +76,9 @@ static int analyze_elf() {
 	}
 
 	FILE *fp = fopen(elf_file, "rb");
-	Assert(fp, "Can not open '%s'", elf_file);
+//	Assert(fp, "Can not open '%s'", elf_file);
+	if(fp == NULL) {printf("error \n"); return 0;}
+
 
 	struct Elf_info {
 		uint32_t mag0_3;
