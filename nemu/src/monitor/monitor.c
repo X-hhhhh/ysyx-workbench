@@ -94,6 +94,7 @@ static int analyze_elf() {
 
 	//analyze section header
 	ret = fseek(fp, ehdr.e_shoff, 0);
+	printf("%d", ret);
 	if(ret == -1) return 1;
 	//Elf64_Shdr shdr;
 
