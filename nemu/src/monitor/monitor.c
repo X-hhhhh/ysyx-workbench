@@ -118,7 +118,7 @@ static int parse_args(int argc, char *argv[]) {
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
       case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
-      case 'f': elf_file = optarg; break;
+      case 'f': elf_file = optarg; analyze_elf(); break;
       case 1: img_file = optarg; return 0;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
@@ -168,9 +168,6 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Display welcome message. */
   welcome();
-
-	analyze_elf();
-
 }
 #else // CONFIG_TARGET_AM
 static long load_img() {
