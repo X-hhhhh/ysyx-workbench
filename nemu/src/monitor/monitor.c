@@ -89,7 +89,7 @@ static int analyze_elf() {
 	ret = fread(&elf_info.mag0_3, 4, 1, fp);
 	if(ret == 0);
 	
-	printf("%x", elf_info.mag0_3);
+	printf("%x\n", elf_info.mag0_3);
 
 
 
