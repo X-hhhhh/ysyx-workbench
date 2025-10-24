@@ -82,8 +82,8 @@ static int analyze_elf() {
 	int ret;
 
 	//analyze elf header
-	Elf64_Ehdr ehdr;
-	ret = fread(&ehdr, sizeof(Elf64_Ehdr), 1, fp);
+	Elf32_Ehdr ehdr;
+	ret = fread(&ehdr, sizeof(Elf32_Ehdr), 1, fp);
 	if(ret != 1) return 1;
 	
 	//check if it is an elf file
@@ -95,7 +95,7 @@ static int analyze_elf() {
 	//analyze section header
 	ret = fseek(fp, ehdr.e_shoff, SEEK_SET);
 	printf("%d", ret);
-	printf("shoff=%lx\n", ehdr.e_shoff);
+	printf("shoff=%x\n", ehdr.e_shoff);
 	if(ret == -1) return 1;
 	//Elf64_Shdr shdr;
 
