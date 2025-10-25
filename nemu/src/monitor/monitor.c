@@ -40,10 +40,12 @@ static void welcome() {
 #ifndef CONFIG_TARGET_AM
 #include <getopt.h>
 
+#define MAX_FUNCNUM 512
+
 static struct {
-	uint32_t address_b[1024];
-	uint32_t address_e[1024];
-	char **name;
+	uint32_t address_b[MAX_FUNCNUM];
+	uint32_t address_e[MAX_FUNCNUM];
+	char name[MAX_FUNCNUM][64];
 	int count;
 } func_add_table = {
 	.count = 0,
@@ -138,27 +140,38 @@ static int analyze_elf() {
 	if(symtab_idx == -1 || strtab_idx == -1) return 1;
 	
 	Elf32_Off symtab_off = shdr[symtab_idx].sh_addr + shdr[symtab_idx].sh_offset;
-	//Elf32_Off strtab_off = shdr[strtab_idx].sh_addr + shdr[strtab_idx].sh_offset;
+	Elf32_Off strtab_off = shdr[strtab_idx].sh_addr + shdr[strtab_idx].sh_offset;
 	
 	//analyze symtab
 	ret = fseek(fp, symtab_off, SEEK_SET);
 	if(ret == -1) return 1;
 	int sym_num = shdr[symtab_idx].sh_size / sizeof(Elf32_Sym);
 	Elf32_Sym sym[sym_num];
+	count = 0;
 	ret = fread(&sym, shdr[symtab_idx].sh_size, 1, fp);
 	if(ret != 1) return 1;
 	for(int i = 0; i < sym_num; i++) {
 		if(ELF32_ST_TYPE(sym[i].st_info) == STT_FUNC) {
 			func_add_table.address_b[func_add_table.count] = sym[i].st_value;
 			func_add_table.address_e[func_add_table.count] = sym[i].st_value + sym[i].st_size;
+			fseek(fp, strtab_off + sym[i].st_name, SEEK_SET);
+			while(1) {
+				ret = fread(&buf[count], 1, 1, fp);
+				if(ret != 1) return 1;
+				if(buf[count] == '\0') {
+					strcpy(func_add_table.name[func_add_table.count], buf);
+					count = 0;
+				}
+				count++;
+				
+			}	
 			func_add_table.count++;
-			//fseek();
-
 		}
 	}
 	
 	for(int i = 0; i < func_add_table.count; i++) {
-		printf("st:%x, ed:%x\n", func_add_table.address_b[i], func_add_table.address_e[i]);
+		printf("st:%x, ed:%x, name:%s\n", func_add_table.address_b[i], func_add_table.address_e[i],
+					func_add_table.name[i]);
 	}
 
 
