@@ -139,7 +139,7 @@ static int analyze_elf() {
 	//if(ret != -1) return 1;
 	
 
-	printf("%d %d\n", symtab_off, strtab_off);
+	printf("%x %x\n", symtab_off, strtab_off);
 
 
 
