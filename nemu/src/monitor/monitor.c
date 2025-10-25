@@ -102,16 +102,29 @@ static int analyze_elf() {
 	}
 
 	//go to section name string table
-	//Elf32_Off symtab_offset, strtab_offset;
+	Elf32_Off symtab_offset, strtab_offset;
 	Elf32_Off shstrtab_off = shdr[ehdr.e_shstrndx].sh_addr + shdr[ehdr.e_shstrndx].sh_offset;
 	uint32_t shstrtab_size = shdr[ehdr.e_shstrndx].sh_size;
+	char buf[128];
+	int count = 0;
+	int str_idx = 0;
 	ret = fseek(fp, shstrtab_off, SEEK_SET);
 	if(ret == -1) return 1;
-	char **shstrtab = (char**)malloc(shstrtab_size);
-	if(shstrtab == NULL) return 1;
-	ret = fread(shstrtab, shstrtab_size, 1, fp);
-	if(ret != 1) return 1;
-	//printf("%s", shstrtab[0]);
+	for(int i = 0; i < shstrtab_size; i++) {
+		ret = fread(&buf[count], 1, 1, fp);
+		if(ret != 1) return 1;
+		if(buf[count] == '\0') {
+			count = 0;
+			if(strcmp(buf, ".symtab") == 0) {
+				symtab_offset = str_idx;
+			}else if(strcmp(buf, ".strtab") == 0) {
+				strtab_offset = str_idx;
+			}
+			str_idx++;
+		}
+		count++;
+	}
+	printf("%d %d\n", symtab_offset, strtab_offset);
 
 
 
