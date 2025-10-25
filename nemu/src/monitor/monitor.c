@@ -110,6 +110,7 @@ static int analyze_elf() {
 	ret = fseek(fp, shstrtab_off, SEEK_SET);
 	if(ret == -1) return 1;
 	for(int i = 0; i < ehdr.e_shnum; i++) {
+		fseek(fp, shstrtab_off + shdr[i].sh_name, SEEK_SET);
 		while(1) {
 			ret = fread(&buf[count], 1, 1, fp);
 			if(ret != 1) return 1;
