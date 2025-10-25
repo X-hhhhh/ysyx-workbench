@@ -135,8 +135,8 @@ static int analyze_elf() {
 	}
 	
 	//analyze symtab
-	ret = fseek(fp, symtab_off, SEEK_SET);
-	if(ret != -1) return 1;
+	//ret = fseek(fp, symtab_off, SEEK_SET);
+	//if(ret != -1) return 1;
 	
 
 	printf("%d %d\n", symtab_off, strtab_off);
