@@ -110,7 +110,7 @@ static int analyze_elf() {
 	}
 
 	//go to section name string table 
-	Elf32_Off symtab_off, strtab_off;
+	int symtab_idx = -1, strtab_idx = -1;
 	Elf32_Off shstrtab_off = shdr[ehdr.e_shstrndx].sh_addr + shdr[ehdr.e_shstrndx].sh_offset;
 	char buf[128];
 	int count = 0;
@@ -124,23 +124,30 @@ static int analyze_elf() {
 			if(buf[count] == '\0') {
 				count = 0;
 				if(strcmp(buf, ".symtab") == 0) {
-					symtab_off = shdr[i].sh_addr + shdr[i].sh_offset;
+					symtab_idx = i;
 				}else if(strcmp(buf, ".strtab") == 0) {
-					strtab_off = shdr[i].sh_addr + shdr[i].sh_offset;
+					strtab_idx = i;
 				}
 				break;
 			}
 			count++;
 		}
 	}
+
+	if(symtab_idx == -1 || strtab_idx == -1) return 1;
+	
+	Elf32_Off symtab_off = shdr[symtab_idx].sh_addr + shdr[symtab_idx].sh_offset;
+	Elf32_Off strtab_off = shdr[strtab_idx].sh_addr + shdr[strtab_idx].sh_offset;
 	
 	//analyze symtab
-	//ret = fseek(fp, symtab_off, SEEK_SET);
-	//if(ret != -1) return 1;
-	
+	ret = fseek(fp, symtab_off, SEEK_SET);
+	if(ret == -1) return 1;
+	int sym_num = shdr[symtab_idx].sh_size / sizeof(Elf32_Sym);
+	//Elf32_Sym sym;
+	//for(int i = 0; i < )
 
 	printf("%x %x\n", symtab_off, strtab_off);
-
+	printf("%d\n", sym_num);
 
 
 
