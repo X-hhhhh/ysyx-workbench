@@ -158,7 +158,7 @@ static int analyze_elf() {
 	}
 	
 	for(int i = 0; i < func_add_table.count; i++) {
-		printf("st:%d, ed:%d\n", func_add_table.address_b[i], func_add_table.address_e[i]);
+		printf("st:%x, ed:%x\n", func_add_table.address_b[i], func_add_table.address_e[i]);
 	}
 
 
