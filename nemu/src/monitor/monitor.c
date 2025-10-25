@@ -211,8 +211,11 @@ void Ftrace(uint32_t pc, uint32_t dnpc, uint8_t inst_type, uint32_t inst) {
 void Ftrace_report() {
 	printf("Ftrace:\n");
 	for(int i = 0; i < func_call_info.count; i++) {
-		if(func_call_info.type[i] == 'c')
-		printf("%x:  call %s\n", func_call_info.pc[i], func_call_info.info[i]);
+		if(func_call_info.type[i] == 'c') {
+			printf("%x:  call %s\n", func_call_info.pc[i], func_call_info.info[i]);
+		}else {
+			printf("%x:  ret  %s\n", func_call_info.pc[i], func_call_info.info[i]);
+		}
 	}
 	printf("\n");
 }
