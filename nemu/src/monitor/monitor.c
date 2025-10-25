@@ -101,10 +101,6 @@ static int analyze_elf() {
 		if(ret != 1) return 1;
 	}
 
-	for(int i = 0; i < ehdr.e_shnum; i++) {
-		printf("%x\n", shdr[i].sh_name);
-	}
-
 	//go to section name string table
 	Elf32_Off symtab_offset, strtab_offset;
 	Elf32_Off shstrtab_off = shdr[ehdr.e_shstrndx].sh_addr + shdr[ehdr.e_shstrndx].sh_offset;
