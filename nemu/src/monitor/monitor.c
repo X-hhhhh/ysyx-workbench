@@ -102,12 +102,15 @@ static int analyze_elf() {
 		if(ret != 1) return 1;
 	}
 
+	
+
 	//go to section name string table
 	//Elf32_Off symtab_offset, strtab_offset;
 	//char *temp;
-	ret = fseek(fp, ehdr.e_shstrndx, SEEK_SET);
+	Elf32_Off shstrtab_off = shdr[ehdr.e_shstrndx].sh_addr + shdr[ehdr.e_shstrndx].sh_offset;
+	ret = fseek(fp, shstrtab_off, SEEK_SET);
 	if(ret == -1) return 1;
-	printf("%x\n", ehdr.e_shstrndx);
+	printf("%x\n", shstrtab_off);
 	//for(i = 0; i < ehdr.e_shnum; i++) {
 	//	ret = fread(temp, sizeof();
 	//} 
