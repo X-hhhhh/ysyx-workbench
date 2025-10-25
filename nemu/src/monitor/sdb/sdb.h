@@ -26,5 +26,6 @@ void display_wp();
 bool scan_wp();
 
 void Ftrace(uint32_t pc, uint8_t inst_type, uint32_t inst);
+void Ftrace_report();
 
 #endif
