@@ -193,13 +193,16 @@ void Ftrace(uint32_t pc, uint32_t dnpc, uint8_t inst_type, uint32_t inst) {
 		func_call_info.type[func_call_info.count] = 'c';
 	}
 	func_call_info.pc[func_call_info.count] = pc;
-	for(int i = 0; i < func_add_table.count; i++) {
+	
+	int i;
+	for(i = 0; i < func_add_table.count; i++) {
 		if(dnpc >= func_add_table.address_b[i] && dnpc < func_add_table.address_e[i]) {
 			strcpy(func_call_info.info[func_call_info.count], func_add_table.name[i]);
-		}else {
-			strcpy(func_call_info.info[func_call_info.count], "???");
+			break;
 		}
-		break;
+	}
+	if(i == func_add_table.count) {
+		strcpy(func_call_info.info[func_call_info.count], "???");
 	}
 	func_call_info.count++;
 	printf("dnpc=%x\n", dnpc);
