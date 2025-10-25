@@ -110,7 +110,7 @@ static int analyze_elf() {
 	char **shstrtab = (char**)malloc(shstrtab_size);
 	if(shstrtab == NULL) return 1;
 	ret = fread(shstrtab, shstrtab_size, 1, fp);
-	//if(ret != 1) return 1;
+	if(ret != 1) return 1;
 	//printf("%s", shstrtab[0]);
 
 
