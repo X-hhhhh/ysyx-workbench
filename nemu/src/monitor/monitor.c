@@ -98,22 +98,23 @@ static int analyze_elf() {
 	Elf32_Shdr shdr[ehdr.e_shnum];
 	for(int i = 0; i < ehdr.e_shnum; i++) {
 		ret = fread(&shdr[i], sizeof(Elf32_Shdr), 1, fp);
-		printf("%x\n", shdr[i].sh_name);
 		if(ret != 1) return 1;
 	}
 
-	
-
 	//go to section name string table
 	//Elf32_Off symtab_offset, strtab_offset;
-	//char *temp;
 	Elf32_Off shstrtab_off = shdr[ehdr.e_shstrndx].sh_addr + shdr[ehdr.e_shstrndx].sh_offset;
+	uint32_t shstrtab_size = shdr[ehdr.e_shstrndx].sh_size;
 	ret = fseek(fp, shstrtab_off, SEEK_SET);
 	if(ret == -1) return 1;
+	char **shstrtab = (char**)malloc(shstrtab_size);
+	ret = fread(shstrtab, shstrtab_size, 1, fp);
+	if(ret != 1) return 1;
+	printf("%s", shstrtab[0]);
+
+
+
 	printf("%x\n", shstrtab_off);
-	//for(i = 0; i < ehdr.e_shnum; i++) {
-	//	ret = fread(temp, sizeof();
-	//} 
 
 
 
