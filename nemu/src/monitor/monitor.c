@@ -106,8 +106,7 @@ static int analyze_elf() {
 	Elf32_Off shstrtab_off = shdr[ehdr.e_shstrndx].sh_addr + shdr[ehdr.e_shstrndx].sh_offset;
 	uint32_t shstrtab_size = shdr[ehdr.e_shstrndx].sh_size;
 	char buf[128];
-	int count = 0;
-	int str_idx = 0;
+	int count = 0, str_idx = 0;
 	ret = fseek(fp, shstrtab_off, SEEK_SET);
 	if(ret == -1) return 1;
 	for(int i = 0; i < shstrtab_size; i++) {
@@ -121,6 +120,7 @@ static int analyze_elf() {
 				strtab_offset = str_idx;
 			}
 			str_idx++;
+			printf("%s", buf);
 		}
 		count++;
 	}
