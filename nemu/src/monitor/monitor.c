@@ -120,7 +120,7 @@ static int analyze_elf() {
 				strtab_offset = str_idx;
 			}
 			str_idx++;
-			printf("%s", buf);
+			printf("%s\n", buf);
 		}
 		count++;
 	}
