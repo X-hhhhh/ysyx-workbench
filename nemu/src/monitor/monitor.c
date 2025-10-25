@@ -143,8 +143,17 @@ static int analyze_elf() {
 	ret = fseek(fp, symtab_off, SEEK_SET);
 	if(ret == -1) return 1;
 	int sym_num = shdr[symtab_idx].sh_size / sizeof(Elf32_Sym);
-	//Elf32_Sym sym;
-	//for(int i = 0; i < )
+	Elf32_Sym sym[sym_num];
+	ret = fread(&sym, shdr[symtab_idx].sh_size, 1, fp);
+	if(ret != 1) return 1;
+	for(int i = 0; i < sym_num; i++) {
+		if(sym[i].st_info == STT_FUNC) {
+			printf("%d\n", i);
+		}
+	}
+	
+
+
 
 	printf("%x %x\n", symtab_off, strtab_off);
 	printf("%d\n", sym_num);
