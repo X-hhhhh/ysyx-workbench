@@ -97,15 +97,15 @@ static int analyze_elf() {
 	if(ret == -1) return 1;
 	Elf32_Shdr shdr;
 	//Elf32_Off symtab_offset, strtab_offset;
-	//for(int i = 0; i < ehdr.e_shnum; i++) {
+	for(int i = 0; i < ehdr.e_shnum; i++) {
 		ret = fread(&shdr, sizeof(Elf32_Shdr), 1, fp);
-	//	if(ret != 1) return 1;
+		printf("%x\n", shdr.sh_name);
+		if(ret != 1) {printf("error\n"); return 1;}
 	//	if(shdr.sh_name == )
-	//}
+	}
 
 
 
-	printf("%x", shdr.sh_name);
 
 
 
