@@ -162,9 +162,9 @@ static int analyze_elf() {
 				if(buf[count] == '\0') {
 					strcpy(func_add_table.name[func_add_table.count], buf);
 					count = 0;
+					break;
 				}
-				count++;
-				
+				count++;	
 			}	
 			func_add_table.count++;
 		}
