@@ -39,14 +39,15 @@ static void welcome() {
 
 #ifndef CONFIG_TARGET_AM
 #include <getopt.h>
-/*
+
 static struct {
 	uint32_t address_b[1024];
+	uint32_t address_e[1024];
 	char **name;
 	int count;
 } func_add_table = {
 	.count = 0,
-};*/
+};
 
 void sdb_set_batch_mode();
 
@@ -137,7 +138,7 @@ static int analyze_elf() {
 	if(symtab_idx == -1 || strtab_idx == -1) return 1;
 	
 	Elf32_Off symtab_off = shdr[symtab_idx].sh_addr + shdr[symtab_idx].sh_offset;
-	Elf32_Off strtab_off = shdr[strtab_idx].sh_addr + shdr[strtab_idx].sh_offset;
+	//Elf32_Off strtab_off = shdr[strtab_idx].sh_addr + shdr[strtab_idx].sh_offset;
 	
 	//analyze symtab
 	ret = fseek(fp, symtab_off, SEEK_SET);
@@ -145,16 +146,20 @@ static int analyze_elf() {
 	int sym_num = shdr[symtab_idx].sh_size / sizeof(Elf32_Sym);
 	Elf32_Sym sym[sym_num];
 	ret = fread(&sym, shdr[symtab_idx].sh_size, 1, fp);
+	if(ret != 1) return 1;
 	for(int i = 0; i < sym_num; i++) {
 		if(ELF32_ST_TYPE(sym[i].st_info) == STT_FUNC) {
-			printf("%d\n", i);
+			func_add_table.address_b[func_add_table.count] = sym[i].st_value;
+			func_add_table.address_e[func_add_table.count] = sym[i].st_value + sym[i].st_size;
+			func_add_table.count++;
+			//fseek();
+
 		}
 	}
 	
-
-
-
-	printf("%x %x\n", symtab_off, strtab_off);
+	for(int i = 0; i < func_add_table.count; i++) {
+		printf("st:%d, ed:%d\n", func_add_table.address_b[i], func_add_table.address_e[i]);
+	}
 
 
 
