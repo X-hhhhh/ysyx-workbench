@@ -186,7 +186,7 @@ static int analyze_elf() {
 	return 0;
 }
 
-void Ftrace(uint32_t pc, uint8_t inst_type, uint32_t inst) {
+void Ftrace(uint32_t pc, uint32_t dnpc, uint8_t inst_type, uint32_t inst) {
 	if(inst_type == 1 && inst == 0xA067) {
 		func_call_info.type[func_call_info.count] = 'r';
 	}else {
@@ -194,7 +194,7 @@ void Ftrace(uint32_t pc, uint8_t inst_type, uint32_t inst) {
 	}
 	func_call_info.pc[func_call_info.count] = pc;
 	for(int i = 0; i < func_add_table.count; i++) {
-		if(pc >= func_add_table.address_b[i] && pc < func_add_table.address_e[i]) {
+		if(dnpc >= func_add_table.address_b[i] && dnpc < func_add_table.address_e[i]) {
 			strcpy(func_call_info.info[func_call_info.count], func_add_table.name[i]);
 		}else {
 			strcpy(func_call_info.info[func_call_info.count], "???");
