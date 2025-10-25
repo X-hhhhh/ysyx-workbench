@@ -107,7 +107,8 @@ static int analyze_elf() {
 	uint32_t shstrtab_size = shdr[ehdr.e_shstrndx].sh_size;
 	ret = fseek(fp, shstrtab_off, SEEK_SET);
 	if(ret == -1) return 1;
-	//char **shstrtab = (char**)malloc(shstrtab_size);
+	char **shstrtab = (char**)malloc(shstrtab_size);
+	if(shstrtab == NULL) return 1;
 	//ret = fread(shstrtab, shstrtab_size, 1, fp);
 	//if(ret != 1) return 1;
 	//printf("%s", shstrtab[0]);
