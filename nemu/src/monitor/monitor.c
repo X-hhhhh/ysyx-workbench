@@ -100,7 +100,7 @@ static int analyze_elf() {
 	for(int i = 0; i < ehdr.e_shnum; i++) {
 		ret = fread(&shdr, sizeof(Elf32_Shdr), 1, fp);
 		printf("%x\n", shdr.sh_name);
-		if(ret != 1) {printf("error\n"); return 1;}
+		//if(ret != 1) {printf("error\n"); return 1;}
 	//	if(shdr.sh_name == )
 	}
 
