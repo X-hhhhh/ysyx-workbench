@@ -41,6 +41,7 @@ static void welcome() {
 #include <getopt.h>
 
 #define MAX_FUNCNUM 512
+#define MAX_CALL_RET 512
 
 static struct {
 	uint32_t address_b[MAX_FUNCNUM];
@@ -48,8 +49,15 @@ static struct {
 	char name[MAX_FUNCNUM][64];
 	int count;
 } func_add_table = {
-	.count = 0,
+	.count = 0
 };
+
+static struct {
+	uint32_t pc[MAX_CALL_RET];
+	char type[MAX_CALL_RET];	//'c' for call, 'r' for ret
+	char info[MAX_CALL_RET][64];	//call func's name or return func's name
+	int count;
+} func_call_info;
 
 void sdb_set_batch_mode();
 
@@ -173,17 +181,27 @@ static int analyze_elf() {
 		printf("st:%x, ed:%x, name:%s\n", func_add_table.address_b[i], func_add_table.address_e[i],
 					func_add_table.name[i]);
 	}
-
-
-
-
-
-
-
-
 	fclose(fp);
 	fp = NULL;
 	return 0;
+}
+
+void Ftrace(uint32_t pc, uint8_t inst_type, uint32_t inst) {
+	if(inst_type == 1 && inst == 0xA067) {
+		func_call_info.type[func_call_info.count] = 'r';
+	}else {
+		func_call_info.type[func_call_info.count] = 'c';
+	}
+	func_call_info.pc[func_call_info.count] = pc;
+	for(int i = 0; i < func_add_table.count; i++) {
+		if(pc >= func_add_table.address_b[i] && pc < func_add_table.address_e[i]) {
+			strcpy(func_call_info.info[func_call_info.count], func_add_table.name[i]);
+		}else {
+			strcpy(func_call_info.info[func_call_info.count], "???");
+		}
+		break;
+	}
+	func_call_info.count++;
 }
 
 static int parse_args(int argc, char *argv[]) {
