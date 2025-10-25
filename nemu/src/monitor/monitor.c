@@ -39,6 +39,14 @@ static void welcome() {
 
 #ifndef CONFIG_TARGET_AM
 #include <getopt.h>
+/*
+static struct {
+	uint32_t address_b[1024];
+	char **name;
+	int count;
+} func_add_table = {
+	.count = 0,
+};*/
 
 void sdb_set_batch_mode();
 
@@ -101,10 +109,9 @@ static int analyze_elf() {
 		if(ret != 1) return 1;
 	}
 
-	//go to section name string table
-	Elf32_Off symtab_offset, strtab_offset;
+	//go to section name string table 
+	Elf32_Off symtab_off, strtab_off;
 	Elf32_Off shstrtab_off = shdr[ehdr.e_shstrndx].sh_addr + shdr[ehdr.e_shstrndx].sh_offset;
-	uint32_t shstrtab_size = shdr[ehdr.e_shstrndx].sh_size;
 	char buf[128];
 	int count = 0;
 	ret = fseek(fp, shstrtab_off, SEEK_SET);
@@ -117,20 +124,25 @@ static int analyze_elf() {
 			if(buf[count] == '\0') {
 				count = 0;
 				if(strcmp(buf, ".symtab") == 0) {
-					symtab_offset = i;
+					symtab_off = shdr[i].sh_addr + shdr[i].sh_offset;
 				}else if(strcmp(buf, ".strtab") == 0) {
-					strtab_offset = i;
+					strtab_off = shdr[i].sh_addr + shdr[i].sh_offset;
 				}
 				break;
 			}
 			count++;
 		}
 	}
-	printf("%d %d\n", symtab_offset, strtab_offset);
+	
+	//analyze symtab
+	ret = fseek(fp, symtab_off, SEEK_SET);
+	if(ret != -1) return 1;
+	
+
+	printf("%d %d\n", symtab_off, strtab_off);
 
 
 
-	printf("%x\n", shstrtab_size);
 
 
 
