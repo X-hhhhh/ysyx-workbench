@@ -123,6 +123,7 @@ static int analyze_elf() {
 			printf("%s\n", buf);
 		}
 		count++;
+		printf("%c", buf[count]);
 	}
 	printf("%d %d\n", symtab_offset, strtab_offset);
 
