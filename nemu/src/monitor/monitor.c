@@ -155,6 +155,7 @@ static int analyze_elf() {
 			func_add_table.address_b[func_add_table.count] = sym[i].st_value;
 			func_add_table.address_e[func_add_table.count] = sym[i].st_value + sym[i].st_size;
 			fseek(fp, strtab_off + sym[i].st_name, SEEK_SET);
+			printf("%x\n", strtab_off + sym[i].st_name );
 			while(1) {
 				ret = fread(&buf[count], 1, 1, fp);
 				if(ret != 1) return 1;
