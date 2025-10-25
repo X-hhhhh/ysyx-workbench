@@ -102,7 +102,7 @@ static int analyze_elf() {
 	}
 
 	for(int i = 0; i < ehdr.e_shnum; i++) {
-		printf("%x", shdr[i].sh_name);
+		printf("%x\n", shdr[i].sh_name);
 	}
 
 	//go to section name string table
