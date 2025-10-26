@@ -24,6 +24,44 @@ static uint8_t *pmem = NULL;
 static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #endif
 
+#define MAX_Mtrace 1000
+#ifdef CONFIG_MTRACE
+static struct Mtrace_info {
+	paddr_t mem_buf[MAX_Mtrace];
+	uint8_t data_len[MAX_Mtrace];
+	uint8_t rw_flag[MAX_Mtrace];	//1:write, 0: read
+	int count;
+} Mt = {
+	.mem_buf = {0},
+	.data_len = {0},
+	.rw_flag = {0},
+	.count = 0,
+};
+
+static void Mtrace(paddr_t addr, int len, uint8_t rw_flag) {
+	if(Mt.count >= MAX_Mtrace) {return;}
+	Mt.mem_buf[Mt.count] = addr;
+	Mt.data_len[Mt.count] = len;
+	Mt.rw_flag[Mt.count] = rw_flag;
+	Mt.count++;
+}
+
+void Mtrace_report() {
+	printf("Mtrace Information:\n");
+	printf("R/W   pmem_addr   len\n");
+	for(int i = 0; i < Mt.count; i++) {
+		if(Mt.rw_flag[i] == 0) {
+			printf("Rd  %10x    %d\n", Mt.mem_buf[i], Mt.data_len[i]);
+		}else {
+			printf("Wr  %10x    %d\n", Mt.mem_buf[i], Mt.data_len[i]);
+		}
+	}
+	if(Mt.count == MAX_Mtrace) {
+		printf("The Mtrace record is full, there may be data that has not been recorded\n");
+	}
+}
+#endif
+
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }
 paddr_t host_to_guest(uint8_t *haddr) { return haddr - pmem + CONFIG_MBASE; }
 
@@ -51,6 +89,10 @@ void init_mem() {
 }
 
 word_t paddr_read(paddr_t addr, int len) {
+#ifdef CONFIG_MTRACE
+  Mtrace(addr, len, 0);
+#endif
+
   if (likely(in_pmem(addr))) return pmem_read(addr, len);
   IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
   out_of_bound(addr);
@@ -58,6 +100,10 @@ word_t paddr_read(paddr_t addr, int len) {
 }
 
 void paddr_write(paddr_t addr, int len, word_t data) {
+#ifdef CONFIG_MTRACE
+  Mtrace(addr, len, 1);
+#endif
+
   if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
   IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
   out_of_bound(addr);

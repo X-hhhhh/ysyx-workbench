@@ -195,6 +195,14 @@ config DIFFTEST_REF_NAME
 config WATCHPOINT_SCAN
   bool "Enable watchpoint scanning function"
   default n
+
+config MTRACE
+  bool "Enable memory trace"
+  default n
+
+config FTRACE
+  bool "Enable function call trace"
+  default n
 endmenu
 
 if MODE_SYSTEM
