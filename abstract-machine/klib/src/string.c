@@ -70,7 +70,13 @@ void *memmove(void *dst, const void *src, size_t n) {
 }
 
 void *memcpy(void *out, const void *in, size_t n) {
-  panic("Not implemented");
+	uint8_t *out_t = out;
+	for(int i = 0; i < n; i++) {
+		*out_t = *(uint8_t*)in;
+		out_t = out_t + 1;
+		in = (uint8_t*)in + 1;
+	}
+	return out;
 }
 
 int memcmp(const void *s1, const void *s2, size_t n) {
