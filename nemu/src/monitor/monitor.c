@@ -206,7 +206,6 @@ void Ftrace(uint32_t pc, uint32_t dnpc, uint8_t inst_type, uint32_t inst) {
 		strcpy(func_call_info.info[func_call_info.count], "???");
 	}
 	func_call_info.count++;
-	printf("dnpc=%x\n", dnpc);
 }
 
 void Ftrace_report() {
