@@ -197,7 +197,11 @@ config WATCHPOINT_SCAN
   default n
 
 config MTRACE
-  bool "Enable Mtrace"
+  bool "Enable memory trace"
+  default n
+
+config FTRACE
+  bool "Enable function call trace"
   default n
 endmenu
 
