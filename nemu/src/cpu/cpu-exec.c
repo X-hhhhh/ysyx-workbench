@@ -173,6 +173,6 @@ void cpu_exec(uint64_t n) {
       // fall through
     case NEMU_QUIT: 
       statistic();
-      Ftrace_report();
+      IFDEF(CONFIG_FTRACE, Ftrace_report();)
   }
 }
