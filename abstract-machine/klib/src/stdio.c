@@ -17,10 +17,10 @@ static void reverse_string(char *str) {
 
 static char* int2char(int num, char *buffer) {
 	//if num is INT_MIN
-	/*if(num == -2147483648) {
+	if(num == -2147483648) {
 		strcpy(buffer, "-2147483648");
 		return buffer;
-	}*/
+	}
 
 	int is_negative = 0;
 	char *dst = buffer;
