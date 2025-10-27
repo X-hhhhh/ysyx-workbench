@@ -81,10 +81,10 @@ void *memcpy(void *out, const void *in, size_t n) {
 
 int memcmp(const void *s1, const void *s2, size_t n) {
 	for(int i = 0; n > 0; n--) {
-		i = *(char*)s1 - *(char*)s2;
+		i = *(uint8_t*)s1 - *(uint8_t*)s2;
 		if(i) {return i;}
-		s1 = (char*)s1 + 1;
-		s2 = (char*)s2 + 1;
+		s1 = (uint8_t*)s1 + 1;
+		s2 = (uint8_t*)s2 + 1;
 	}
 	return 0;
 }
