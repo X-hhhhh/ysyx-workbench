@@ -1,13 +1,11 @@
 #include <Vtop.h>
-#include <verilated.h>
-
 #include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-
-#include <nvboard.h>
+#include "svdpi.h"
+#include "Vtop__Dpi.h"
+#include <getopt.h>
 
 #define CONFIG_FST_WAVE_TRACE 0
+#define PMEM_SIZE 512000
 
 VerilatedContext* contextp = new VerilatedContext;
 Vtop* top = new Vtop{contextp};
@@ -17,67 +15,152 @@ Vtop* top = new Vtop{contextp};
 VerilatedFstC *tfp = new VerilatedFstC;
 #endif
 
-static TOP_NAME dut;
+static char* img_file = NULL;
+static bool NEMU_TRAP = false;
 
-void nvboard_bind_all_pins(TOP_NAME* top);
+static uint32_t pmem[PMEM_SIZE] = {0};
 
-static void single_cycle(){
-	dut.clk = 0;
-	dut.eval();
-	dut.clk = 1;
-       	dut.eval();
+int pmem_read(int paddr) {
+	if(paddr == 0) return 1;
+	//printf("paddr:%x pc = %x\n", paddr, top -> pc);
+	uint32_t paddr_ = paddr - 0x80000000;
+	/*if(((uint32_t)paddr_ >> 2) >= PMEM_SIZE) {
+		printf("paddr:%x, pc = %x\n", paddr_, top -> pc);
+		for(int i = 0; i < 16 ; i++) {
+			printf("x%d: %x   \n", i, top -> gpr[i]);
+		}
+		return 1;
+	} */
+	assert(((uint32_t)paddr_ >> 2) < PMEM_SIZE);
+	return pmem[(uint32_t)paddr_ >> 2];
+}
+
+void pmem_write(int paddr, int wdata, char wmask) {
+	uint32_t paddr_ = paddr - 0x80000000;
+	assert(((uint32_t)paddr_ >> 2) < PMEM_SIZE);
+	uint32_t mask = 0;
+	for(int i = 0; i < 4; i++) {
+		if((wmask >> i) & 0x1 == 1) {
+			mask |= 0xFF << (i * 8);
+		}
+	}
+	pmem[(uint32_t)paddr_ >> 2] = (pmem[(uint32_t)paddr_ >> 2] & ~mask) | (wdata & mask);
+}
+
+void load_memory(const char *filename) {
+	FILE *fp = fopen(filename, "rb");
+	int ret;
+	assert(fp);
+	for(int i = 0; feof(fp) != 1; i++) {
+		ret = fread(&pmem[i], 4, 1, fp);
+		if(ret != 1) break;
+	}
+	fclose(fp);
+	fp = NULL;
+}
+
+static void wave_trace() {
+	contextp -> timeInc(1);
+	#if CONFIG_FST_WAVE_TRACE
+	tfp -> dump(contextp -> time());
+	#endif	
 }
 
 static void reset(int n){
-	dut.rst = 1;
-	while (n-- > 0) single_cycle();
-	dut.rst = 0;
+	top -> sys_rst = 1;
+	while(n-- > 0){
+		top -> sys_clk = 1; top -> eval(); wave_trace();
+		top -> sys_clk = 0; top -> eval(); wave_trace();
+	}
+	top -> sys_rst = 0;
 }
 
-int main(int argc, char** argv){
+void nemu_trap() {
+	NEMU_TRAP = true;
+}
+
+static int parse_args(int argc, char *argv[]) {
+	const struct option table[] = {
+		{"img"	, required_argument, NULL, 'i'},	
+		{0      ,   		  0, NULL, 0},
+	};
+	int o;
+	while( (o = getopt_long(argc, argv, "-i:", table, NULL)) != -1) {
+		printf("o = %c, optarg = %s\n", o, optarg);
+		switch(o) {
+			case 1: img_file = optarg; return 0;
+			default:
+				  printf("-i, --img: import an img file\n");
+				  exit(0);
+		}
+	}
+	return 0;
+}
+
+static void check_ret() {
+	int halt_ret = top -> gpr[10];
+	if(halt_ret == 0) {
+		printf("npc:\33[1;32m HIT GOOD TRAP\33[1;0m at pc = %x\n", top -> pc);
+	}else {
+		printf("npc:\33[1;31m HIT BAD TRAP\33[1;0m at pc = %x\n", top -> pc);	
+	}
+}
+
+int main(int argc, char* argv[]){
 	contextp->commandArgs(argc, argv);
 
 	#if CONFIG_FST_WAVE_TRACE
 	contextp->traceEverOn(true);
 	top->trace(tfp, 99);
-	tfp->open("build/logs/cpu_wave.fst");
+	tfp->open("wave.fst");
 	#endif
 
-	//reset
-	reset(10);
+	parse_args(argc, argv);
+	load_memory(img_file);
 
-	//define the number of cycles
-	//int cycle = 50;
+	//int cycle = 500000;
+	int reset_time = 10;
+	int inst_num = 0;
 
-	//bind and initialize nvboard
-	nvboard_bind_all_pins(&dut);
-	nvboard_init();
-
-	while(1){
-		contextp->timeInc(1);
-
-		#if CONFIG_FST_WAVE_TRACE
-		tfp->dump(contextp->time());
-		#endif
-		//cycle--;
-		
-		//update nvboard
-		nvboard_update();
-		single_cycle();
+	while(reset_time-- > 0){
+		reset(1);
 	}
+
+	top -> eval(); wave_trace();
+	top -> eval(); wave_trace();
+
+	while(NEMU_TRAP == false) {
+	//while(cycle && NEMU_TRAP == false) {
+		top -> sys_clk = !top -> sys_clk;	
+		top -> eval();
+		wave_trace();
+
+		top -> sys_clk = !top -> sys_clk;		
+		top -> eval();
+		wave_trace();
+		
+		//cycle --;
+		inst_num++;
+	}
+
+	check_ret();
+	printf("executed instructions:%d\n", inst_num);
+
+	/*for(int i = 83954; i < 83954 + 200; i++) {
+		printf("%x: %x  ", i, pmem[i]);
+		if(i % 4 == 0) printf("\n");
+	} */
 
 	#if CONFIG_FST_WAVE_TRACE
 	tfp->close();
 	#endif
-
-	top->final();
+	
+	top -> final();
 	delete top;
 	top = nullptr;
 	delete contextp;
 	contextp = nullptr;
 
-	//destroy nvboard
-	nvboard_quit();
-
 	return 0;
 }
+
