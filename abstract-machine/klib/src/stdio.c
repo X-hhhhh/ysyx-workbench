@@ -61,6 +61,41 @@ static char* int2str(int64_t num, char *buffer) {
 	reverse_string(buffer);
 	return buffer;
 }
+/*
+static void double2str(double num, int dec_place, char *buffer) {
+	bool sign = false;
+	if(num < 0) {sign = true;}
+
+	int i;
+	double integer, decimal;
+	decimal = modf(num, &integer);
+	
+	int64_t int_part = (int64_t)integer;
+	if(decimal != 0.0) {
+		for(i = 0; i < dec_place; i++) {
+			decimal *= 10;
+		}
+		decimal += (sign == true) ? -0.5 : 0.5;
+	}
+	int64_t dec_part = (int64_t)decimal;
+	
+	char buf[64];
+	strcpy(buffer, "");
+	int2str(int_part, buf);
+	strcat(buffer, buf);
+	strcat(buffer, ".");
+	if(decimal == 0.0) {
+		for(i = 0; i < dec_place; i++) {
+			strcat(buffer, "0");
+		}
+	}
+	int2str(dec_part, buf);
+	if(sign == true) {
+		strcat(buffer, &buf[1]);
+	}else {
+		strcat(buffer, buf);
+	}
+} */
 
 static void double2str(double num, int dec_place, char *buffer) {
 	bool sign = false;
@@ -124,12 +159,12 @@ int printf(const char *fmt, ...) {
 					perc = 0;
 					break;
 				case 'f':
-					double2str(va_arg(args, double), 6, buf);
+					/*double2str(va_arg(args, double), 6, buf);
 					for(i = 0; buf[i] != '\0'; i++) {
 						count++;
 						putch(buf[i]);
 					}
-					perc = 0;
+					perc = 0;*/
 					break;
 				case '.':
 				default: break;
