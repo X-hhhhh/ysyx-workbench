@@ -98,10 +98,51 @@ static void double2str(double num, int dec_place, char *buffer) {
 }
 
 int printf(const char *fmt, ...) {
-
-
-
-  panic("Not implemented");
+	va_list args;
+	va_start(args, fmt);
+	int perc = 0;
+	int i, count = 0;
+	//int extr_num[2];
+	char buf[64];
+	for(; *fmt != '\0'; fmt++) {
+		if(perc == 1) {
+			switch(*fmt) {
+				case 'd': 
+					int2str(va_arg(args, int), buf);
+					for(i = 0; buf[i] != '\0'; i++) {
+						count++;
+						putch(buf[i]);
+					}
+					perc = 0;
+					break;
+				case 's': 
+					strcpy(buf, va_arg(args, char*));
+					for(i = 0; buf[i] != '\0'; i++) {
+						count++;
+						putch(buf[i]);
+					}
+					perc = 0;
+					break;
+				case 'f':
+					double2str(va_arg(args, double), 6, buf);
+					for(i = 0; buf[i] != '\0'; i++) {
+						count++;
+						putch(buf[i]);
+					}
+					perc = 0;
+					break;
+				case '.':
+				default: break;
+			}
+		}else if(*fmt == '%') {
+			perc = 1;
+		}else {
+			count++;
+			putch(*fmt);
+		}
+	}
+	va_end(args);	
+	return count;	
 }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
@@ -113,6 +154,7 @@ int sprintf(char *out, const char *fmt, ...) {
 	va_start(args, fmt);
 	int perc = 0;
 	int i, count = 0;
+	//int extr_num[2];
 	char buf[64];
 	for(; *fmt != '\0'; fmt++) {
 		if(perc == 1) {
@@ -122,22 +164,25 @@ int sprintf(char *out, const char *fmt, ...) {
 					for(i = 0; buf[i] != '\0'; i++) {
 						out[count++] = buf[i];
 					}
+					perc = 0;
 					break;
 				case 's': 
 					strcpy(buf, va_arg(args, char*));
 					for(i = 0; buf[i] != '\0'; i++) {
 						out[count++] = buf[i];
-					} 
+					}
+					perc = 0;
 					break;
 				case 'f':
 					double2str(va_arg(args, double), 6, buf);
 					for(i = 0; buf[i] != '\0'; i++) {
 						out[count++] = buf[i];
-					} 
-					 break;
+					}
+					perc = 0;
+					break;
+				case '.':
 				default: break;
 			}
-			perc = 0;
 		}else if(*fmt == '%') {
 			perc = 1;
 		}else {
