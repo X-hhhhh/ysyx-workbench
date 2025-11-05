@@ -15,10 +15,32 @@ static void reverse_string(char *str) {
 	}
 }
 
-static char* int2char(int num, char *buffer) {
-	//if num is INT_MIN
-	if(num == -2147483648) {
-		strcpy(buffer, "-2147483648");
+static double modf(double num, double *integer_part) {
+	uint64_t num_bin;
+	memcpy(&num_bin, &num, sizeof(uint64_t));
+	int64_t e = ((num_bin >> 52) & 0x7FF) - 1023;
+	
+	//if num has no decimal part
+	if(e >= 52) {
+		*integer_part = num;
+		return 0.0;
+	}
+	//if num has no integer part
+	if(e < 0) {
+		*integer_part = 0.0;
+		return num;
+	}
+
+	uint64_t mask = ~((1ULL << (52 - e)) - 1);
+	uint64_t integer_bits = num_bin & mask;
+	memcpy(integer_part, &integer_bits, sizeof(double));
+	return num - *integer_part;
+}
+
+static char* int2str(int64_t num, char *buffer) {
+	//if num is INT64_MIN
+	if(num == 0x8000000000000000) {
+		strcpy(buffer, "-9223372036854775808");
 		return buffer;
 	}
 
@@ -40,7 +62,45 @@ static char* int2char(int num, char *buffer) {
 	return buffer;
 }
 
+static void double2str(double num, int dec_place, char *buffer) {
+	bool sign = false;
+	if(num < 0) {sign = true;}
+
+	int i;
+	double integer, decimal;
+	decimal = modf(num, &integer);
+	
+	int64_t int_part = (int64_t)integer;
+	if(decimal != 0.0) {
+		for(i = 0; i < dec_place; i++) {
+			decimal *= 10;
+		}
+		decimal += (sign == true) ? -0.5 : 0.5;
+	}
+	int64_t dec_part = (int64_t)decimal;
+	
+	char buf[64];
+	strcpy(buffer, "");
+	int2str(int_part, buf);
+	strcat(buffer, buf);
+	strcat(buffer, ".");
+	if(decimal == 0.0) {
+		for(i = 0; i < dec_place; i++) {
+			strcat(buffer, "0");
+		}
+	}
+	int2str(dec_part, buf);
+	if(sign == true) {
+		strcat(buffer, &buf[1]);
+	}else {
+		strcat(buffer, buf);
+	}
+}
+
 int printf(const char *fmt, ...) {
+
+
+
   panic("Not implemented");
 }
 
@@ -53,12 +113,12 @@ int sprintf(char *out, const char *fmt, ...) {
 	va_start(args, fmt);
 	int perc = 0;
 	int i, count = 0;
-	char buf[50];
+	char buf[64];
 	for(; *fmt != '\0'; fmt++) {
 		if(perc == 1) {
 			switch(*fmt) {
 				case 'd': 
-					int2char(va_arg(args, int), buf);
+					int2str(va_arg(args, int), buf);
 					for(i = 0; buf[i] != '\0'; i++) {
 						out[count++] = buf[i];
 					}
@@ -69,6 +129,12 @@ int sprintf(char *out, const char *fmt, ...) {
 						out[count++] = buf[i];
 					} 
 					break;
+				case 'f':
+					double2str(va_arg(args, double), 6, buf);
+					for(i = 0; buf[i] != '\0'; i++) {
+						out[count++] = buf[i];
+					} 
+					 break;
 				default: break;
 			}
 			perc = 0;
