@@ -8,7 +8,7 @@ void __am_timer_init() {
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {	
       	static uint64_t last = 0;
 	uint64_t now = (uint64_t)inl(RTC_ADDR) | ((uint64_t)inl(RTC_ADDR + 4) << 32);
-	printf("now = %lx, lase = %lx\n", now, last);
+	printf("now = %d, lase = %d\n", (int)now, (int)last);
 	uptime->us = now - last;
 	last = now;
 }
