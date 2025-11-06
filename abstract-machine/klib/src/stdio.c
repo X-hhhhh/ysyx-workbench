@@ -14,7 +14,7 @@ static void reverse_string(char *str) {
 		str[i] = temp;
 	}
 }
-
+/*
 static double modf(double num, double *integer_part) {
 	uint64_t num_bin;
 	memcpy(&num_bin, &num, sizeof(uint64_t));
@@ -35,7 +35,7 @@ static double modf(double num, double *integer_part) {
 	uint64_t integer_bits = num_bin & mask;
 	memcpy(integer_part, &integer_bits, sizeof(double));
 	return num - *integer_part;
-}
+} */
 
 static char* int2str(int64_t num, char *buffer) {
 	//if num is INT64_MIN
@@ -61,7 +61,7 @@ static char* int2str(int64_t num, char *buffer) {
 	reverse_string(buffer);
 	return buffer;
 }
-
+/*
 static void double2str(double num, int dec_place, char *buffer) {
 	bool sign = false;
 	if(num < 0) {sign = true;}
@@ -95,14 +95,13 @@ static void double2str(double num, int dec_place, char *buffer) {
 	}else {
 		strcat(buffer, buf);
 	}
-}
+}*/
 
 int printf(const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
 	int perc = 0;
 	int i, count = 0;
-	//int extr_num[2];
 	char buf[64];
 	for(; *fmt != '\0'; fmt++) {
 		if(perc == 1) {
@@ -174,11 +173,11 @@ int sprintf(char *out, const char *fmt, ...) {
 					perc = 0;
 					break;
 				case 'f':
-					double2str(va_arg(args, double), 6, buf);
+					/*double2str(va_arg(args, double), 6, buf);
 					for(i = 0; buf[i] != '\0'; i++) {
 						out[count++] = buf[i];
 					}
-					perc = 0;
+					perc = 0;*/
 					break;
 				case '.':
 				default: break;
