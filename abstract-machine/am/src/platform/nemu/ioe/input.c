@@ -17,5 +17,6 @@ void __am_input_keybrd(AM_INPUT_KEYBRD_T *kbd) {
 	}else {
 		kbd -> keydown = false;
 		kbd -> keycode = keycode;
+		printf("%d\n", keycode);
 	}
 }
