@@ -122,6 +122,11 @@ int printf(const char *fmt, ...) {
 					}
 					perc = 0;
 					break;
+				case 'c':
+					count++;
+					putch(va_arg(args, int));
+					break;
+					perc = 0;
 				case 'f':
 					/*double2str(va_arg(args, double), 6, buf);
 					for(i = 0; buf[i] != '\0'; i++) {
