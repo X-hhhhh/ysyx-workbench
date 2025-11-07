@@ -55,9 +55,9 @@ void init_map() {
 void Dtrace(IOMap *map, word_t rd_data, word_t wr_data, bool is_write) {
 #ifdef CONFIG_DTRACE
 	if(!is_write) {
-		printf("[Dtrace] Name: %s, Type: %s, rd_data: %x\n", map -> name, "rd", rd_data);
+		printf("[Dtrace] Name: %s, Type: %s, rd_data: 0x%x\n", map -> name, "rd", rd_data);
 	}else {
-		printf("[Dtrace] Name: %s, Type: %s, wr_data: %x\n", map -> name, "wr", wr_data);
+		printf("[Dtrace] Name: %s, Type: %s, wr_data: 0x%x\n", map -> name, "wr", wr_data);
 	}
 #endif
 }
