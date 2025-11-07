@@ -7,9 +7,10 @@ void __am_gpu_init() {
 }
 
 void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
+  uint32_t gpu_size = inl(VGACTL_ADDR);
   *cfg = (AM_GPU_CONFIG_T) {
     .present = true, .has_accel = false,
-    .width = 0, .height = 0,
+    .width = gpu_size >> 16, .height = gpu_size & 0xFFFF,
     .vmemsz = 0
   };
 }
