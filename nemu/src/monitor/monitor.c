@@ -177,10 +177,11 @@ static int analyze_elf() {
 		}
 	}
 	
-	for(int i = 0; i < func_add_table.count; i++) {
+	/*for(int i = 0; i < func_add_table.count; i++) {
 		printf("st:%x, ed:%x, name:%s\n", func_add_table.address_b[i], func_add_table.address_e[i],
 					func_add_table.name[i]);
-	}
+	}*/
+
 	fclose(fp);
 	fp = NULL;
 	return 0;

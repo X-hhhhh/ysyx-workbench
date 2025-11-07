@@ -68,18 +68,7 @@ int main(int argc, char *argv[]) {
 
 
 
- 	/*
-  	cpu.gpr[1] = 1;
-  	cpu.gpr[2] = 2;
-
-	bool success;
-	//char str[64] = "($ra + 3 * ($sp) - --2 /2 + 0xA) ";
-	char str[64] = "*(0x80000000 + $ra * 4)";
-	int exp = expr(str, &success);
-	printf("exp=%x, success=%d", exp, success);
-	*/
-
-
+  	//printf("%d", CONFIG_DEVICE);
 
 
 

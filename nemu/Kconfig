@@ -203,6 +203,10 @@ config MTRACE
 config FTRACE
   bool "Enable function call trace"
   default n
+
+config DTRACE
+  bool "Enable device trace"
+  default n
 endmenu
 
 if MODE_SYSTEM

@@ -89,10 +89,12 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
-#endif
+
+
 	//save disassembled infomation to iringbuf
 	strcpy(Irb.disam_buf[Irb.p++], p);
   	if(Irb.p >= MAX_IRINGBUF) {Irb.p = 0;} 
+#endif
 }
 
 static void execute(uint64_t n) {
@@ -116,6 +118,7 @@ static void statistic() {
 }
 
 static void fail_report() {
+#ifdef CONFIG_ITRACE
 	char p[50];
 	uint32_t pc_t = Irb.pc_buf[Irb.p];
 	word_t last_inst = inst_fetch(&pc_t, 4);
@@ -133,6 +136,7 @@ static void fail_report() {
 
 #ifdef CONFIG_MTRACE
 	Mtrace_report();	
+#endif
 #endif
 }
 
