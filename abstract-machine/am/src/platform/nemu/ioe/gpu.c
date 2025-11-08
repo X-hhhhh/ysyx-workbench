@@ -32,9 +32,10 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
 	while(ctl->h--) {
 		while(ctl->w--) {
 			outl(pfb, *(uint32_t*)ctl->pixels);
-			pfb++;
+			pfb += 4;
+			ctl->pixels = (uint32_t*)ctl->pixels + 1;
 		}
-		pfb += width - 1;
+		pfb += width * 4 - 4;
 	}
 	
 	/*for(int y = ctl->y; y < ctl->y + ctl->h; y++) {
