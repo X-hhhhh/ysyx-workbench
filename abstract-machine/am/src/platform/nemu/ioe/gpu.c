@@ -32,7 +32,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
 	for(int y = ctl->y; y < ctl->y + ctl->h; y++) {
 		//printf("y = %d\n", y);
 		for(int x = ctl->x; x < ctl->x + ctl->w; x++) {
-			outl(FB_ADDR + y * width + x, (uintptr_t)ctl->pixels);
+			outl(FB_ADDR + y * width + x, *(uint32_t*)ctl->pixels);
 			ctl->pixels = (uint32_t*)ctl->pixels + 1;
 		//	printf("x = %d", x);
 		}
