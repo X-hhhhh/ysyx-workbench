@@ -36,7 +36,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
 			pfb += 4;
 			ctl->pixels = (uint32_t*)ctl->pixels + 1;
 		}
-		pfb = pfb - ctl->w + width * 4;
+		pfb = pfb - ctl->w * 4 + width * 4;
 	}
  	if(ctl->sync) {
     		outl(SYNC_ADDR, 1);
