@@ -28,8 +28,27 @@ enum {
 };
 
 static uint8_t *sbuf = NULL;
+//static int sbuf_head = 0;
+//static int sbuf_rear = 0;
 static uint32_t *audio_base = NULL;
+/*
+void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
+	
+}
 
+static void init_sdl_audio() {
+	SDL_AudioSpec s = {};
+	s.freq = audio_base[0];
+	s.channels = audio_base[1];
+	s.samples = audio_base[2];
+	s.format = AUDIO_S16SYS;
+	s.userdata = NULL;
+	s.callback = sdl_audio_callback;
+	SDL_InitSubSystem(SDL_INIT_AUDIO);
+	SDL_OpenAudio(&s, NULL);
+	SDL_PauseAudio(0);
+}
+*/
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
 }
 
@@ -37,6 +56,7 @@ void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
   audio_base[3] = CONFIG_SB_SIZE;
+  audio_base[4] = 0;
 #ifdef CONFIG_HAS_PORT_IO
   add_pio_map ("audio", CONFIG_AUDIO_CTL_PORT, audio_base, space_size, audio_io_handler);
 #else
