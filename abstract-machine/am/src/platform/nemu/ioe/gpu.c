@@ -28,16 +28,21 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
 	static uint32_t width = 0; 
 	if(width == 0) {width = inl(VGACTL_ADDR) >> 16;}
-	//printf("x=%d,y=%d,w=%d,h=%d\n", ctl->x, ctl->y, ctl->w, ctl->h);
-	for(int y = ctl->y; y < ctl->y + ctl->h; y++) {
-		//printf("y = %d\n", y);
+	uintptr_t pfb = FB_ADDR + ctl->y * width * 4 + ctl->x * 4;
+	while(ctl->h--) {
+		while(ctl->w--) {
+			outl(pfb, *(uint32_t*)ctl->pixels);
+			pfb++;
+		}
+		pfb += width;
+	}
+	
+	/*for(int y = ctl->y; y < ctl->y + ctl->h; y++) {
 		for(int x = ctl->x; x < ctl->x + ctl->w; x++) {
 			outl(FB_ADDR + y * width * 4 + x * 4, *(uint32_t*)ctl->pixels);
 			ctl->pixels = (uint32_t*)ctl->pixels + 1;
-		//	printf("x = %d", x);
 		}
-		//printf("\n");
-	}
+	}*/
  	if(ctl->sync) {
     		outl(SYNC_ADDR, 1);
  	}
