@@ -6,16 +6,23 @@
 #define SYNC_ADDR (VGACTL_ADDR + 4)
 
 void __am_gpu_init() {
+	int i;
+	int w = 400;
+	int h = 300;
+	uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
+	for (i = 0; i < w * h; i ++) fb[i] = i;
+	outl(SYNC_ADDR, 1);
 }
 
 void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
   uint32_t gpu_size = inl(VGACTL_ADDR);
+  uint32_t w = gpu_size >> 16;
+  uint32_t h = gpu_size & 0xFFFF;
   *cfg = (AM_GPU_CONFIG_T) {
     .present = true, .has_accel = false,
-    .width = gpu_size >> 16, .height = gpu_size & 0xFFFF,
-    .vmemsz = 0
+    .width = w, .height = h,
+    .vmemsz = w * h * 32
   };
-  printf("w=%d, h=%d", gpu_size >> 16, gpu_size & 0xFFFF);
 }
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
