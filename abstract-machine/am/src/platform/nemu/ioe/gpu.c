@@ -18,7 +18,6 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
   uint32_t gpu_size = inl(VGACTL_ADDR);
   uint32_t w = gpu_size >> 16;
   uint32_t h = gpu_size & 0xFFFF;
-  printf("w=%d,h=%d\n", w, h);
   *cfg = (AM_GPU_CONFIG_T) {
     .present = true, .has_accel = false,
     .width = w, .height = h,
@@ -33,7 +32,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
 	for(int y = ctl->y; y < ctl->y + ctl->h; y++) {
 		//printf("y = %d\n", y);
 		for(int x = ctl->x; x < ctl->x + ctl->w; x++) {
-			outl(FB_ADDR + y * width + x, *(uint32_t*)ctl->pixels);
+			outl(FB_ADDR + y * width * 4 + x * 4, *(uint32_t*)ctl->pixels);
 			ctl->pixels = (uint32_t*)ctl->pixels + 1;
 		//	printf("x = %d", x);
 		}
