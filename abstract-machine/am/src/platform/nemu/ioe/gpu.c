@@ -24,8 +24,8 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
 	if(width == 0) {width = inl(VGACTL_ADDR) >> 16;}
 
 	uintptr_t pfb = FB_ADDR + ctl->y * width * 4 + ctl->x * 4;
-	for(int y = ctl->y; y < ctl->y + ctl->h; y++) {
-		for(int x = ctl->x; x < ctl->x + ctl->w; x++) {
+	for(int y = 0; y < ctl->h; y++) {
+		for(int x = 0; x < ctl->w; x++) {
 			outl(pfb, *(uint32_t*)ctl->pixels);
 			pfb += 4;
 			ctl->pixels = (uint32_t*)ctl->pixels + 1;
