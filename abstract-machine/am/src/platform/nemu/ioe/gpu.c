@@ -18,6 +18,7 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
   uint32_t gpu_size = inl(VGACTL_ADDR);
   uint32_t w = gpu_size >> 16;
   uint32_t h = gpu_size & 0xFFFF;
+  printf("w=%d,h=%d\n", w, h);
   *cfg = (AM_GPU_CONFIG_T) {
     .present = true, .has_accel = false,
     .width = w, .height = h,
