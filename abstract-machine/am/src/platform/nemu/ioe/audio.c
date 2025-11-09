@@ -36,10 +36,10 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
 	if(sbuf_size == -1) {sbuf_size = inl(AUDIO_SBUF_SIZE_ADDR);}
 	
 	int count = inl(AUDIO_COUNT_ADDR);
-	int free = sbuf_size - count - 1;	//the queue sacrifices a space
+	int free = sbuf_size - count - 1;		//the queue sacrifices a space
 	int datanum = ctl->buf.end - ctl->buf.start;
 	int sbuf_rear = inl(AUDIO_SBUF_REAR);
-	printf("sbuf_size=%d, count=%d, free=%d, sbuf_rear=%d\n", sbuf_size, count, free, datanum);
+	printf("sbuf_size=%d, count=%d, free=%d, datanum=%d, sbuf_rear=%d\n", sbuf_size, count, free, datanum, sbuf_rear);
 	
 	//if the space of sbuf is not enough to write, wait until it is enough
 	while(datanum > free);
