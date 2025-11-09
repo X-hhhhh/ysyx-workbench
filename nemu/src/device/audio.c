@@ -46,6 +46,7 @@ static uint8_t audio_dequeue() {
 
 void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
 	int count = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE;
+	printf("count=%d\n", count);
 	if(len <= count) {
 		while(len--) {
 			*stream = audio_dequeue();
