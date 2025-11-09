@@ -71,13 +71,13 @@ static void init_sdl_audio() {
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {	
 	//update rear pointer, and synchronize to memory
-	if(offset == 24) {
+	/*if(offset == 24) {
 		if(is_write) {
 			sbuf_rear = (sbuf_rear + 1) % CONFIG_SB_SIZE;
 			audio_base[6] = sbuf_rear;
 		}
 		return;
-	}
+	}*/
 	//if accessing the count reg, update free space count
 	if(offset == 20) {
 		audio_base[5] = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE; 

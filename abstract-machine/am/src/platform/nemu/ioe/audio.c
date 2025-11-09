@@ -9,8 +9,7 @@
 #define AUDIO_SBUF_SIZE_ADDR (AUDIO_ADDR + 0x0c)
 #define AUDIO_INIT_ADDR      (AUDIO_ADDR + 0x10)
 #define AUDIO_COUNT_ADDR     (AUDIO_ADDR + 0x14)
-#define AUDIO_SBUF_HEAD	     (AUDIO_ADDR + 0x18)
-#define AUDIO_SBUF_REAR	     (AUDIO_ADDR + 0x1c)
+#define AUDIO_SBUF_REAR	     (AUDIO_ADDR + 0x18)
 
 void __am_audio_init() {
 }
@@ -49,5 +48,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
 		sbuf_rear = (sbuf_rear + 1) % sbuf_size;
 		ctl->buf.start = (uint8_t*)ctl->buf.start + 1;
 	}
+	//synchronize sbuf_rear to memory
+	outl(AUDIO_SBUF_REAR, sbuf_rear);
 }
 
