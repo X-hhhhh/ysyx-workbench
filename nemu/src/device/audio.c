@@ -78,6 +78,11 @@ static void init_sdl_audio() {
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {	
+	//synchronize sbuf_rear to nemu
+	if(offset == 24 && is_write) {
+		sbuf_rear = audio_base[6];
+		return;
+	}
 	//if accessing the count reg, update free space count
 	if(offset == 20) {
 		audio_base[5] = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE; 
