@@ -39,12 +39,16 @@ void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
 	int count = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE;
 	if(len <= count) {
 		while(len--) {
-			*stream++ = sbuf[sbuf_head++];
+			*stream = sbuf[sbuf_head];
+			stream++;
+			sbuf_head++;
 		}
 	}else {
 		int rest = len - count;
 		while(count--) {
-			*stream++ = sbuf[sbuf_head++];
+			*stream = sbuf[sbuf_head];
+			stream++;
+			sbuf_head++;
 		}
 		//set the rest portion to zero
 		memset(stream, 0, rest);
