@@ -35,20 +35,27 @@ static int sbuf_head = 0;
 static int sbuf_rear = 0;
 static uint32_t *audio_base = NULL;
 
+static uint8_t audio_dequeue() {
+	uint8_t data = 0;
+	if(sbuf_head != sbuf_rear) {
+		data = sbuf[sbuf_head];
+		sbuf_head = (sbuf_head + 1) % CONFIG_SB_SIZE;
+	}
+	return data;
+}
+
 void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
 	int count = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE;
 	if(len <= count) {
 		while(len--) {
-			*stream = sbuf[sbuf_head];
+			*stream = audio_dequeue();
 			stream++;
-			sbuf_head++;
 		}
 	}else {
 		int rest = len - count;
 		while(count--) {
-			*stream = sbuf[sbuf_head];
+			*stream = audio_dequeue();
 			stream++;
-			sbuf_head++;
 		}
 		//set the rest portion to zero
 		memset(stream, 0, rest);
@@ -70,14 +77,6 @@ static void init_sdl_audio() {
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {	
-	//update rear pointer, and synchronize to memory
-	/*if(offset == 24) {
-		if(is_write) {
-			sbuf_rear = (sbuf_rear + 1) % CONFIG_SB_SIZE;
-			audio_base[6] = sbuf_rear;
-		}
-		return;
-	}*/
 	//if accessing the count reg, update free space count
 	if(offset == 20) {
 		audio_base[5] = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE; 
