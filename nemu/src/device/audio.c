@@ -49,26 +49,27 @@ void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
 	SDL_PauseAudio(0);
 }*/
 
-
-
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
 	//update free space count
-	audio_base[5] = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE; 
+	if(offset == 20) {
+		audio_base[5] = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE; 
+	}
+		
 	
-	
-	
-	/*if(is_write) {
+	if(is_write) {
 		sbuf_rear = (sbuf_rear + 1) % CONFIG_SB_SIZE;
 	}else {
 		sbuf_head = (sbuf_rear + 1) % CONFIG_SB_SIZE;	
-	}*/
+	}
 	
 }
+
+//static void audio_sbuf_io_handler() {}
 
 void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
-  audio_base[3] = CONFIG_SB_SIZE - 1;	//the queue sacrifice a space
+  audio_base[3] = CONFIG_SB_SIZE;	//the queue sacrifice a space
   audio_base[4] = 0;
 #ifdef CONFIG_HAS_PORT_IO
   add_pio_map ("audio", CONFIG_AUDIO_CTL_PORT, audio_base, space_size, audio_io_handler);

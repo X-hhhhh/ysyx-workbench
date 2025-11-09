@@ -28,8 +28,19 @@ void __am_audio_ctrl(AM_AUDIO_CTRL_T *ctrl) {
 
 void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
   	stat->count = inl(AUDIO_COUNT_ADDR);
-	printf("count=%d\n", stat->count);
 }
 
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
+	//static int sbuf_head = 0;
+	//static int sbuf_rear = 0;
+	static int sbuf_size = -1;
+	if(sbuf_size == -1) {sbuf_size = inl(AUDIO_SBUF_SIZE_ADDR);}
+	printf("sbuf:%d\n", sbuf_size);
+	
+	/*while(ctl->start < ctl->end) {
+		outl(AUDIO_SBUF_ADDR + sbuf_head, *(uint8_t *)ctl->start);
+		sbuf_rear = (sbuf_rear + 1) % sbuf_size;
+		ctl->start++;
+	}*/
+	
 }
