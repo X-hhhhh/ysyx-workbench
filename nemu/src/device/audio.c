@@ -51,6 +51,7 @@ static void init_sdl_audio() {
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
 	SDL_OpenAudio(&s, NULL);
 	SDL_PauseAudio(0);
+	printf("sdl initialization finish\n");
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {	
