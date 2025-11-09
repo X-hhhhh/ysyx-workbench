@@ -33,7 +33,7 @@ enum {
 
 static uint8_t *sbuf = NULL;
 static int sbuf_head = 0;
-static int sbuf_rear = 0;
+static int sbuf_rear = 10;
 static uint32_t *audio_base = NULL;
 
 void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
