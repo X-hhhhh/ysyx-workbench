@@ -33,11 +33,23 @@ enum {
 
 static uint8_t *sbuf = NULL;
 static int sbuf_head = 0;
-static int sbuf_rear = 10;
+static int sbuf_rear = 0;
 static uint32_t *audio_base = NULL;
 
 void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
-	
+	int count = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE;
+	if(len <= count) {
+		while(len--) {
+			*stream++ = sbuf[sbuf_head++];
+		}
+	}else {
+		int rest = len - count;
+		while(count--) {
+			*stream++ = sbuf[sbuf_head++];
+		}
+		//set the rest portion to zero
+		memset(stream, 0, rest);
+	}
 }
 
 static void init_sdl_audio() {
