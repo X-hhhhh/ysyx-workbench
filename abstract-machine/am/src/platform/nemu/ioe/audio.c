@@ -9,6 +9,8 @@
 #define AUDIO_SBUF_SIZE_ADDR (AUDIO_ADDR + 0x0c)
 #define AUDIO_INIT_ADDR      (AUDIO_ADDR + 0x10)
 #define AUDIO_COUNT_ADDR     (AUDIO_ADDR + 0x14)
+#define AUDIO_SBUF_HEAD	     (AUDIO_ADDR + 0x18)
+#define AUDIO_SBUF_REAR	     (AUDIO_ADDR + 0x1c)
 
 void __am_audio_init() {
 }
@@ -31,16 +33,20 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
 }
 
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
-	//static int sbuf_head = 0;
-	//static int sbuf_rear = 0;
 	static int sbuf_size = -1;
 	if(sbuf_size == -1) {sbuf_size = inl(AUDIO_SBUF_SIZE_ADDR);}
-	printf("sbuf:%d\n", sbuf_size);
 	
-	/*while(ctl->start < ctl->end) {
-		outl(AUDIO_SBUF_ADDR + sbuf_head, *(uint8_t *)ctl->start);
+	int count = inl(AUDIO_COUNT_ADDR);
+	int free = sbuf_size - count - 1;
+	int datanum = ctl->buf.end - ctl->buf.start;
+	int sbuf_rear = inl(AUDIO_SBUF_REAR);
+	
+	//if the space of sbuf is not enough to write, wait until it is enough
+	while(datanum > free);
+	while(ctl->buf.start < ctl->buf.end) {
+		outl(AUDIO_SBUF_ADDR + sbuf_rear, *(uint8_t *)ctl->buf.start);
 		sbuf_rear = (sbuf_rear + 1) % sbuf_size;
-		ctl->start++;
-	}*/
-	
+		ctl->buf.start++;
+	}
 }
+

@@ -24,6 +24,10 @@ enum {
   reg_sbuf_size,
   reg_init,
   reg_count,
+  //add head and rear reg
+  reg_sbuf_head,
+  reg_sbuf_rear,
+
   nr_reg
 };
 
@@ -36,7 +40,7 @@ void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
 	
 }
 
-/*static void init_sdl_audio() {
+static void init_sdl_audio() {
 	SDL_AudioSpec s = {};
 	s.freq = audio_base[0];
 	s.channels = audio_base[1];
@@ -47,30 +51,38 @@ void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
 	SDL_OpenAudio(&s, NULL);
 	SDL_PauseAudio(0);
-}*/
-
-static void audio_io_handler(uint32_t offset, int len, bool is_write) {
-	//update free space count
-	if(offset == 20) {
-		audio_base[5] = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE; 
-	}
-		
-	
-	if(is_write) {
-		sbuf_rear = (sbuf_rear + 1) % CONFIG_SB_SIZE;
-	}else {
-		sbuf_head = (sbuf_rear + 1) % CONFIG_SB_SIZE;	
-	}
-	
 }
 
-//static void audio_sbuf_io_handler() {}
+static void audio_io_handler(uint32_t offset, int len, bool is_write) {	
+	//update head and rear pointer, and synchronize to memory
+	if(offset == 24 || offset == 28) {
+		if(is_write) {
+			sbuf_rear = (sbuf_rear + 1) % CONFIG_SB_SIZE;
+			audio_base[7] = sbuf_rear;
+		}else {
+			sbuf_head = (sbuf_rear + 1) % CONFIG_SB_SIZE;	
+			audio_base[6] = sbuf_head;
+		}
+		return;
+	}
+	//if accessing the count reg, update free space count
+	if(offset == 20) {
+		audio_base[5] = (sbuf_rear + CONFIG_SB_SIZE - sbuf_head) % CONFIG_SB_SIZE; 
+		return;
+	}
+	//if init reg is non-zero, start sdl initialization
+	if(offset == 16 && audio_base[4] != 0) {
+		init_sdl_audio();
+	}
+}
 
 void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
-  audio_base[3] = CONFIG_SB_SIZE;	//the queue sacrifice a space
-  audio_base[4] = 0;
+  audio_base[3] = CONFIG_SB_SIZE;	//reg_sbuf_size
+  audio_base[4] = 0;			//reg_init
+  audio_base[6] = 0;			//reg_sbuf_head
+  audio_base[7] = 0;			//reg_sbuf_rear
 #ifdef CONFIG_HAS_PORT_IO
   add_pio_map ("audio", CONFIG_AUDIO_CTL_PORT, audio_base, space_size, audio_io_handler);
 #else
