@@ -44,7 +44,8 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
 	//if the space of sbuf is not enough to write, wait until it is enough
 	while(datanum > free) {
 		free = sbuf_size - inl(AUDIO_COUNT_ADDR) - 1;
-		printf("free=%d\n", free);}
+		printf("datanum=%d, free=%d\n", datanum, free);
+	}
 	while(ctl->buf.start < ctl->buf.end) {
 		outl(AUDIO_SBUF_ADDR + sbuf_rear, *(uint8_t *)ctl->buf.start);
 		sbuf_rear = (sbuf_rear + 1) % sbuf_size;
