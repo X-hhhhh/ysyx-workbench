@@ -60,6 +60,7 @@ void sdl_audio_callback(void *userdata, Uint8 *stream, int len) {
 		//set the rest portion to zero
 		memset(stream, 0, rest);
 	}
+	printf("head=%d\n", sbuf_head);
 }
 
 static void init_sdl_audio() {
