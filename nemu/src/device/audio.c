@@ -25,7 +25,6 @@ enum {
   reg_init,
   reg_count,
   //add head and rear reg
-  reg_sbuf_head,
   reg_sbuf_rear,
 
   nr_reg
@@ -67,14 +66,11 @@ static void init_sdl_audio() {
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {	
-	//update head and rear pointer, and synchronize to memory
-	if(offset == 24 || offset == 28) {
+	//update rear pointer, and synchronize to memory
+	if(offset == 24) {
 		if(is_write) {
 			sbuf_rear = (sbuf_rear + 1) % CONFIG_SB_SIZE;
-			audio_base[7] = sbuf_rear;
-		}else {
-			sbuf_head = (sbuf_rear + 1) % CONFIG_SB_SIZE;	
-			audio_base[6] = sbuf_head;
+			audio_base[6] = sbuf_rear;
 		}
 		return;
 	}
@@ -94,8 +90,7 @@ void init_audio() {
   audio_base = (uint32_t *)new_space(space_size);
   audio_base[3] = CONFIG_SB_SIZE;	//reg_sbuf_size
   audio_base[4] = 0;			//reg_init
-  audio_base[6] = 0;			//reg_sbuf_head
-  audio_base[7] = 0;			//reg_sbuf_rear
+  audio_base[6] = 0;			//reg_sbuf_rear
 #ifdef CONFIG_HAS_PORT_IO
   add_pio_map ("audio", CONFIG_AUDIO_CTL_PORT, audio_base, space_size, audio_io_handler);
 #else
