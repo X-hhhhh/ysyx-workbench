@@ -3,6 +3,7 @@
 #include "svdpi.h"
 #include "Vtop__Dpi.h"
 #include <getopt.h>
+#include <time.h>
 
 #define CONFIG_FST_WAVE_TRACE 1
 
@@ -14,16 +15,23 @@ Vtop* top = new Vtop{contextp};
 VerilatedFstC *tfp = new VerilatedFstC;
 #endif
 
+#define ANSI_FG_RED	"\33[1;31m"
+#define ANSI_FG_GREEN	"\33[1;32m"
+#define ANSI_FG_NONE	"\33[0m"
+
 #define PMEM_BASE 	0x80000000
 #define DEVICE_BASE	0x10000000 
 #define PMEM_SIZE 	0x200000
 #define MMIO_SIZE	0x10000
 
+#define SERIAL_ADDR	(DEVICE_BASE + 0x0)
+#define TIMER_ADDR	(DEVICE_BASE + 0x100)
+
 static char* img_file = NULL;
 static bool NEMU_TRAP = false;
 
 static uint32_t pmem[PMEM_SIZE] = {0};
-static uint32_t pmem_io[MMIO_SIZE] = {0};
+//static uint32_t pmem_io[MMIO_SIZE] = {0};
 
 static bool in_pmem(uint32_t addr) {
 	return addr >= PMEM_BASE && addr < PMEM_BASE + PMEM_SIZE;
@@ -33,25 +41,44 @@ static bool in_mmio(uint32_t addr) {
 	return addr >= DEVICE_BASE && addr < DEVICE_BASE + MMIO_SIZE;
 }
 
+static void out_of_bound(uint32_t addr) {
+	printf(ANSI_FG_RED "address = %x is out of bound at pc = %x\n" ANSI_FG_NONE, addr, top -> pc);
+	assert(0);
+}
+
 int pmem_read(int paddr) {
 	if(paddr == 0) return 1;
 	if(in_pmem(paddr)) {
 		uint32_t paddr_ = paddr - PMEM_BASE;
 		return pmem[(uint32_t)paddr_ >> 2];
 	}
-	if(in_mmio(paddr)) {return 0;}
+	if(in_mmio(paddr)) {
+		if(paddr == TIMER_ADDR) {
+			return 0;
+		}
+	}
+	out_of_bound(paddr);
 }
 
 void pmem_write(int paddr, int wdata, char wmask) {
-	uint32_t paddr_ = paddr - PMEM_BASE;
-	assert(((uint32_t)paddr_ >> 2) < PMEM_SIZE);
-	uint32_t mask = 0;
-	for(int i = 0; i < 4; i++) {
-		if((wmask >> i) & 0x1 == 1) {
-			mask |= 0xFF << (i * 8);
+	if(in_pmem(paddr)) {
+		uint32_t paddr_ = paddr - PMEM_BASE;
+		uint32_t mask = 0;
+		for(int i = 0; i < 4; i++) {
+			if((wmask >> i) & 0x1 == 1) {
+				mask |= 0xFF << (i * 8);
+			}
 		}
+		pmem[(uint32_t)paddr_ >> 2] = (pmem[(uint32_t)paddr_ >> 2] & ~mask) | (wdata & mask);
+		return;
 	}
-	pmem[(uint32_t)paddr_ >> 2] = (pmem[(uint32_t)paddr_ >> 2] & ~mask) | (wdata & mask);
+	if(in_mmio(paddr)) {
+		if(paddr == SERIAL_ADDR) {
+			putchar(wdata);
+		}
+		return;
+	}
+	out_of_bound(paddr);
 }
 
 void load_memory(const char *filename) {
