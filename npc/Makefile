@@ -42,12 +42,10 @@ run:
 	@rm -rf $(BUILD_DIR)/logs
 	@mkdir -p $(BUILD_DIR)/logs
 
-	#@$(BIN) +trace
-
 	@echo
 	@echo "-------------------- DONE --------------------"
 	
-	#gtkwave wave.fst
+	@#gtkwave wave.fst
 	@echo
 
 

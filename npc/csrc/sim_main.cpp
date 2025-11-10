@@ -3,7 +3,7 @@
 #include "svdpi.h"
 #include "Vtop__Dpi.h"
 #include <getopt.h>
-#include <time.h>
+#include <sys/time.h>
 
 #define CONFIG_FST_WAVE_TRACE 1
 
@@ -17,8 +17,11 @@ VerilatedFstC *tfp = new VerilatedFstC;
 
 #define ANSI_FG_RED	"\33[1;31m"
 #define ANSI_FG_GREEN	"\33[1;32m"
+#define ANSI_FG_YELLOW	"\33[1;33m"
 #define ANSI_FG_BLUE	"\33[1;34m"
-#define ANSI_FG_NONE	"\33[0m"
+#define ANSI_BG_RED	"\33[1;41m"
+#define ANSI_BG_YELLOW	"\33[1;43m"
+#define ANSI_NONE	"\33[0m"
 
 #define PMEM_BASE 	0x80000000
 #define DEVICE_BASE	0x10000000 
@@ -26,13 +29,13 @@ VerilatedFstC *tfp = new VerilatedFstC;
 #define MMIO_SIZE	0x10000
 
 #define SERIAL_ADDR	(DEVICE_BASE + 0x0)
-#define TIMER_ADDR	(DEVICE_BASE + 0x100)
+#define TIMER_ADDR	(DEVICE_BASE + 0x40)
 
 static char* img_file = NULL;
 static bool NEMU_TRAP = false;
 
 static uint32_t pmem[PMEM_SIZE] = {0};
-//static uint32_t pmem_io[MMIO_SIZE] = {0};
+static uint32_t pmem_io[MMIO_SIZE] = {0};
 
 static bool in_pmem(uint32_t addr) {
 	return addr >= PMEM_BASE && addr < PMEM_BASE + PMEM_SIZE;
@@ -43,8 +46,15 @@ static bool in_mmio(uint32_t addr) {
 }
 
 static void out_of_bound(uint32_t addr) {
-	printf(ANSI_FG_RED "address = %x is out of bound at pc = %x\n" ANSI_FG_NONE, addr, top -> pc);
+	printf(ANSI_FG_RED "address = %x is out of bound at pc = %x\n" ANSI_NONE, addr, top -> pc);
 	assert(0);
+}
+
+uint64_t get_time() {
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	uint64_t us = tv.tv_sec * 1000000 + tv.tv_usec;
+	return us;
 }
 
 int pmem_read(int paddr) {
@@ -54,9 +64,14 @@ int pmem_read(int paddr) {
 		return pmem[(uint32_t)paddr_ >> 2];
 	}
 	if(in_mmio(paddr)) {
-		if(paddr == TIMER_ADDR) {
-			return 0;
+		//while reading the high register, update data
+		if(paddr == TIMER_ADDR + 1) {
+			uint64_t us = get_time();
+			pmem_io[TIMER_ADDR - DEVICE_BASE] = (uint32_t)us;
+			pmem_io[TIMER_ADDR - DEVICE_BASE + 1] = us >> 32;
 		}
+		uint32_t paddr_ = paddr - DEVICE_BASE;
+		return pmem_io[(uint32_t)paddr_ >> 2];
 	}
 	out_of_bound(paddr);
 	return 0;
@@ -153,7 +168,7 @@ int main(int argc, char* argv[]){
 
 	parse_args(argc, argv);
 	load_memory(img_file);
-	printf(ANSI_FG_BLUE "Welcome to NPC!\n" ANSI_FG_NONE);
+	printf("Welcome to " ANSI_FG_YELLOW ANSI_BG_RED "NPC!" ANSI_NONE "\n");
 
 	//int cycle = 500000;
 	int reset_time = 10;
