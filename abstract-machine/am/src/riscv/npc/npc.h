@@ -2,7 +2,7 @@
 #define NPC_H__
 
 #include <klib-macro.h>
-#include "riscv.h"
+#include "riscv/riscv.h"
 
 #define DEVICE_BASE	0x10000000
 
