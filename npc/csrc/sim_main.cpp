@@ -4,8 +4,7 @@
 #include "Vtop__Dpi.h"
 #include <getopt.h>
 
-#define CONFIG_FST_WAVE_TRACE 0
-#define PMEM_SIZE 512000
+#define CONFIG_FST_WAVE_TRACE 1
 
 VerilatedContext* contextp = new VerilatedContext;
 Vtop* top = new Vtop{contextp};
@@ -15,28 +14,36 @@ Vtop* top = new Vtop{contextp};
 VerilatedFstC *tfp = new VerilatedFstC;
 #endif
 
+#define PMEM_BASE 	0x80000000
+#define DEVICE_BASE	0x10000000 
+#define PMEM_SIZE 	0x200000
+#define MMIO_SIZE	0x10000
+
 static char* img_file = NULL;
 static bool NEMU_TRAP = false;
 
 static uint32_t pmem[PMEM_SIZE] = {0};
+static uint32_t pmem_io[MMIO_SIZE] = {0};
+
+static bool in_pmem(uint32_t addr) {
+	return addr >= PMEM_BASE && addr < PMEM_BASE + PMEM_SIZE;
+}
+
+static bool in_mmio(uint32_t addr) {
+	return addr >= DEVICE_BASE && addr < DEVICE_BASE + MMIO_SIZE;
+}
 
 int pmem_read(int paddr) {
 	if(paddr == 0) return 1;
-	//printf("paddr:%x pc = %x\n", paddr, top -> pc);
-	uint32_t paddr_ = paddr - 0x80000000;
-	/*if(((uint32_t)paddr_ >> 2) >= PMEM_SIZE) {
-		printf("paddr:%x, pc = %x\n", paddr_, top -> pc);
-		for(int i = 0; i < 16 ; i++) {
-			printf("x%d: %x   \n", i, top -> gpr[i]);
-		}
-		return 1;
-	} */
-	assert(((uint32_t)paddr_ >> 2) < PMEM_SIZE);
-	return pmem[(uint32_t)paddr_ >> 2];
+	if(in_pmem(paddr)) {
+		uint32_t paddr_ = paddr - PMEM_BASE;
+		return pmem[(uint32_t)paddr_ >> 2];
+	}
+	if(in_mmio(paddr)) {return 0;}
 }
 
 void pmem_write(int paddr, int wdata, char wmask) {
-	uint32_t paddr_ = paddr - 0x80000000;
+	uint32_t paddr_ = paddr - PMEM_BASE;
 	assert(((uint32_t)paddr_ >> 2) < PMEM_SIZE);
 	uint32_t mask = 0;
 	for(int i = 0; i < 4; i++) {
