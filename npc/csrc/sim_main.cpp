@@ -17,6 +17,7 @@ VerilatedFstC *tfp = new VerilatedFstC;
 
 #define ANSI_FG_RED	"\33[1;31m"
 #define ANSI_FG_GREEN	"\33[1;32m"
+#define ANSI_FG_BLUE	"\33[1;34m"
 #define ANSI_FG_NONE	"\33[0m"
 
 #define PMEM_BASE 	0x80000000
@@ -58,6 +59,7 @@ int pmem_read(int paddr) {
 		}
 	}
 	out_of_bound(paddr);
+	return 0;
 }
 
 void pmem_write(int paddr, int wdata, char wmask) {
@@ -120,7 +122,7 @@ static int parse_args(int argc, char *argv[]) {
 	};
 	int o;
 	while( (o = getopt_long(argc, argv, "-i:", table, NULL)) != -1) {
-		printf("o = %c, optarg = %s\n", o, optarg);
+		//printf("o = %c, optarg = %s\n", o, optarg);
 		switch(o) {
 			case 1: img_file = optarg; return 0;
 			default:
@@ -151,6 +153,7 @@ int main(int argc, char* argv[]){
 
 	parse_args(argc, argv);
 	load_memory(img_file);
+	printf(ANSI_FG_BLUE "Welcome to NPC!\n" ANSI_FG_NONE);
 
 	//int cycle = 500000;
 	int reset_time = 10;
