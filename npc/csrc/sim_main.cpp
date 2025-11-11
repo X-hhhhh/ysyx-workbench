@@ -25,7 +25,7 @@ VerilatedFstC *tfp = new VerilatedFstC;
 
 #define PMEM_BASE 	0x80000000
 #define DEVICE_BASE	0x10000000 
-#define PMEM_SIZE 	0x200000
+#define PMEM_SIZE 	0x2000000
 #define MMIO_SIZE	0x10000
 
 #define SERIAL_ADDR	(DEVICE_BASE + 0x0)
@@ -50,12 +50,12 @@ static void out_of_bound(uint32_t addr) {
 	assert(0);
 }
 
-/*uint64_t get_time() {
+uint64_t get_time() {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	uint64_t us = tv.tv_sec * 1000000 + tv.tv_usec;
 	return us;
-}*/
+}
 
 int pmem_read(int paddr) {
 	if(paddr == 0) return 1;
@@ -65,14 +65,13 @@ int pmem_read(int paddr) {
 	}
 	if(in_mmio(paddr)) {
 		//while reading the high register, update data
-		/*if(paddr == TIMER_ADDR + 1) {
+		if(paddr == TIMER_ADDR + 4) {
 			uint64_t us = get_time();
-			pmem_io[TIMER_ADDR - DEVICE_BASE] = (uint32_t)us;
-			pmem_io[TIMER_ADDR - DEVICE_BASE + 1] = us >> 32;
+			pmem_io[(TIMER_ADDR - DEVICE_BASE) >> 2] = (uint32_t)us;
+			pmem_io[(TIMER_ADDR - DEVICE_BASE) >> 2 + 1] = us >> 32;
 		}
 		uint32_t paddr_ = paddr - DEVICE_BASE;
-		return pmem_io[(uint32_t)paddr_ >> 2];*/
-		return 0;
+		return pmem_io[(uint32_t)paddr_ >> 2];
 	}
 	out_of_bound(paddr);
 	return 0;
@@ -100,13 +99,22 @@ void pmem_write(int paddr, int wdata, char wmask) {
 }
 
 void load_memory(const char *filename) {
+	if(filename == NULL) {
+		printf("No img is given\n");
+		exit(0);
+	}
 	FILE *fp = fopen(filename, "rb");
 	int ret;
+	int img_size = 0;
 	assert(fp);
+	printf("Img is %s\n", filename);
 	for(int i = 0; feof(fp) != 1; i++) {
 		ret = fread(&pmem[i], 4, 1, fp);
 		if(ret != 1) break;
+		img_size++;
 	}
+	printf("Img_size is %d bytes\n", img_size * 4);
+	assert(img_size < PMEM_SIZE);
 	fclose(fp);
 	fp = NULL;
 }
