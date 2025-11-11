@@ -14,7 +14,7 @@ BIN = $(BUILD_DIR)/$(TOPNAME)
 
 #compilation options
 VERILATOR_FLAGS += --Mdir $(OBJ_DIR)
-VERILATOR_FLAGS += -Wall
+VERILATOR_FLAGS += -O2 -MMD -Wall
 VERILATOR_FLAGS += --trace-fst
 VERILATOR_FLAGS += --build
 VERILATOR_FLAGS += --top-module $(TOPNAME)
@@ -48,7 +48,10 @@ run:
 	@#gtkwave wave.fst
 	@echo
 
+gdb:
+	@gdb -s $(BIN) --args $(BIN) $(ARGS) $(IMG)
 
+.PHONY: all run gdb 
 
 include ../Makefile
 
