@@ -48,10 +48,17 @@ run:
 	@#gtkwave wave.fst
 	@echo
 
-gdb: $(BIN) 
+gdb: 
+	@rm -rf $(OBJ_DIR)
+	@mkdir -p $(OBJ_DIR)
+
+	@$(VERILATOR) $(VERILATOR_FLAGS) $(VSRCS) $(CSRCS) --gdbbt --debug --gdb
 	@gdb -s $(BIN) --args $(BIN) $(ARGS) $(IMG)
 
-.PHONY: all run gdb 
+clean:
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all run gdb clean
 
 include ../Makefile
 

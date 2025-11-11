@@ -50,12 +50,12 @@ static void out_of_bound(uint32_t addr) {
 	assert(0);
 }
 
-uint64_t get_time() {
+/*uint64_t get_time() {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	uint64_t us = tv.tv_sec * 1000000 + tv.tv_usec;
 	return us;
-}
+}*/
 
 int pmem_read(int paddr) {
 	if(paddr == 0) return 1;
@@ -65,13 +65,14 @@ int pmem_read(int paddr) {
 	}
 	if(in_mmio(paddr)) {
 		//while reading the high register, update data
-		if(paddr == TIMER_ADDR + 1) {
+		/*if(paddr == TIMER_ADDR + 1) {
 			uint64_t us = get_time();
 			pmem_io[TIMER_ADDR - DEVICE_BASE] = (uint32_t)us;
 			pmem_io[TIMER_ADDR - DEVICE_BASE + 1] = us >> 32;
 		}
 		uint32_t paddr_ = paddr - DEVICE_BASE;
-		return pmem_io[(uint32_t)paddr_ >> 2];
+		return pmem_io[(uint32_t)paddr_ >> 2];*/
+		return 0;
 	}
 	out_of_bound(paddr);
 	return 0;
