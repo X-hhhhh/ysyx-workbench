@@ -48,7 +48,7 @@ run:
 	@#gtkwave wave.fst
 	@echo
 
-gdb:
+gdb: $(BIN) $(ARGS) $(IMG)
 	@gdb -s $(BIN) --args $(BIN) $(ARGS) $(IMG)
 
 .PHONY: all run gdb 
