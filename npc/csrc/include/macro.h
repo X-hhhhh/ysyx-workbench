@@ -12,6 +12,7 @@
 #define ANSI_NONE	"\33[0m"
 
 //#define CONFIG_WATCHPOINT_SCAN 1
+#define CONFIG_ITRACE 1
 
 #define PMEM_BASE	0x80000000
 #define DEVICE_BASE	0x10000000
@@ -23,7 +24,5 @@
 
 //calculate the length of an array
 #define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
-
-typedef uint32_t word_t;
 
 #endif

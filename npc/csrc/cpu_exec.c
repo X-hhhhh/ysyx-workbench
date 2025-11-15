@@ -5,6 +5,7 @@
 #include "Vtop__Dpi.h"
 #include <sdb.h>
 #include <dpi.h>
+#include <disasm.h>
 
 static bool NPC_TRAP = false;
 static bool NPC_END = false;
@@ -38,6 +39,14 @@ void cpu_exec(uint64_t n) {
 #ifdef CONFIG_WATCHPOINT_SCAN
 		bool triggered = scan_wp();
 		if(triggered) {break;}
+#endif
+#ifdef CONFIG_ITRACE
+		char buf[256];
+		uint32_t inst = inst_get();
+		int ret = snprintf(buf, 256, "%x", top->pc);
+
+		disassemble(buf + ret, 256 - ret, top->pc, (uint8_t*)&inst, 4);
+		printf("%s\n", buf);
 #endif
 	}
 

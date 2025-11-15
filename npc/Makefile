@@ -22,7 +22,8 @@ VERILATOR_FLAGS += --build
 
 CFLAGS = -O2 -MMD -Wall -Werror
 CFLAGS += -I$(NPC_HOME)/csrc/include
-LDFLAGS = -lreadline
+CFLAGS += -I$(NEMU_HOME)/tools/capstone/repo/include
+LDFLAGS = -lreadline -ldl
 
 #search for files
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v" -or -name "*.sv")

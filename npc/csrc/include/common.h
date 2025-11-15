@@ -8,4 +8,6 @@
 #include <assert.h>
 #include <macro.h>
 
+typedef uint32_t word_t;
+
 #endif
