@@ -1,102 +1,14 @@
 #include <Vtop.h>
 #include <stdio.h>
-#include "svdpi.h"
-#include "Vtop__Dpi.h"
 #include <getopt.h>
-#include <sys/time.h>
 
-#define CONFIG_FST_WAVE_TRACE 1
-
-VerilatedContext* contextp = new VerilatedContext;
-Vtop* top = new Vtop{contextp};
-
-#if CONFIG_FST_WAVE_TRACE
-#include "verilated_fst_c.h"
-VerilatedFstC *tfp = new VerilatedFstC;
-#endif
-
-#define ANSI_FG_RED	"\33[1;31m"
-#define ANSI_FG_GREEN	"\33[1;32m"
-#define ANSI_FG_YELLOW	"\33[1;33m"
-#define ANSI_FG_BLUE	"\33[1;34m"
-#define ANSI_BG_RED	"\33[1;41m"
-#define ANSI_BG_YELLOW	"\33[1;43m"
-#define ANSI_NONE	"\33[0m"
-
-#define PMEM_BASE 	0x80000000
-#define DEVICE_BASE	0x10000000 
-#define PMEM_SIZE 	0x2000000
-#define MMIO_SIZE	0x10000
-
-#define SERIAL_ADDR	(DEVICE_BASE + 0x0)
-#define TIMER_ADDR	(DEVICE_BASE + 0x40)
+#include <sdb.h>
+#include <pmem.h>
+#include <macro.h>
+#include <wave_trace.h>
+#include <cpu.h>
 
 static char* img_file = NULL;
-static bool NEMU_TRAP = false;
-
-static uint32_t pmem[PMEM_SIZE] = {0};
-static uint32_t pmem_io[MMIO_SIZE] = {0};
-
-static bool in_pmem(uint32_t addr) {
-	return addr >= PMEM_BASE && addr < PMEM_BASE + PMEM_SIZE;
-}
-
-static bool in_mmio(uint32_t addr) {
-	return addr >= DEVICE_BASE && addr < DEVICE_BASE + MMIO_SIZE;
-}
-
-static void out_of_bound(uint32_t addr) {
-	printf(ANSI_FG_RED "address = %x is out of bound at pc = %x\n" ANSI_NONE, addr, top -> pc);
-	assert(0);
-}
-
-uint64_t get_time() {
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	uint64_t us = tv.tv_sec * 1000000 + tv.tv_usec;
-	return us;
-}
-
-int pmem_read(int paddr) {
-	if(paddr == 0) return 1;
-	if(in_pmem(paddr)) {
-		uint32_t paddr_ = paddr - PMEM_BASE;
-		return pmem[(uint32_t)paddr_ >> 2];
-	}
-	if(in_mmio(paddr)) {
-		//while reading the high register, update data
-		if(paddr == TIMER_ADDR + 4) {
-			uint64_t us = get_time();
-			pmem_io[(TIMER_ADDR - DEVICE_BASE) >> 2] = (uint32_t)us;
-			pmem_io[(TIMER_ADDR - DEVICE_BASE) >> 2 + 1] = us >> 32;
-		}
-		uint32_t paddr_ = paddr - DEVICE_BASE;
-		return pmem_io[(uint32_t)paddr_ >> 2];
-	}
-	out_of_bound(paddr);
-	return 0;
-}
-
-void pmem_write(int paddr, int wdata, char wmask) {
-	if(in_pmem(paddr)) {
-		uint32_t paddr_ = paddr - PMEM_BASE;
-		uint32_t mask = 0;
-		for(int i = 0; i < 4; i++) {
-			if((wmask >> i) & 0x1 == 1) {
-				mask |= 0xFF << (i * 8);
-			}
-		}
-		pmem[(uint32_t)paddr_ >> 2] = (pmem[(uint32_t)paddr_ >> 2] & ~mask) | (wdata & mask);
-		return;
-	}
-	if(in_mmio(paddr)) {
-		if(paddr == SERIAL_ADDR) {
-			putchar(wdata);
-		}
-		return;
-	}
-	out_of_bound(paddr);
-}
 
 void load_memory(const char *filename) {
 	if(filename == NULL) {
@@ -119,13 +31,6 @@ void load_memory(const char *filename) {
 	fp = NULL;
 }
 
-static void wave_trace() {
-	contextp -> timeInc(1);
-	#if CONFIG_FST_WAVE_TRACE
-	tfp -> dump(contextp -> time());
-	#endif	
-}
-
 static void reset(int n){
 	top -> sys_rst = 1;
 	while(n-- > 0){
@@ -135,10 +40,6 @@ static void reset(int n){
 	top -> sys_rst = 0;
 }
 
-void nemu_trap() {
-	NEMU_TRAP = true;
-}
-
 static int parse_args(int argc, char *argv[]) {
 	const struct option table[] = {
 		{"img"	, required_argument, NULL, 'i'},	
@@ -146,7 +47,6 @@ static int parse_args(int argc, char *argv[]) {
 	};
 	int o;
 	while( (o = getopt_long(argc, argv, "-i:", table, NULL)) != -1) {
-		//printf("o = %c, optarg = %s\n", o, optarg);
 		switch(o) {
 			case 1: img_file = optarg; return 0;
 			default:
@@ -157,70 +57,26 @@ static int parse_args(int argc, char *argv[]) {
 	return 0;
 }
 
-static void check_ret() {
-	int halt_ret = top -> gpr[10];
-	if(halt_ret == 0) {
-		printf("npc:\33[1;32m HIT GOOD TRAP\33[1;0m at pc = %x\n", top -> pc);
-	}else {
-		printf("npc:\33[1;31m HIT BAD TRAP\33[1;0m at pc = %x\n", top -> pc);	
-	}
-}
-
 int main(int argc, char* argv[]){
-	contextp->commandArgs(argc, argv);
+	wave_trace_init(argc, argv);
 
-	#if CONFIG_FST_WAVE_TRACE
-	contextp->traceEverOn(true);
-	top->trace(tfp, 99);
-	tfp->open("wave.fst");
-	#endif
+	init_monitor();
 
 	parse_args(argc, argv);
 	load_memory(img_file);
 	printf("Welcome to " ANSI_FG_YELLOW ANSI_BG_RED "NPC!" ANSI_NONE "\n");
 
-	//int cycle = 500000;
 	int reset_time = 10;
-	int inst_num = 0;
-
 	while(reset_time-- > 0){
 		reset(1);
 	}
-
 	top -> eval(); wave_trace();
 	top -> eval(); wave_trace();
 
-	while(NEMU_TRAP == false) {
-	//while(cycle && NEMU_TRAP == false) {
-		top -> sys_clk = !top -> sys_clk;	
-		top -> eval();
-		wave_trace();
-
-		top -> sys_clk = !top -> sys_clk;		
-		top -> eval();
-		wave_trace();
-		
-		//cycle --;
-		inst_num++;
-	}
-
-	check_ret();
-	printf("executed instructions:%d\n", inst_num);
-
-	/*for(int i = 83954; i < 83954 + 200; i++) {
-		printf("%x: %x  ", i, pmem[i]);
-		if(i % 4 == 0) printf("\n");
-	} */
-
-	#if CONFIG_FST_WAVE_TRACE
-	tfp->close();
-	#endif
 	
-	top -> final();
-	delete top;
-	top = nullptr;
-	delete contextp;
-	contextp = nullptr;
+	sdb_mainloop();
+
+	wave_trace_end();
 
 	return 0;
 }
