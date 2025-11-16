@@ -6,11 +6,16 @@
 #include <sdb.h>
 #include <dpi.h>
 #include <disasm.h>
+#include <pmem.h>
+#include <reg.h>
+
+#define MAX_INST_TO_PRINT 10
 
 static bool NPC_TRAP = false;
 static bool NPC_END = false;
 
 static int inst_num = 0;
+static bool print_inst = false;
 
 //This function is called by dpi interface
 void npc_trap() {
@@ -26,7 +31,13 @@ static void check_ret() {
 	}
 }
 
+void assert_fali_msg() {
+	riscve_reg_display();
+	Mtrace_report();
+}
+
 void cpu_exec(uint64_t n) {
+	print_inst = (n < MAX_INST_TO_PRINT); 
 	while(n-- && NPC_TRAP == false) {
 		//execute an instruction
 		top->sys_clk = !top->sys_clk;
@@ -36,23 +47,29 @@ void cpu_exec(uint64_t n) {
 		top->eval();
 		wave_trace();
 		inst_num++;
+		
+		uint32_t inst = inst_get();
+		if(print_inst) {
+#ifdef CONFIG_ITRACE
+			char buf[256];
+			int ret = snprintf(buf, 256, "0x%x: %x\t", top->pc, inst);
+			disassemble(buf + ret, 256 - ret, top->pc, (uint8_t*)&inst, 4);
+			printf("%s\n", buf);
+#endif
+		}
+
+		Ftrace(top->pc, inst);
+
 #ifdef CONFIG_WATCHPOINT_SCAN
 		bool triggered = scan_wp();
 		if(triggered) {break;}
-#endif
-#ifdef CONFIG_ITRACE
-		char buf[256];
-		uint32_t inst = inst_get();
-		int ret = snprintf(buf, 256, "%x", top->pc);
-
-		disassemble(buf + ret, 256 - ret, top->pc, (uint8_t*)&inst, 4);
-		printf("%s\n", buf);
 #endif
 	}
 
 	if(NPC_TRAP == true) {
 		if(NPC_END == false) {
 			check_ret();
+			Ftrace_report();
 			NPC_END = true;
 			printf("Executed instructions: %d\n", inst_num);
 		}else {

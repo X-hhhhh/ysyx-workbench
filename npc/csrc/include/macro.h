@@ -1,6 +1,7 @@
 #ifndef MACRO_H__
 #define MACRO_H__
 
+//Enable waveforms will consume more resources
 #define CONFIG_FST_WAVE_TRACE 0
 
 #define ANSI_FG_RED	"\33[1;31m"
@@ -13,6 +14,8 @@
 
 //#define CONFIG_WATCHPOINT_SCAN 1
 #define CONFIG_ITRACE 1
+//#define CONFIG_MTRACE 1
+//#define CONFIG_FTRACE 1
 
 #define PMEM_BASE	0x80000000
 #define DEVICE_BASE	0x10000000
@@ -24,5 +27,18 @@
 
 //calculate the length of an array
 #define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
+
+#define SEXT(x, len) ({struct {int64_t n : len;} __x = {.n = x}; (uint64_t)__x.n;})
+
+#define Assert(cond, format, ...) \
+	do { \
+		if(!(cond)) { \
+			fflush(stdout); \
+			fprintf(stderr, ANSI_FG_RED format ANSI_NONE "\n", ##__VA_ARGS__); \
+			extern void assert_fali_msg(); \
+			assert_fali_msg(); \
+			assert(cond); \
+		} \
+	}while(0)
 
 #endif

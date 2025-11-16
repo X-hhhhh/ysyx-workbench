@@ -9,4 +9,6 @@ bool in_mmio(uint32_t addr);
 int pmem_rd(int paddr);
 int pmem_wr(int paddr, int wdata, char wmask);
 
+void Mtrace_report();
+
 #endif

@@ -22,14 +22,18 @@ VERILATOR_FLAGS += --build
 
 CFLAGS = -O2 -MMD -Wall -Werror
 CFLAGS += -I$(NPC_HOME)/csrc/include
-CFLAGS += -I$(NEMU_HOME)/tools/capstone/repo/include
 LDFLAGS = -lreadline -ldl
 
 #search for files
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v" -or -name "*.sv")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cpp")
 
-all:
+#disasm's dependency
+CFLAGS += -I$(NEMU_HOME)/tools/capstone/repo/include
+LIBCAPSTONE = $(NEMU_HOME)/tools/capstone/repo/libcapstone.so.5
+csrc/disasm.c: $(LIBCAPSTONE)
+$(LIBCAPSTONE):
+	$(MAKE) -C $(NEMU_HOME)/tools/capstone
 
 run:
 	@echo "-------- VERILATE --- AND --- BUILD --------"
@@ -51,7 +55,6 @@ gdb:
 	@mkdir -p $(OBJ_DIR)
 
 	@$(VERILATOR) $(VERILATOR_FLAGS) $(VSRCS) $(CSRCS) -CFLAGS "$(CFLAGS) -g" -LDFLAGS "$(LDFLAGS) -g" --gdbbt --debug
-	@#@gdb -s $(BIN) --args $(BIN) $(ARGS) $(IMG)
 	gdb --args $(BIN) $(ARGS) $(IMG)
 
 clean:
