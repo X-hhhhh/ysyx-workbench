@@ -58,6 +58,51 @@ static void out_of_bound(uint32_t addr) {
 	Assert(0, "address = 0x%x is out of bound at pc = %x", addr, top->pc);
 }
 
+/*int pmem_rd_t(int paddr) {
+	Mtrace(paddr, 4, 0);
+
+	if(paddr == 0) return 1;
+	if(in_pmem(paddr)) {
+		uint32_t paddr_ = paddr - PMEM_BASE;
+		return (uint32_t)&pmem[(uint32_t)paddr_];
+	}
+	if(in_mmio(paddr)) {
+		//while reading the high register, update data
+		if(paddr == TIMER_ADDR + 4) {
+			uint64_t us = get_time();
+			pmem_io[(TIMER_ADDR - DEVICE_BASE) >> 2] = (uint32_t)us;
+			pmem_io[((TIMER_ADDR - DEVICE_BASE) >> 2) + 1] = us >> 32;
+	   	}
+		uint32_t paddr_ = paddr - DEVICE_BASE;
+		return pmem_io[(uint32_t)paddr_ >> 2];
+	}
+	out_of_bound(paddr);
+	return 0;
+}
+
+void pmem_wr_t(int paddr, int wdata, char wmask) {
+	Mtrace(paddr, 4, 1);
+	if(in_pmem(paddr)) {
+		uint32_t paddr_ = paddr - PMEM_BASE;
+		uint32_t mask = 0;
+		for(int i = 0; i < 4; i++) {
+			if(((wmask >> i) & 0x1) == 1) {
+				mask |= 0xFF << (i * 8);
+			}
+		}
+		pmem[(uint32_t)paddr_ >> 2] = (pmem[(uint32_t)paddr_ >> 2] & ~mask) | (wdata & mask);
+		return;
+	}
+	if(in_mmio(paddr)) {
+		if(paddr == SERIAL_ADDR) {
+			putchar(wdata);
+		}
+		return;
+	}
+	out_of_bound(paddr);
+}*/
+
+//ori
 int pmem_rd_t(int paddr) {
 	Mtrace(paddr, 4, 0);
 

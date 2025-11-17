@@ -35,6 +35,9 @@ csrc/disasm.c: $(LIBCAPSTONE)
 $(LIBCAPSTONE):
 	$(MAKE) -C $(NEMU_HOME)/tools/capstone
 
+#difftest
+ARGS += "-diff=$(NEMU_HOME)/build/riscv32-nemu-interpreter-so"
+
 run:
 	@echo "-------- VERILATE --- AND --- BUILD --------"
 	@rm -rf $(OBJ_DIR)

@@ -7,6 +7,7 @@
 
 void init_sdb();
 void init_disasm();
+void init_difftest(char *ref_so_file, long img_size, int port);
 
 #define MAX_FUNCNUM 512
 #define MAX_CALL_RET 512
@@ -29,6 +30,7 @@ static struct {
 
 static char *img_file = NULL;
 static char *elf_file = NULL;
+static char *diff_so_file = NULL;
 
 static int analyze_elf() {
 	if(elf_file == NULL) {
@@ -177,9 +179,32 @@ void Ftrace_report() {
 #endif
 }
 
-static void load_memory(const char *filename) {
+static long load_memory(const char *filename) {
 	if(filename == NULL) {
-		printf("Np img is given\n");
+		printf("No img is given\n");
+		exit(0);
+	}
+	FILE *fp = fopen(filename, "rb");
+	assert(fp);
+
+	fseek(fp, 0, SEEK_END);
+	long img_size = ftell(fp);
+
+	printf("Img is %s\n, size = %ld", filename, img_size);
+	assert(img_size < PMEM_SIZE);
+	
+	fseek(fp, 0, SEEK_SET);
+	int ret = fread(&pmem, img_size, 1, fp);
+	assert(ret == 1);
+
+	fclose(fp);
+	fp = NULL;
+	return img_size;
+}
+/*
+static long load_memory(const char *filename) {
+	if(filename == NULL) {
+		printf("No img is given\n");
 		exit(0);
 	}
 	FILE *fp = fopen(filename, "rb");
@@ -197,19 +222,23 @@ static void load_memory(const char *filename) {
 	fclose(fp);
 	fp = NULL;
 }
-
+*/
 static int parse_args(int argc, char *argv[]) {
 	const struct option table[] = {
 		{"ftrace"  , required_argument	, NULL	, 'f'},
+		{"diff"	   , required_argument  , NULL  , 'd'},
 		{0	   ,	0		, NULL	,  0},
 	};
 	int o;
-	while( (o = getopt_long(argc, argv, "-f:", table, NULL)) != -1) {
+	while( (o = getopt_long(argc, argv, "-f:d:", table, NULL)) != -1) {
 		switch(o) {
 			case 'f': elf_file = optarg; analyze_elf(); break;
+			case 'd': diff_so_file = optarg; break;
 			case 1: img_file = optarg; return 0;
 			default:
 				printf("\t-f,--ftrace=ELF_FILE	include elf file ELF_FILE to enable function trace\n");
+				printf("\t-d,--diff=REF_SO	run Difftest with reference REF_SO\n");
+				printf("\n");
 				exit(0);
 		}
 	}
@@ -218,8 +247,11 @@ static int parse_args(int argc, char *argv[]) {
 
 void init_monitor(int argc, char *argv[]) {
 	parse_args(argc, argv);
-	load_memory(img_file);
-
+	long img_size = load_memory(img_file);
+	
+#ifdef CONFIG_DIFFTEST
+	init_difftest(diff_so_file, img_size, 666);
+#endif
 	init_sdb();
 #ifdef CONFIG_ITRACE
 	init_disasm();

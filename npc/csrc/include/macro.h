@@ -16,14 +16,17 @@
 #define CONFIG_ITRACE 1
 //#define CONFIG_MTRACE 1
 //#define CONFIG_FTRACE 1
+#define CONFIG_DIFFTEST 1
 
 #define PMEM_BASE	0x80000000
 #define DEVICE_BASE	0x10000000
-#define PMEM_SIZE	0x2000000
+#define PMEM_SIZE	0x8000000
 #define MMIO_SIZE	0x10000
 
 #define SERIAL_ADDR	(DEVICE_BASE + 0x0)
 #define TIMER_ADDR	(DEVICE_BASE + 0x40)
+
+typedef uint32_t paddr_t;
 
 //calculate the length of an array
 #define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
