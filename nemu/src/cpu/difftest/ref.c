@@ -43,6 +43,10 @@ __EXPORT void difftest_regcpy(void *dut, bool direction) {
 		}
 			cpu.pc = cs->pc;
 			printf("pc = %x\n", cpu.pc);
+			printf("pc = %x\n", cpu.pc);
+			printf("pc = %x\n", cpu.pc);
+			printf("pc = %x\n", cpu.pc);
+			printf("pc = %x\n", cpu.pc);
 	}else {
 		for(int i = 0; i < NR_GPR; i++) {
 			cs->gpr[i] = cpu.gpr[i];
@@ -61,8 +65,6 @@ __EXPORT void difftest_raise_intr(word_t NO) {
 }
 
 __EXPORT void difftest_init(int port) {
-	printf("\n\n\n\n");
-	fflush(stdout);
   void init_mem();
   init_mem();
   /* Perform ISA dependent initialization. */
