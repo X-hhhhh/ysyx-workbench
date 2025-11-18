@@ -16,14 +16,14 @@ static void reset(int n){
 int main(int argc, char* argv[]){
 	wave_trace_init(argc, argv);
 
-	init_monitor(argc, argv);
-
-	printf("Welcome to " ANSI_FG_YELLOW ANSI_BG_RED "NPC!" ANSI_NONE "\n");
-
 	int reset_time = 10;
 	while(reset_time-- > 0){
 		reset(1);
 	}
+
+	init_monitor(argc, argv);
+	printf("Welcome to " ANSI_FG_YELLOW ANSI_BG_RED "NPC!" ANSI_NONE "\n");
+
 	top -> eval(); wave_trace();
 	top -> eval(); wave_trace();
 

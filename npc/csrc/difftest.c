@@ -3,9 +3,12 @@
 #include <pmem.h>
 #include <dpi.h>
 #include <wave_trace.h>
+#include <cpu.h>
+#include <reg.h>
 
 #define NR_GPR 16
 #define DIFFTEST_TO_REF false
+#define DIFFTEST_TO_DUT true
 
 typedef void (*difftest_memcpy_dl)(paddr_t addr, void *buf, size_t n, bool direction);
 typedef void (*difftest_regcpy_dl)(void *dut, bool direction);
@@ -56,19 +59,29 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 	dut.pc = top->pc;
 	ref_difftest_regcpy(&dut, DIFFTEST_TO_REF);
 }
-/*
+
 static void checkregs(cpu_state *ref, uint32_t pc) {
 	for(int i = 0; i < NR_GPR; i++) {
-		
+		if(ref->gpr[i] != gpr_read(i)) {
+			npc_state.state = NPC_ABORT;
+			npc_state.halt_pc = pc;
+			riscve_reg_display();
+			return;
+		}	
 	}
-}*/
+}
 
 void difftest_step(uint32_t pc) {
 	cpu_state ref;
 	ref_difftest_exec(1);
-
+	ref_difftest_regcpy(&ref, DIFFTEST_TO_DUT);
+	checkregs(&ref, pc);
 }
 
+#else
+
+void init_difftest(char *ref_so_file, long img_size, int port) {}
+void difftest_step(uint32_t pc) {}
 
 #endif
 

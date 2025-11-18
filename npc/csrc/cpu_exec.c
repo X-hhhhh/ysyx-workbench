@@ -9,6 +9,7 @@
 #include <pmem.h>
 #include <reg.h>
 #include <cpu.h>
+#include <difftest.h>
 
 #define MAX_INST_TO_PRINT 10
 
@@ -63,9 +64,9 @@ void cpu_exec(uint64_t n) {
 
 #ifdef CONFIG_WATCHPOINT_SCAN
 		bool triggered = scan_wp();
-		//if(triggered) {break;}
 		if(triggered) {npc_state.state = NPC_STOP;}
 #endif
+		difftest_step(top->pc);
 	}
 
 	switch(npc_state.state) {
