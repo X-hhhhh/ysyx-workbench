@@ -12,9 +12,9 @@
 #define ANSI_BG_YELLOW	"\33[1;43m"
 #define ANSI_NONE	"\33[0m"
 
-//#define CONFIG_WATCHPOINT_SCAN 1
+#define CONFIG_WATCHPOINT_SCAN 1
 #define CONFIG_ITRACE 1
-//#define CONFIG_MTRACE 1
+#define CONFIG_MTRACE 1
 //#define CONFIG_FTRACE 1
 #define CONFIG_DIFFTEST 1
 

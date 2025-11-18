@@ -16,7 +16,7 @@ difftest_memcpy_dl ref_difftest_memcpy = NULL;
 difftest_regcpy_dl ref_difftest_regcpy = NULL;
 difftest_exec_dl ref_difftest_exec = NULL;
 
-struct {
+typedef struct {
 	uint32_t gpr[NR_GPR];
 	uint32_t pc;
 }cpu_state;
@@ -42,18 +42,31 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 	difftest_init_dl ref_difftest_init = (difftest_init_dl)dlsym(handle, "difftest_init");
 	assert(ref_difftest_init);
 	
-	printf("Differential testing: " ANSI_FG_GREEN "ON" ANSI_NONE);
+	printf("Differential testing: " ANSI_FG_GREEN "ON" ANSI_NONE "\n");
 	
 	//initialize difftest function of ref(nemu)
 	ref_difftest_init(port);
 	//copy the memory of npc to ref(nemu)
 	ref_difftest_memcpy(PMEM_BASE, pmem, img_size, DIFFTEST_TO_REF);
 	//copy cpu state to ref(nemu)
+	cpu_state dut;
 	for(int i = 0 ; i < NR_GPR; i++) {
-		cpu_state.gpr[i] = gpr_read(i);
+		dut.gpr[i] = gpr_read(i);
 	}
-	cpu_state.pc = top->pc;
-	ref_difftest_regcpy(&cpu_state, DIFFTEST_TO_REF);
+	dut.pc = top->pc;
+	ref_difftest_regcpy(&dut, DIFFTEST_TO_REF);
+}
+/*
+static void checkregs(cpu_state *ref, uint32_t pc) {
+	for(int i = 0; i < NR_GPR; i++) {
+		
+	}
+}*/
+
+void difftest_step(uint32_t pc) {
+	cpu_state ref;
+	ref_difftest_exec(1);
+
 }
 
 

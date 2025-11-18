@@ -8,27 +8,20 @@
 #include <disasm.h>
 #include <pmem.h>
 #include <reg.h>
+#include <cpu.h>
 
 #define MAX_INST_TO_PRINT 10
 
-static bool NPC_TRAP = false;
-static bool NPC_END = false;
+NPCstate npc_state = {.state = -1, .halt_ret = -1};
 
 static int inst_num = 0;
 static bool print_inst = false;
 
 //This function is called by dpi interface
 void npc_trap() {
-	NPC_TRAP = true;
-}
-
-static void check_ret() {
-	int halt_ret = gpr_read(10);
-	if(halt_ret == 0) {
-		printf("npc: " ANSI_FG_GREEN "HIT GOOD TRAP " ANSI_NONE "at pc = %x\n", top->pc);
-	}else {
-		printf("npc: " ANSI_FG_RED "HIT BAD TRAP " ANSI_NONE "at pc = %x\n", top->pc);
-	}
+	npc_state.state = NPC_END;
+	npc_state.halt_pc = top->pc;
+	npc_state.halt_ret = gpr_read(10);
 }
 
 void assert_fali_msg() {
@@ -38,7 +31,15 @@ void assert_fali_msg() {
 
 void cpu_exec(uint64_t n) {
 	print_inst = (n < MAX_INST_TO_PRINT); 
-	while(n-- && NPC_TRAP == false) {
+	switch(npc_state.state) {
+		case NPC_END: case NPC_ABORT: case NPC_QUIT:
+			printf("Program execution has ended.\n");	
+			return;
+		default:
+			npc_state.state = NPC_RUNNING;
+	}
+
+	while(n-- && npc_state.state == NPC_RUNNING) {
 		//execute an instruction
 		top->sys_clk = !top->sys_clk;
 		top->eval();
@@ -62,19 +63,28 @@ void cpu_exec(uint64_t n) {
 
 #ifdef CONFIG_WATCHPOINT_SCAN
 		bool triggered = scan_wp();
-		if(triggered) {break;}
+		//if(triggered) {break;}
+		if(triggered) {npc_state.state = NPC_STOP;}
 #endif
 	}
 
-	if(NPC_TRAP == true) {
-		if(NPC_END == false) {
-			check_ret();
+	switch(npc_state.state) {
+		case NPC_RUNNING:
+			npc_state.state = NPC_STOP; break;
+		case NPC_END:
+			if(npc_state.halt_ret == 0) {
+				printf("npc: " ANSI_FG_GREEN "HIT GOOD TRAP " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
+			}else {
+				printf("npc: " ANSI_FG_RED "HIT BAD TRAP " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
+			}
+			printf("Executed instructions: %d\n", inst_num); 
 			Ftrace_report();
-			NPC_END = true;
-			printf("Executed instructions: %d\n", inst_num);
-		}else {
-			printf("Program execution has ended.\n");	
-		}
+			break;
+		case NPC_ABORT:
+			printf("npc: " ANSI_FG_RED "ABORT " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
+			printf("Executed instructions: %d\n", inst_num); 
+			Ftrace_report();
+			break;
 	}
 }
 
