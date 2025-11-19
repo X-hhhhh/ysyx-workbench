@@ -78,9 +78,9 @@ void cpu_exec(uint64_t n) {
 				printf("npc: " ANSI_FG_GREEN "HIT GOOD TRAP " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
 			}else {
 				printf("npc: " ANSI_FG_RED "HIT BAD TRAP " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
+				assert_fali_msg();
 			}
 			printf("Executed instructions: %d\n", inst_num); 
-			assert_fali_msg();
 			break;
 		case NPC_ABORT:
 			printf("npc: " ANSI_FG_RED "ABORT " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
