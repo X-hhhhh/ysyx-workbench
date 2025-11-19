@@ -1,3 +1,5 @@
+CONFIG_DIFFTEST = 1;
+
 #name of top module
 TOPNAME = top
 
@@ -36,10 +38,12 @@ $(LIBCAPSTONE):
 	$(MAKE) -C $(NEMU_HOME)/tools/capstone
 
 #difftest's dependency
+ifdef CONFIG_DIFFTEST
 DIFF_REF_SO = $(NEMU_HOME)/build/riscv32-nemu-interpreter-so
 $(DIFF_REF_SO):
 	$(MAKE) -C $(NEMU_HOME) app
 override ARGS += --diff=$(DIFF_REF_SO)
+endif
 
 run: $(DIFF_REF_SO)
 	@echo "-------- VERILATE --- AND --- BUILD --------"
