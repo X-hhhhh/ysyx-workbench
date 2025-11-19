@@ -36,18 +36,17 @@ $(LIBCAPSTONE):
 	$(MAKE) -C $(NEMU_HOME)/tools/capstone
 
 #difftest's dependency
-DIFF_REF_SO = $(NEMU_HOME)/build/riscv32-nemu-interpreter-so 
+DIFF_REF_SO = $(NEMU_HOME)/build/riscv32-nemu-interpreter-so
 DIFF_REF_SO:
 	$(MAKE) -C $(NEMU_HOME) app
 
-override ARGS += "--diff=$(DIFF_REF_SO)"
+override ARGS += --diff=$(DIFF_REF_SO)
+#override ARGS += "--diff=$(NEMU_HOME)/build/riscv32-nemu-interpreter-so"
 
-run:
+run: DIFF_REF_SO
 	@echo "-------- VERILATE --- AND --- BUILD --------"
 	@rm -rf $(OBJ_DIR)
 	@mkdir -p $(OBJ_DIR)
-
-	echo $(ARGS)
 
 	@$(VERILATOR) $(VERILATOR_FLAGS) $(VSRCS) $(CSRCS) -CFLAGS "$(CFLAGS)" -LDFLAGS "$(LDFLAGS)"
 	@$(BIN) $(ARGS) $(IMG) --trace
