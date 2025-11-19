@@ -39,7 +39,9 @@ typedef uint32_t paddr_t;
 			fflush(stdout); \
 			fprintf(stderr, ANSI_FG_RED format ANSI_NONE "\n", ##__VA_ARGS__); \
 			extern void assert_fali_msg(); \
+			extern void wave_trace_end(); \
 			assert_fali_msg(); \
+			wave_trace_end(); \
 			assert(cond); \
 		} \
 	}while(0)
