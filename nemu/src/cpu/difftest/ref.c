@@ -41,13 +41,11 @@ __EXPORT void difftest_regcpy(void *dut, bool direction) {
 			cpu.gpr[i] = cs->gpr[i];
 		}
 			cpu.pc = cs->pc;
-			printf("pc = %x\n", cpu.pc);
 	}else {
 		for(int i = 0; i < 32; i++) {
 			cs->gpr[i] = cpu.gpr[i];
 		}	
 			cs->pc = cpu.pc;
-			printf("pc = %x\n", cpu.pc);
 	}
 }
 
