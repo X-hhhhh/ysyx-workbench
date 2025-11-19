@@ -69,8 +69,9 @@ static void checkregs(cpu_state *ref, uint32_t pc) {
 		if(ref->gpr[i] != gpr_read(i)) {
 			npc_state.state = NPC_ABORT;
 			npc_state.halt_pc = pc;
-			riscve_reg_display();
-			printf("Register status is inconsistent with the reference model at pc=%x\n", pc);
+			//riscve_reg_display();
+			printf("[Difftest]Register status is inconsistent with the reference model at pc=%x\n", pc);
+			Assert(0);
 		return;
 		}	
 	}
