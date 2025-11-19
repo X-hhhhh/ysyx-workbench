@@ -51,8 +51,6 @@ void cpu_exec(uint64_t n) {
 		inst_num++;
 		
 		uint32_t inst = inst_get();
-		printf("npc:\n");
-		riscve_reg_display();
 		if(print_inst) {
 #ifdef CONFIG_ITRACE
 			char buf[256];
