@@ -39,7 +39,6 @@ $(LIBCAPSTONE):
 DIFF_REF_SO = $(NEMU_HOME)/build/riscv32-nemu-interpreter-so
 $(DIFF_REF_SO):
 	$(MAKE) -C $(NEMU_HOME) app
-
 override ARGS += --diff=$(DIFF_REF_SO)
 
 run: $(DIFF_REF_SO)

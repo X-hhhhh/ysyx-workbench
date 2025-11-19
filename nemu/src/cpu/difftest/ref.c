@@ -38,11 +38,10 @@ __EXPORT void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction)
 __EXPORT void difftest_regcpy(void *dut, bool direction) {
 	CPU_state *cs = (CPU_state*)dut;
 	if(direction == DIFFTEST_TO_REF) {
-		for(int i = 0; i < NR_GPR; i++) {
+		for(int i = 0; i < 32; i++) {
 			cpu.gpr[i] = cs->gpr[i];
 		}
 			cpu.pc = cs->pc;
-			printf("pc = %x\n", cpu.pc);
 			printf("pc = %x\n", cpu.pc);
 	}else {
 		for(int i = 0; i < NR_GPR; i++) {
