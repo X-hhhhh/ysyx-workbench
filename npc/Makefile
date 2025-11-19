@@ -1,3 +1,4 @@
+#build options
 CONFIG_DIFFTEST = 1;
 
 #name of top module

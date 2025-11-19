@@ -190,7 +190,7 @@ static long load_memory(const char *filename) {
 	fseek(fp, 0, SEEK_END);
 	long img_size = ftell(fp);
 
-	printf("Img is %s\n, size = %ld\n", filename, img_size);
+	printf("Img is %s, size = %ld\n", filename, img_size);
 	assert(img_size < PMEM_SIZE);
 	
 	fseek(fp, 0, SEEK_SET);
