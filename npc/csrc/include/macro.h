@@ -2,7 +2,7 @@
 #define MACRO_H__
 
 //Enable waveforms will consume more resources
-#define CONFIG_FST_WAVE_TRACE 0
+#define CONFIG_FST_WAVE_TRACE 1
 
 #define ANSI_FG_RED	"\33[1;31m"
 #define ANSI_FG_GREEN	"\33[1;32m"
