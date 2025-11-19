@@ -22,7 +22,6 @@
 #define DIFFTEST_TO_DUT true
 
 #define DUT_MBASE 0x80000000
-#define NR_GPR 16
 
 __EXPORT void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
 	assert(addr - DUT_MBASE + CONFIG_MBASE + n - 1 <= PMEM_RIGHT);
@@ -44,7 +43,7 @@ __EXPORT void difftest_regcpy(void *dut, bool direction) {
 			cpu.pc = cs->pc;
 			printf("pc = %x\n", cpu.pc);
 	}else {
-		for(int i = 0; i < NR_GPR; i++) {
+		for(int i = 0; i < 32; i++) {
 			cs->gpr[i] = cpu.gpr[i];
 		}	
 			cs->pc = cpu.pc;

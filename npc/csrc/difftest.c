@@ -6,7 +6,6 @@
 #include <cpu.h>
 #include <reg.h>
 
-#define NR_GPR 16
 #define DIFFTEST_TO_REF false
 #define DIFFTEST_TO_DUT true
 
@@ -20,7 +19,7 @@ difftest_regcpy_dl ref_difftest_regcpy = NULL;
 difftest_exec_dl ref_difftest_exec = NULL;
 
 typedef struct {
-	uint32_t gpr[NR_GPR];
+	uint32_t gpr[32];
 	uint32_t pc;
 }cpu_state;
 
@@ -53,15 +52,18 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 	ref_difftest_memcpy(PMEM_BASE, pmem, img_size, DIFFTEST_TO_REF);
 	//copy cpu state to ref(nemu)
 	cpu_state dut;
-	for(int i = 0 ; i < NR_GPR; i++) {
+	for(int i = 0 ; i < 16; i++) {
 		dut.gpr[i] = gpr_read(i);
+	}
+	for(int i = 16 ; i < 32; i++) {
+		dut.gpr[i] = 0;
 	}
 	dut.pc = top->pc;
 	ref_difftest_regcpy(&dut, DIFFTEST_TO_REF);
 }
 
 static void checkregs(cpu_state *ref, uint32_t pc) {
-	for(int i = 0; i < NR_GPR; i++) {
+	for(int i = 0; i < 16; i++) {
 		if(ref->gpr[i] != gpr_read(i)) {
 			npc_state.state = NPC_ABORT;
 			npc_state.halt_pc = pc;
