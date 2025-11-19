@@ -55,6 +55,7 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 	for(int i = 0 ; i < 16; i++) {
 		dut.gpr[i] = gpr_read(i);
 	}
+	//now the number of gpr is 16, which may change in the future
 	for(int i = 16 ; i < 32; i++) {
 		dut.gpr[i] = 0;
 	}
