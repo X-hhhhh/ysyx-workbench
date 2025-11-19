@@ -85,6 +85,7 @@ void cpu_exec(uint64_t n) {
 			printf("npc: " ANSI_FG_RED "ABORT " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
 			printf("Executed instructions: %d\n", inst_num); 
 			Ftrace_report();
+			wave_trace_end();
 			break;
 	}
 }
