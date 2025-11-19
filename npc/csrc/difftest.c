@@ -64,6 +64,7 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 }
 
 static void checkregs(cpu_state *ref, uint32_t pc) {
+	//now the number of gpr is 16, which may change in the future
 	for(int i = 0; i < 16; i++) {
 		if(ref->gpr[i] != gpr_read(i)) {
 			npc_state.state = NPC_ABORT;
