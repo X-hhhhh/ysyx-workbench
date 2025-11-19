@@ -41,7 +41,6 @@ $(DIFF_REF_SO):
 	$(MAKE) -C $(NEMU_HOME) app
 
 override ARGS += --diff=$(DIFF_REF_SO)
-#override ARGS += "--diff=$(NEMU_HOME)/build/riscv32-nemu-interpreter-so"
 
 run: $(DIFF_REF_SO)
 	@echo "-------- VERILATE --- AND --- BUILD --------"
@@ -58,7 +57,7 @@ run: $(DIFF_REF_SO)
 
 	@echo "------------------ END ---------------------"
 
-gdb: 
+gdb: $(DIFF_REF_SO)
 	@rm -rf $(OBJ_DIR)
 	@mkdir -p $(OBJ_DIR)
 
@@ -68,7 +67,7 @@ gdb:
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all run gdb clean
+.PHONY: all run gdb clean $(DIFF_REF_SO)
 
 include ../Makefile
 
