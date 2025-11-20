@@ -30,10 +30,11 @@ always@(*) begin
 	endcase
 end
 
-universal_adder universal_adder_inst
+universal_adder 
 #(
 	.DATAWIDTH(32)
 )
+universal_adder_inst
 (
 	.a(a),
 	.b(b),
