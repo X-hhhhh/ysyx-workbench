@@ -160,6 +160,7 @@ static int analyze_elf() {
 	if(ret != 1) return 1;
 	for(int i = 0; i < sym_num; i++) {
 		if(ELF32_ST_TYPE(sym[i].st_info) == STT_FUNC) {
+			assert(func_add_table.count < MAX_FUNCNUM);
 			func_add_table.address_b[func_add_table.count] = sym[i].st_value;
 			func_add_table.address_e[func_add_table.count] = sym[i].st_value + sym[i].st_size;
 			fseek(fp, strtab_off + sym[i].st_name, SEEK_SET);

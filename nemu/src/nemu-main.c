@@ -68,8 +68,6 @@ int main(int argc, char *argv[]) {
 
 
 
-  	//printf("%d", CONFIG_DEVICE);
-
 
 
 
