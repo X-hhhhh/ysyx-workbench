@@ -2,27 +2,40 @@ module 	EXU(
 	input	wire	[31:0]	gpr_rdata1_in,
 	input	wire	[31:0]	gpr_rdata2_in,
 	input	wire	[31:0]	imm,
-	input	wire	[1:0]	EXU_mode, 	//bit[0]:0 for src1 and src2, 1 for src and imm, bit[1]: 0 for add, 1 for sub
+	
+	//bit[0]:0 for src1 and src2, 1 for src and imm, bit[1]: 0 for add, 1 for sub
+	//bit[2]:1 for compare
+	input	wire	[2:0]	EXU_mode, 	
 
-	output	wire	[31:0]	EXU_data
+	output	reg	[31:0]	EXU_data
 );
 
-reg	[31:0]	a;
-reg	[31:0]	b;
+reg	[31:0] a;
+reg	[31:0] b;
+wire	[31:0] out;
 
 always@(*) begin
 	case(EXU_mode)
-		2'b00: begin
+		3'b000: begin
 			a = gpr_rdata1_in;
 			b = gpr_rdata2_in;
+			EXU_data = out;
 		end
-		2'b01: begin
+		3'b001: begin
 			a = gpr_rdata1_in;
 			b = imm;
+			EXU_data = out;
+		end
+		3'b100: begin
+			//if equal, EXU_data is 0, if a > b, EXU_data is 32'10, if a < b, EXU_data is 32'b100
+			a = gpr_rdata1_in;
+			b = ~gpr_rdata2_in + 1'b1;
+			EXU_data = (out == 32'b0) ? 32'b0 : (out[31] == 0) ? 32'b10 : 32'b100;
 		end
 		default: begin 
 			a = 32'b0;
 			b = 32'b0;
+			EXU_data = 32'b0;
 		end
 	endcase
 end
@@ -35,7 +48,7 @@ universal_adder_inst
 (
 	.a(a),
 	.b(b),
-	.out(EXU_data)
+	.out(out)
 );
 
 endmodule
