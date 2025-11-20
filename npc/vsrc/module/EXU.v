@@ -4,11 +4,11 @@ module 	EXU(
 	input	wire	[31:0]	imm,
 	input	wire	[1:0]	EXU_mode, 	//bit[0]:0 for src1 and src2, 1 for src and imm, bit[1]: 0 for add, 1 for sub
 
-	output	reg	[31:0]	EXU_data
+	output	wire	[31:0]	EXU_data
 );
 
-wire	[31:0]	a;
-wire	[31:0]	b;
+reg	[31:0]	a;
+reg	[31:0]	b;
 
 always@(*) begin
 	case(EXU_mode)
