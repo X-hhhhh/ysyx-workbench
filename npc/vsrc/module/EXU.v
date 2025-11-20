@@ -12,12 +12,14 @@ wire	[31:0]	b;
 
 always@(*) begin
 	case(EXU_mode)
-		2'b00:
+		2'b00: begin
 			a = gpr_rdata1_in;
 			b = gpr_rdata2_in;
-		2'b01:
+		end
+		2'b01: begin
 			a = gpr_rdata1_in;
 			b = imm;
+		end
 		//2'b00: EXU_data = gpr_rdata1_in + gpr_rdata2_in; 
 		//2'b01: EXU_data = gpr_rdata1_in + imm;
 		default: 
