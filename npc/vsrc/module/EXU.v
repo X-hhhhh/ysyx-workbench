@@ -32,7 +32,7 @@ end
 
 universal_adder universal_adder_inst
 #(
-	.DATAWIDTH = 32
+	.DATAWIDTH(32)
 )
 (
 	.a(a),
