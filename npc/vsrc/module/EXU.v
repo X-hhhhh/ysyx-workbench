@@ -20,10 +20,7 @@ always@(*) begin
 			a = gpr_rdata1_in;
 			b = imm;
 		end
-		//2'b00: EXU_data = gpr_rdata1_in + gpr_rdata2_in; 
-		//2'b01: EXU_data = gpr_rdata1_in + imm;
 		default: begin 
-			//EXU_data = 32'b0;
 			a = 32'b0;
 			b = 32'b0;
 		end
