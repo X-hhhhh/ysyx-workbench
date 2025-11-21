@@ -15,7 +15,7 @@ module universal_adder
 wire	[DATAWIDTH - 1:0]	b_1comp;
 
 assign 	b_1comp = {DATAWIDTH{mode}} ^ b;	//complement of 1
-assign {carry, out} = a + b + mode;
+assign {carry, out} = a + b + {31'b0, mode};
 assign overflow = (a[DATAWIDTH-1] == b_1comp[DATAWIDTH-1]) && (out[DATAWIDTH-1] != a[DATAWIDTH-1]);
 
 endmodule
