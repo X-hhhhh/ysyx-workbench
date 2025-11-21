@@ -41,11 +41,13 @@ always@(*) begin
 		4'b1000: begin
 			a = gpr_rdata1_in;
 			b = gpr_rdata2_in;
+			mode = 1'b1;
 			EXU_data = (out == 32'b0) ? 32'b0 : (out[31] ^ overflow) ? 32'b100: 32'b10;
 		end
 		default: begin 
 			a = 32'b0;
 			b = 32'b0;
+			mode = 1'b0;
 			EXU_data = 32'b0;
 		end
 	endcase
