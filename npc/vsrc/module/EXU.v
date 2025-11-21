@@ -10,9 +10,10 @@ module 	EXU(
 	output	reg	[31:0]	EXU_data
 );
 
-reg	[31:0] a;
-reg	[31:0] b;
-wire	[31:0] out;
+reg	[31:0] 	a;
+reg	[31:0] 	b;
+wire	[31:0] 	out;
+wire	       	carry;
 
 always@(*) begin
 	case(EXU_mode)
@@ -30,9 +31,11 @@ always@(*) begin
 			//if equal, EXU_data is 0, if a > b, EXU_data is 32'10, if a < b, EXU_data is 32'b100
 			a = gpr_rdata1_in;
 			b = ~gpr_rdata2_in + 1'b1;
-			EXU_data = (out == 32'b0) ? 32'b0 : (out[31] == 0) ? 32'b10 : 32'b100;
+			EXU_data = (out == 32'b0) ? 32'b0 : (carry == 0) ? 32'b100 : 32'b10;
 		end
-		4'b1000
+		4'b1000: begin
+			
+		end
 		default: begin 
 			a = 32'b0;
 			b = 32'b0;
@@ -49,7 +52,8 @@ universal_adder_inst
 (
 	.a(a),
 	.b(b),
-	.out(out)
+	.out(out),
+	.carry(carry)
 );
 
 endmodule
