@@ -32,6 +32,10 @@ always@(*) begin
 			mode = 1'b0;
 			EXU_data = out;
 		end
+		3'b001: begin
+			mode = 1'b1;
+			EXU_data = out;
+		end
 		3'b010: begin
 			//if equal, EXU_data is 0, if a > b, EXU_data is 32'10, if a < b, EXU_data is 32'b100
 			mode = 1'b1;
