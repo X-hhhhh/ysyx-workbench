@@ -24,7 +24,6 @@ always@(*) begin
 		b = gpr_rdata2_in;
 	else
 		b = imm;
-	endcase
 end
 
 always@(*) begin
