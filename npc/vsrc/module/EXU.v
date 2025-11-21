@@ -41,7 +41,7 @@ always@(*) begin
 		4'b1000: begin
 			a = gpr_rdata1_in;
 			b = gpr_rdata2_in;
-			EXU_data = (out == 32'b0) ? 32'b0 : (out[31] ^ overflow) ? 32'b100: 32'b10
+			EXU_data = (out == 32'b0) ? 32'b0 : (out[31] ^ overflow) ? 32'b100: 32'b10;
 		end
 		default: begin 
 			a = 32'b0;
