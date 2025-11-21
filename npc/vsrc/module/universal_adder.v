@@ -12,7 +12,7 @@ module universal_adder
 	output	wire				overflow
 );
 
-wire	b_1comp;
+wire	[DATAWIDTH - 1:0]	b_1comp;
 
 assign 	b_1comp = {DATAWIDTH{mode}} ^ b;	//complement of 1
 assign {carry, out} = a + b + mode;
