@@ -86,7 +86,8 @@ void cpu_exec(uint64_t n) {
 			assert_fali_msg();
 			printf("npc: " ANSI_FG_RED "ABORT " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
 			printf("Executed instructions: %d\n", inst_num); 
-			Assert(0, "");
+			wave_trace_end();
+			assert(0);
 			break;
 	}
 }
