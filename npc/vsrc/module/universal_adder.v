@@ -6,10 +6,11 @@ module universal_adder
 	input	wire	[DATAWIDTH - 1:0] a,
 	input	wire	[DATAWIDTH - 1:0] b,
 	
-	output	wire	[DATAWIDTH - 1:0] out
+	output	wire	[DATAWIDTH - 1:0] out,
+	output	wire			  carry
 );
 
-assign out = a + b;
+assign {carry, out} = a + b;
 
 endmodule
 

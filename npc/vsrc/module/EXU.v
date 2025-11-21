@@ -4,8 +4,8 @@ module 	EXU(
 	input	wire	[31:0]	imm,
 	
 	//bit[0]:0 for src1 and src2, 1 for src and imm, bit[1]: 0 for add, 1 for sub
-	//bit[2]:1 for compare
-	input	wire	[2:0]	EXU_mode, 	
+	//bit[2]:1 for unisgned comparation, bit[3]: 1 for signed comparation
+	input	wire	[3:0]	EXU_mode, 	
 
 	output	reg	[31:0]	EXU_data
 );
@@ -16,22 +16,23 @@ wire	[31:0] out;
 
 always@(*) begin
 	case(EXU_mode)
-		3'b000: begin
+		4'b0000: begin
 			a = gpr_rdata1_in;
 			b = gpr_rdata2_in;
 			EXU_data = out;
 		end
-		3'b001: begin
+		4'b0001: begin
 			a = gpr_rdata1_in;
 			b = imm;
 			EXU_data = out;
 		end
-		3'b100: begin
+		4'b0100: begin
 			//if equal, EXU_data is 0, if a > b, EXU_data is 32'10, if a < b, EXU_data is 32'b100
 			a = gpr_rdata1_in;
 			b = ~gpr_rdata2_in + 1'b1;
 			EXU_data = (out == 32'b0) ? 32'b0 : (out[31] == 0) ? 32'b10 : 32'b100;
 		end
+		4'b1000
 		default: begin 
 			a = 32'b0;
 			b = 32'b0;
