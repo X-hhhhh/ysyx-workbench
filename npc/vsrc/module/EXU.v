@@ -4,8 +4,10 @@ module 	EXU(
 	input	wire	[31:0]	imm,
 	
 	//bit[0]:0 for src1 and src2, 1 for src and imm, bit[1]: 0 for add, 1 for sub
-	//bit[2]:1 for unisgned comparation, bit[3]: 1 for signed comparation
-	input	wire	[3:0]	EXU_mode, 	
+	//bit[2]:1 for unsigned comparation, bit[3]: 1 for signed comparation
+	//bit[4]:1 for unsigned shift right, bit[5]:1 for signed shift right 
+	//bit[6]:1 for unsigned/signed shift left
+	input	wire	[6:0]	EXU_mode, 	
 
 	output	reg	[31:0]	EXU_data
 );
@@ -17,7 +19,10 @@ wire	[31:0] 	out;
 wire	       	carry;
 wire		overflow;
 
+wire	[63:0] 	shift_right;
+
 assign a = gpr_rdata1_in;
+assign shift_right = {{32{gpr_rdata1_in[31]}}, gpr_rdata1_in} >> imm;
 
 always@(*) begin
 	if(EXU_mode[0] == 1'b0)
@@ -27,24 +32,28 @@ always@(*) begin
 end
 
 always@(*) begin
-	case(EXU_mode[3:1])
-		3'b000: begin
+	case(EXU_mode[6:1])
+		6'b000000: begin
 			mode = 1'b0;
 			EXU_data = out;
 		end
-		3'b001: begin
+		6'b000001: begin
 			mode = 1'b1;
 			EXU_data = out;
 		end
-		3'b010: begin
+		6'b000010: begin
 			//if equal, EXU_data is 0, if a > b, EXU_data is 32'10, if a < b, EXU_data is 32'b100
 			mode = 1'b1;
 			EXU_data = (out == 32'b0) ? 32'b0 : (carry == 0) ? 32'b100 : 32'b10;
 		end
-		3'b100: begin
+		6'b000100: begin
 			//if equal, EXU_data is 0, if a > b, EXU_data is 32'10, if a < b, EXU_data is 32'b100
 			mode = 1'b1;
 			EXU_data = (out == 32'b0) ? 32'b0 : (out[31] ^ overflow) ? 32'b100: 32'b10;
+		end
+		6'b010000: begin
+			mode = 1'b0;
+			EXU_data = shift_right[31:0];
 		end
 		default: begin 
 			mode = 1'b0;
@@ -52,6 +61,8 @@ always@(*) begin
 		end
 	endcase
 end
+
+
 
 universal_adder 
 #(
