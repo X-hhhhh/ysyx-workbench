@@ -33,9 +33,6 @@ always@(*) begin
 			b = ~gpr_rdata2_in + 1'b1;
 			EXU_data = (out == 32'b0) ? 32'b0 : (carry == 0) ? 32'b100 : 32'b10;
 		end
-		4'b1000: begin
-			
-		end
 		default: begin 
 			a = 32'b0;
 			b = 32'b0;
