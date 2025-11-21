@@ -12,8 +12,8 @@ module 	EXU(
 
 reg	[31:0] 	a;
 reg	[31:0] 	b;
+reg		mode;
 wire	[31:0] 	out;
-wire		mode;
 wire	       	carry;
 wire		overflow;
 
