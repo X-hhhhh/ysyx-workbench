@@ -61,7 +61,7 @@ static void out_of_bound(uint32_t addr) {
 int pmem_rd_t(int paddr) {
 	Mtrace(paddr, 4, 0);
 
-	if(paddr == 0) return 1;
+	if(paddr == 0 || paddr == 4) return 1;
 	if(in_pmem(paddr)) {
 		uint32_t paddr_ = paddr - PMEM_BASE;
 		return pmem[(uint32_t)paddr_ >> 2];
