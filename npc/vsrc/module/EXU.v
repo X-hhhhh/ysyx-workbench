@@ -34,28 +34,36 @@ always@(*) begin
 end
 
 always@(*) begin
-	case(EXU_mode[6:1])
-		6'b000000: begin
+	case(EXU_mode[10:1])
+		10'b00_0000_0000: begin
 			mode = 1'b0;
 			EXU_data = out;
 		end
-		6'b000001: begin
+		10'b00_0000_0001: begin
 			mode = 1'b1;
 			EXU_data = out;
 		end
-		6'b000010: begin
+		10'b00_0000_0010: begin
 			//if equal, EXU_data is 0, if a > b, EXU_data is 32'10, if a < b, EXU_data is 32'b100
 			mode = 1'b1;
 			EXU_data = (out == 32'b0) ? 32'b0 : (carry == 0) ? 32'b100 : 32'b10;
 		end
-		6'b000100: begin
+		10'b00_0000_0100: begin
 			//if equal, EXU_data is 0, if a > b, EXU_data is 32'10, if a < b, EXU_data is 32'b100
 			mode = 1'b1;
 			EXU_data = (out == 32'b0) ? 32'b0 : (out[31] ^ overflow) ? 32'b100: 32'b10;
 		end
-		6'b010000: begin
+		10'b00_0001_0000: begin
 			mode = 1'b0;
 			EXU_data = shift_right[31:0];
+		end
+		10'b00_0100_0000: begin
+			mode = 1'b0;
+			EXU_data = gpr_rdata1_in ^ gpr_rdata2_in;
+		end
+		10'b00_1000_0000: begin
+			mode = 1'b0;
+			EXU_data = gpr_rdata1_in & gpr_rdata2_in;
 		end
 		default: begin 
 			mode = 1'b0;
