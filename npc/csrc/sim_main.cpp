@@ -11,6 +11,7 @@ static void reset(int n){
 		top -> sys_clk = 0; top -> eval(); wave_trace();
 	}
 	top -> sys_rst = 0;
+	printf("reset");
 }
 
 int main(int argc, char* argv[]){
