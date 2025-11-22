@@ -118,6 +118,7 @@ int pmem_read(int paddr) {
 
 //Called by dpi-c
 void pmem_write(int paddr, int wdata, char wmask) {
+	printf("wr\n");
 	pmem_wr_t(paddr, wdata, wmask);
 }
 
