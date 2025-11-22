@@ -112,7 +112,7 @@ int pmem_wr(int paddr, int wdata, char wmask) {
 
 //Called by dpi-c
 int pmem_read(int paddr) {
-	printf("read\n");
+	printf("read, valid=%d\n", top->mem_valid);
 	return pmem_rd_t(paddr);
 }
 
