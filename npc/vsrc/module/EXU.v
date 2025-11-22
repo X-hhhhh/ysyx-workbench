@@ -24,7 +24,7 @@ wire		overflow;
 wire	[63:0] 	shift_right;
 
 assign a = gpr_rdata1_in;
-assign shift_right = {{32{gpr_rdata1_in[31]}}, gpr_rdata1_in} >> imm;
+assign shift_right = {{32{gpr_rdata1_in[31]}}, gpr_rdata1_in} >> b[4:0];	//only the low 5 bits of b is valid while shifting
 
 always@(*) begin
 	if(EXU_mode[0] == 1'b0)
@@ -56,6 +56,10 @@ always@(*) begin
 		10'b00_0001_0000: begin
 			mode = 1'b0;
 			EXU_data = shift_right[31:0];
+		end
+		10'b00_0010_0000: begin
+			mode = 1'b0;
+			EXU_data = a << b[4:0];
 		end
 		10'b00_0100_0000: begin
 			mode = 1'b0;
