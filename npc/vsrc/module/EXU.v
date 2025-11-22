@@ -69,6 +69,10 @@ always@(*) begin
 			mode = 1'b0;
 			EXU_data = a & b;
 		end
+		10'b01_0000_0000: begin
+			mode = 1'b0;
+			EXU_data = a | b;
+		end
 		default: begin 
 			mode = 1'b0;
 			EXU_data = 32'b0;
