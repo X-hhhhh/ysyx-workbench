@@ -8,7 +8,7 @@ static void reset(int n){
 	top -> sys_rst = 1;
 	while(n-- > 0){
 		top -> sys_clk = 1; top -> eval(); wave_trace();
-		printf("valid=%d\n", top->valid);
+		printf("valid=%d\n", top->mem_valid);
 		top -> sys_clk = 0; top -> eval(); wave_trace();
 		printf("\n\n\n\n");
 	}
