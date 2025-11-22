@@ -2,7 +2,7 @@
 #define MACRO_H__
 
 //Enable waveforms will consume more resources
-#define CONFIG_FST_WAVE_TRACE 1
+//#define CONFIG_FST_WAVE_TRACE 1
 
 #define ANSI_FG_RED	"\33[1;31m"
 #define ANSI_FG_GREEN	"\33[1;32m"
@@ -14,9 +14,9 @@
 
 //#define CONFIG_WATCHPOINT_SCAN 1
 #define CONFIG_ITRACE 1
-#define CONFIG_MTRACE 1
+//#define CONFIG_MTRACE 1
 //#define CONFIG_FTRACE 1
-#define CONFIG_DIFFTEST 1
+//#define CONFIG_DIFFTEST 1
 
 #define PMEM_BASE	0x80000000
 #define DEVICE_BASE	0x10000000

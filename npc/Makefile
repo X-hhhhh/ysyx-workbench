@@ -1,5 +1,5 @@
 #build options, which also need to define in macro.h to enable
-CONFIG_DIFFTEST = 1;
+#CONFIG_DIFFTEST = 1;
 
 #name of top module
 TOPNAME = top

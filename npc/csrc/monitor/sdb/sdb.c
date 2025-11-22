@@ -6,6 +6,8 @@
 #include <reg.h>
 #include <sdb.h>
 
+#define SET_BATCH_MODE 1
+
 static int cmd_c(char *args) {
 	cpu_exec(-1);
 	return 0;
@@ -155,6 +157,10 @@ static char* rl_gets() {
 }
 
 void sdb_mainloop() {
+	if(SET_BATCH_MODE) {
+		cpu_exec(-1);
+		return;
+	}
 	for(char *str; (str = rl_gets()) != NULL; ) {
 		char *str_end = str + strlen(str);
 
