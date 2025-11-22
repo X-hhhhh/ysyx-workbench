@@ -23,7 +23,9 @@ word_t expr(char *e, bool *success);
 int new_wp(char *expr);
 void free_wp(int NO);
 void display_wp();
-
 bool scan_wp();
+
+void Ftrace(uint32_t pc, uint32_t dnpc, uint8_t inst_type, uint32_t inst);
+void Ftrace_report();
 
 #endif

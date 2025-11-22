@@ -18,7 +18,13 @@
 #include "../local-include/reg.h"
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
-  return false;
+	for(int i = 0; i < 32; i++) {
+		if(ref_r -> gpr[i] != cpu.gpr[i]) {
+			printf("[Difftest]" ANSI_FG_RED "There is an issue with the instruction pointed to by the PC %x\n" ANSI_NONE , pc);
+			return false;
+		}
+	}
+  	return true;
 }
 
 void isa_difftest_attach() {

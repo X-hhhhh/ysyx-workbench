@@ -15,6 +15,7 @@
 
 #include <isa.h>
 #include <memory/paddr.h>
+#include <elf.h>
 
 void init_rand();
 void init_log(const char *log_file);
@@ -39,12 +40,32 @@ static void welcome() {
 #ifndef CONFIG_TARGET_AM
 #include <getopt.h>
 
+#define MAX_FUNCNUM 512
+#define MAX_CALL_RET 512
+
+static struct {
+	uint32_t address_b[MAX_FUNCNUM];
+	uint32_t address_e[MAX_FUNCNUM];
+	char name[MAX_FUNCNUM][64];
+	int count;
+} func_add_table = {
+	.count = 0
+};
+
+static struct {
+	uint32_t pc[MAX_CALL_RET];
+	char type[MAX_CALL_RET];	//'c' for call, 'r' for ret
+	char info[MAX_CALL_RET][64];	//call func's name or return func's name
+	int count;
+} func_call_info;
+
 void sdb_set_batch_mode();
 
 static char *log_file = NULL;
 static char *diff_so_file = NULL;
 static char *img_file = NULL;
 static int difftest_port = 1234;
+static char *elf_file = NULL;
 
 static long load_img() {
   if (img_file == NULL) {
@@ -68,6 +89,140 @@ static long load_img() {
   return size;
 }
 
+static int analyze_elf() {
+	if(elf_file == NULL) {
+        	Log("No elf_file is given. Function trace is disabled.");
+		return 0;
+	}
+
+	FILE *fp = fopen(elf_file, "rb");
+	Assert(fp, "Can not open '%s'", elf_file);
+
+	int ret;
+
+	//analyze elf header
+	Elf32_Ehdr ehdr;
+	ret = fread(&ehdr, sizeof(Elf32_Ehdr), 1, fp);
+	if(ret != 1) return 1;
+	
+	//check if it is an elf file
+	if(ehdr.e_ident[0] != 0x7f || ehdr.e_ident[1] != 'E' || ehdr.e_ident[2] != 'L' || ehdr.e_ident[3] != 'F') {
+		printf("Please make sure it is an elf file\n");
+		return 1;
+	}
+
+	//analyze section header
+	ret = fseek(fp, ehdr.e_shoff, SEEK_SET);
+	if(ret == -1) return 1;
+	Elf32_Shdr shdr[ehdr.e_shnum];
+	for(int i = 0; i < ehdr.e_shnum; i++) {
+		ret = fread(&shdr[i], sizeof(Elf32_Shdr), 1, fp);
+		if(ret != 1) return 1;
+	}
+
+	//go to section name string table 
+	int symtab_idx = -1, strtab_idx = -1;
+	Elf32_Off shstrtab_off = shdr[ehdr.e_shstrndx].sh_addr + shdr[ehdr.e_shstrndx].sh_offset;
+	char buf[128];
+	int count = 0;
+	ret = fseek(fp, shstrtab_off, SEEK_SET);
+	if(ret == -1) return 1;
+	for(int i = 0; i < ehdr.e_shnum; i++) {
+		fseek(fp, shstrtab_off + shdr[i].sh_name, SEEK_SET);
+		while(1) {
+			ret = fread(&buf[count], 1, 1, fp);
+			if(ret != 1) return 1;
+			if(buf[count] == '\0') {
+				count = 0;
+				if(strcmp(buf, ".symtab") == 0) {
+					symtab_idx = i;
+				}else if(strcmp(buf, ".strtab") == 0) {
+					strtab_idx = i;
+				}
+				break;
+			}
+			count++;
+		}
+	}
+
+	if(symtab_idx == -1 || strtab_idx == -1) return 1;
+	
+	Elf32_Off symtab_off = shdr[symtab_idx].sh_addr + shdr[symtab_idx].sh_offset;
+	Elf32_Off strtab_off = shdr[strtab_idx].sh_addr + shdr[strtab_idx].sh_offset;
+	
+	//analyze symtab
+	ret = fseek(fp, symtab_off, SEEK_SET);
+	if(ret == -1) return 1;
+	int sym_num = shdr[symtab_idx].sh_size / sizeof(Elf32_Sym);
+	Elf32_Sym sym[sym_num];
+	count = 0;
+	ret = fread(&sym, shdr[symtab_idx].sh_size, 1, fp);
+	if(ret != 1) return 1;
+	for(int i = 0; i < sym_num; i++) {
+		if(ELF32_ST_TYPE(sym[i].st_info) == STT_FUNC) {
+			assert(func_add_table.count < MAX_FUNCNUM);
+			func_add_table.address_b[func_add_table.count] = sym[i].st_value;
+			func_add_table.address_e[func_add_table.count] = sym[i].st_value + sym[i].st_size;
+			fseek(fp, strtab_off + sym[i].st_name, SEEK_SET);
+			while(1) {
+				ret = fread(&buf[count], 1, 1, fp);
+				if(ret != 1) return 1;
+				if(buf[count] == '\0') {
+					strcpy(func_add_table.name[func_add_table.count], buf);
+					count = 0;
+					break;
+				}
+				count++;	
+			}	
+			func_add_table.count++;
+		}
+	}
+	
+	/*for(int i = 0; i < func_add_table.count; i++) {
+		printf("st:%x, ed:%x, name:%s\n", func_add_table.address_b[i], func_add_table.address_e[i],
+					func_add_table.name[i]);
+	}*/
+
+	fclose(fp);
+	fp = NULL;
+	return 0;
+}
+
+void Ftrace(uint32_t pc, uint32_t dnpc, uint8_t inst_type, uint32_t inst) {
+	assert(func_call_info.count < MAX_CALL_RET);
+	if(inst_type == 1 && inst == 0x8067) {
+		//if the instruction is ret
+		func_call_info.type[func_call_info.count] = 'r';
+	}else {
+		func_call_info.type[func_call_info.count] = 'c';
+	}
+	func_call_info.pc[func_call_info.count] = pc;
+	
+	int i;
+	for(i = 0; i < func_add_table.count; i++) {
+		if(dnpc >= func_add_table.address_b[i] && dnpc < func_add_table.address_e[i]) {
+			strcpy(func_call_info.info[func_call_info.count], func_add_table.name[i]);
+			break;
+		}
+	}
+	if(i == func_add_table.count) {
+		strcpy(func_call_info.info[func_call_info.count], "???");
+	}
+	func_call_info.count++;
+}
+
+void Ftrace_report() {
+	printf("Ftrace:\n");
+	for(int i = 0; i < func_call_info.count; i++) {
+		if(func_call_info.type[i] == 'c') {
+			printf("%x:  call %s\n", func_call_info.pc[i], func_call_info.info[i]);
+		}else {
+			printf("%x:  ret  %s\n", func_call_info.pc[i], func_call_info.info[i]);
+		}
+	}
+	printf("\n");
+}
+
 static int parse_args(int argc, char *argv[]) {
   const struct option table[] = {
     {"batch"    , no_argument      , NULL, 'b'},
@@ -75,15 +230,17 @@ static int parse_args(int argc, char *argv[]) {
     {"diff"     , required_argument, NULL, 'd'},
     {"port"     , required_argument, NULL, 'p'},
     {"help"     , no_argument      , NULL, 'h'},
+    {"ftrace"   , required_argument, NULL, 'f'},
     {0          , 0                , NULL,  0 },
   };
   int o;
-  while ( (o = getopt_long(argc, argv, "-bhl:d:p:", table, NULL)) != -1) {
+  while ( (o = getopt_long(argc, argv, "-bhl:d:p:f:", table, NULL)) != -1) {
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
       case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
+      case 'f': elf_file = optarg; analyze_elf(); break;
       case 1: img_file = optarg; return 0;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
@@ -91,6 +248,7 @@ static int parse_args(int argc, char *argv[]) {
         printf("\t-l,--log=FILE           output log to FILE\n");
         printf("\t-d,--diff=REF_SO        run DiffTest with reference REF_SO\n");
         printf("\t-p,--port=PORT          run DiffTest with port PORT\n");
+	printf("\t-f,--ftrace=ELF_FILE    include elf file ELF_FILE to enable function trace\n");
         printf("\n");
         exit(0);
     }

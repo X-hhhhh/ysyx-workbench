@@ -1,51 +1,77 @@
+#build options, which also need to define in macro.h to enable
+#CONFIG_DIFFTEST = 1;
+
+#name of top module
 TOPNAME = top
-NXDC_FILES = constr/top.nxdc
-INC_PATH ?=
 
 VERILATOR = verilator
-VERILATOR_CFLAGS += -MMD --build -cc  \
-				-O3 --x-assign fast --x-initial fast --noassert
 
-VERILATOR_CFLAGS += -Wall
+#build address
+BUILD_DIR = ./build/verilator
 
-BUILD_DIR = ./build
+#address for storing files after building
 OBJ_DIR = $(BUILD_DIR)/obj_dir
+
+#address of executable file
 BIN = $(BUILD_DIR)/$(TOPNAME)
 
-default: $(BIN)
+#compilation options
+VERILATOR_FLAGS += --Mdir $(OBJ_DIR)
+VERILATOR_FLAGS += --trace-fst
+VERILATOR_FLAGS += --top-module $(TOPNAME)
+VERILATOR_FLAGS += --cc --exe -o $(abspath $(BIN))
+VERILATOR_FLAGS += --Wno-UNUSEDSIGNAL
+VERILATOR_FLAGS += --build
 
-$(shell mkdir -p $(BUILD_DIR))
+CFLAGS = -O2 -MMD -Wall -Werror
+CFLAGS += -I$(NPC_HOME)/csrc/include
+LDFLAGS = -lreadline -ldl
 
-# constraint file
-SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
-$(SRC_AUTO_BIND): $(NXDC_FILES)
-	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
+#search for files
+VSRCS = $(shell find $(abspath ./vsrc) -name "*.v" -or -name "*.sv")
+CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cpp")
 
-# project source
-VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
-CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
-CSRCS += $(SRC_AUTO_BIND)
+#disasm's dependency
+CFLAGS += -I$(NEMU_HOME)/tools/capstone/repo/include
+LIBCAPSTONE = $(NEMU_HOME)/tools/capstone/repo/libcapstone.so.5
+csrc/disasm.c: $(LIBCAPSTONE)
+$(LIBCAPSTONE):
+	$(MAKE) -C $(NEMU_HOME)/tools/capstone
 
-# rules for NVBoard
-include $(NVBOARD_HOME)/scripts/nvboard.mk
+#difftest's dependency
+ifdef CONFIG_DIFFTEST
+DIFF_REF_SO = $(NEMU_HOME)/build/riscv32-nemu-interpreter-so
+$(DIFF_REF_SO):
+	$(MAKE) -C $(NEMU_HOME) app
+override ARGS += --diff=$(DIFF_REF_SO)
+endif
 
-# rules for verilator
-INCFLAGS = $(addprefix -I, $(INC_PATH))
-CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
-
-$(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
+run: $(DIFF_REF_SO)
+	@echo "-------- VERILATE --- AND --- BUILD --------"
 	@rm -rf $(OBJ_DIR)
-	$(VERILATOR) $(VERILATOR_CFLAGS) \
-		--top-module $(TOPNAME) $^ \
-		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
+	@mkdir -p $(OBJ_DIR)
 
-all: default
+	@$(VERILATOR) $(VERILATOR_FLAGS) $(VSRCS) $(CSRCS) -CFLAGS "$(CFLAGS)" -LDFLAGS "$(LDFLAGS)"
+	@$(BIN) $(ARGS) $(IMG) --trace
 
-run: $(BIN)
-	@$^
+	@rm -rf $(BUILD_DIR)/logs
+	@mkdir -p $(BUILD_DIR)/logs
+	
+	@#gtkwave wave.fst
+
+	@echo "------------------ END ---------------------"
+
+gdb: $(DIFF_REF_SO)
+	@rm -rf $(OBJ_DIR)
+	@mkdir -p $(OBJ_DIR)
+
+	@$(VERILATOR) $(VERILATOR_FLAGS) $(VSRCS) $(CSRCS) -CFLAGS "$(CFLAGS) -g" -LDFLAGS "$(LDFLAGS) -g" --gdbbt --debug
+	gdb --args $(BIN) $(ARGS) $(IMG)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: default all clean run
+.PHONY: all run gdb clean $(DIFF_REF_SO)
+
+include ../Makefile
+

@@ -18,6 +18,8 @@
 #include <cpu/difftest.h>
 #include <locale.h>
 #include <../src/monitor/sdb/sdb.h>
+#include <cpu/ifetch.h>
+#include <memory/paddr.h>
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -26,10 +28,21 @@
  */
 #define MAX_INST_TO_PRINT 10
 
+#define MAX_IRINGBUF 20
+
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
+
+static struct Iringbuf {
+	word_t pc_buf[MAX_IRINGBUF];
+	char disam_buf[MAX_IRINGBUF][50];
+	int p;
+} Irb = {
+	.pc_buf = {0},
+	.p = 0,
+};
 
 void device_update();
 
@@ -37,16 +50,20 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
 #endif
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
-  IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
 #ifdef CONFIG_WATCHPOINT_SCAN
   bool triggered = scan_wp();
   if(triggered == true) {nemu_state.state = NEMU_STOP;}
 #endif
+
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
+  IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+
 }
 
 static void exec_once(Decode *s, vaddr_t pc) {
+  Irb.pc_buf[Irb.p] = pc;	//Save pc to iringbuf
+  
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
@@ -74,6 +91,11 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
+
+
+	//save disassembled infomation to iringbuf
+	strcpy(Irb.disam_buf[Irb.p++], p);
+  	if(Irb.p >= MAX_IRINGBUF) {Irb.p = 0;} 
 #endif
 }
 
@@ -97,9 +119,35 @@ static void statistic() {
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 }
 
+static void fail_report() {
+#ifdef CONFIG_ITRACE
+	char p[50];
+	uint32_t pc_t = Irb.pc_buf[Irb.p];
+	word_t last_inst = inst_fetch(&pc_t, 4);
+  	void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
+	disassemble(p, 50, pc_t, (uint8_t*)&last_inst, 4);
+	
+	for(int i = 0; i < MAX_IRINGBUF; i++) {
+		if(i == Irb.p) {
+			printf("--> %10x  %s\n", Irb.pc_buf[i], p);
+		       	continue;
+		}
+		printf("    %10x  %s\n", Irb.pc_buf[i], Irb.disam_buf[i]);
+	}
+	printf("\n");
+
+#ifdef CONFIG_MTRACE
+	Mtrace_report();	
+#endif
+#endif
+}
+
 void assert_fail_msg() {
-  isa_reg_display();
-  statistic();
+  	isa_reg_display();
+	
+	fail_report();
+
+  	statistic();
 }
 
 /* Simulate how the CPU works. */
@@ -129,6 +177,8 @@ void cpu_exec(uint64_t n) {
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           nemu_state.halt_pc);
       // fall through
-    case NEMU_QUIT: statistic();
+    case NEMU_QUIT: 
+      statistic();
+      IFDEF(CONFIG_FTRACE, Ftrace_report();)
   }
 }

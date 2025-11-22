@@ -18,16 +18,39 @@
 #include <difftest-def.h>
 #include <memory/paddr.h>
 
+#define DIFFTEST_TO_REF false
+#define DIFFTEST_TO_DUT true
+
+#define DUT_MBASE 0x80000000
+
 __EXPORT void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
-  assert(0);
+	assert(addr - DUT_MBASE + CONFIG_MBASE + n - 1 <= PMEM_RIGHT);
+	if(direction == DIFFTEST_TO_REF) {
+		for(int i = 0; i < n; i++) {
+			paddr_write(addr - DUT_MBASE + CONFIG_MBASE + i, 1, *((uint8_t*)buf + i));
+		}
+	}else {
+  		assert(0);
+	}
 }
 
 __EXPORT void difftest_regcpy(void *dut, bool direction) {
-  assert(0);
+	CPU_state *cs = (CPU_state*)dut;
+	if(direction == DIFFTEST_TO_REF) {
+		for(int i = 0; i < 32; i++) {
+			cpu.gpr[i] = cs->gpr[i];
+		}
+			cpu.pc = cs->pc;
+	}else {
+		for(int i = 0; i < 32; i++) {
+			cs->gpr[i] = cpu.gpr[i];
+		}	
+			cs->pc = cpu.pc;
+	}
 }
 
 __EXPORT void difftest_exec(uint64_t n) {
-  assert(0);
+	cpu_exec(n);
 }
 
 __EXPORT void difftest_raise_intr(word_t NO) {
