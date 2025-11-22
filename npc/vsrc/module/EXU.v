@@ -59,11 +59,11 @@ always@(*) begin
 		end
 		10'b00_0100_0000: begin
 			mode = 1'b0;
-			EXU_data = gpr_rdata1_in ^ gpr_rdata2_in;
+			EXU_data = a ^ b;
 		end
 		10'b00_1000_0000: begin
 			mode = 1'b0;
-			EXU_data = gpr_rdata1_in & gpr_rdata2_in;
+			EXU_data = a & b;
 		end
 		default: begin 
 			mode = 1'b0;
