@@ -6,8 +6,10 @@ module 	EXU(
 	//bit[0]:0 for src1 and src2, 1 for src and imm, bit[1]: 0 for add, 1 for sub
 	//bit[2]:1 for unsigned comparation, bit[3]: 1 for signed comparation
 	//bit[4]:1 for unsigned shift right, bit[5]:1 for signed shift right 
-	//bit[6]:1 for unsigned/signed shift left
-	input	wire	[6:0]	EXU_mode, 	
+	//bit[6]:1 for unsigned/signed shift left, bit[7]:1 for logical XOR
+	//bit[8]:1 for logical AND, bit[9]:1 for logical OR
+	//bit[10]1 for logical NOT
+	input	wire	[10:0]	EXU_mode, 	
 
 	output	reg	[31:0]	EXU_data
 );
