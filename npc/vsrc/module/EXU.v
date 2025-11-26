@@ -14,7 +14,7 @@ module 	EXU(
 	output	reg	[31:0]	EXU_data
 );
 
-reg	[31:0] 	a;
+wire	[31:0] 	a;
 reg	[31:0] 	b;
 reg		mode;
 wire	[31:0] 	out;
