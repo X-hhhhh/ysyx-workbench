@@ -46,6 +46,9 @@ static struct Iringbuf {
 
 void device_update();
 
+void Etrace_report();
+void Mtrace_report();
+
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
@@ -136,9 +139,7 @@ static void fail_report() {
 	}
 	printf("\n");
 
-#ifdef CONFIG_MTRACE
-	Mtrace_report();	
-#endif
+	IFDEF(CONFIG_MTRACE, Mtrace_report();)
 #endif
 }
 
@@ -180,5 +181,6 @@ void cpu_exec(uint64_t n) {
     case NEMU_QUIT: 
       statistic();
       IFDEF(CONFIG_FTRACE, Ftrace_report();)
+      IFDEF(CONFIG_ETRACE, Etrace_report();)
   }
 }
