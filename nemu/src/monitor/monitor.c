@@ -40,8 +40,8 @@ static void welcome() {
 #ifndef CONFIG_TARGET_AM
 #include <getopt.h>
 
-#define MAX_FUNCNUM 512
-#define MAX_CALL_RET 512
+#define MAX_FUNCNUM 51200
+#define MAX_CALL_RET 102
 
 static struct {
 	uint32_t address_b[MAX_FUNCNUM];
@@ -189,6 +189,8 @@ static int analyze_elf() {
 }
 
 void Ftrace(uint32_t pc, uint32_t dnpc, uint8_t inst_type, uint32_t inst) {
+	if(func_call_info.count >= MAX_CALL_RET) return ;
+	
 	assert(func_call_info.count < MAX_CALL_RET);
 	if(inst_type == 1 && inst == 0x8067) {
 		//if the instruction is ret

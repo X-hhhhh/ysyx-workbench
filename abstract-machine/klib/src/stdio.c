@@ -61,6 +61,24 @@ static char* int2str(int64_t num, char *buffer) {
 	reverse_string(buffer);
 	return buffer;
 }
+
+static void d2x_str(uint32_t dec, char *buffer) {
+	if(dec == 0) {
+		buffer[0] = '0';
+		buffer[1] = '\0';
+		return;
+	}
+
+	int i, res;
+	for(i = 0; dec > 0; i++) {
+		res = dec % 16;
+		buffer[i] = (res >= 10) ? res + 87 : res + '0';
+		dec /= 16;
+	}
+	buffer[i] = '\0';
+	reverse_string(buffer);
+}
+
 /*
 static void double2str(double num, int dec_place, char *buffer) {
 	bool sign = false;
@@ -97,35 +115,38 @@ static void double2str(double num, int dec_place, char *buffer) {
 	}
 }*/
 
+static int putstring(char *buffer) {
+	putstr(buffer);
+	return sizeof(buffer);
+}
+
 int printf(const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
 	int perc = 0;
-	int i, count = 0;
+	int count = 0;
 	char buf[64];
 	for(; *fmt != '\0'; fmt++) {
 		if(perc == 1) {
 			switch(*fmt) {
 				case 'd': 
 					int2str(va_arg(args, int), buf);
-					for(i = 0; buf[i] != '\0'; i++) {
-						count++;
-						putch(buf[i]);
-					}
+					count += putstring(buf);
 					perc = 0;
 					break;
 				case 's': 
 					strcpy(buf, va_arg(args, char*));
-					for(i = 0; buf[i] != '\0'; i++) {
-						count++;
-						putch(buf[i]);
-					}
+					count += putstring(buf);
 					perc = 0;
 					break;
 				case 'c':
 					count++;
 					putch(va_arg(args, int));
 					break;
+					perc = 0;
+				case 'x':
+					d2x_str(va_arg(args, int), buf);
+					count += putstring(buf);
 					perc = 0;
 				case 'f':
 					/*double2str(va_arg(args, double), 6, buf);

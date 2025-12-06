@@ -141,6 +141,8 @@ static void fail_report() {
 
 	IFDEF(CONFIG_MTRACE, Mtrace_report();)
 #endif
+	IFDEF(CONFIG_FTRACE, Ftrace_report();)
+      	IFDEF(CONFIG_ETRACE, Etrace_report();)
 }
 
 void assert_fail_msg() {

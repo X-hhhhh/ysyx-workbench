@@ -9,8 +9,9 @@ void init_sdb();
 void init_disasm();
 void init_difftest(char *ref_so_file, long img_size, int port);
 
-#define MAX_FUNCNUM 512
-#define MAX_CALL_RET 512
+#define MAX_FUNCNUM 10240
+#define MAX_CALL_RET 10200
+#define DEFAULT_IMG_SIZE 512
 
 static struct {
 	uint32_t address_b[MAX_FUNCNUM];
@@ -22,7 +23,7 @@ static struct {
 #ifdef CONFIG_FTRACE
 static struct {
 	uint32_t pc[MAX_CALL_RET];
-	char type[MAX_CALL_RET];	//'c' for call, 'r' for ret
+	char type[MAX_CALL_RET];		//'c' for call, 'r' for ret
 	char info[MAX_CALL_RET][64];	//call func's name or return func's name
 	int count;
 } func_call_info;
@@ -31,6 +32,27 @@ static struct {
 static char *img_file = NULL;
 static char *elf_file = NULL;
 static char *diff_so_file = NULL;
+
+static uint32_t default_img[DEFAULT_IMG_SIZE] = {
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb00020f3,
+	0xb80020f3,
+	0xb80020f3,
+	0xb80020f3,
+	0xb80020f3,
+	0xb80020f3,
+	0xb89020f3,
+	0x00100073		//ebreak
+};
 
 static int analyze_elf() {
 	if(elf_file == NULL) {
@@ -128,8 +150,8 @@ static int analyze_elf() {
 
 void Ftrace(uint32_t pc, uint32_t inst) {
 #ifdef CONFIG_FTRACE
-	assert(func_call_info.count < MAX_CALL_RET);
-	
+	if(func_call_info.count >= MAX_CALL_RET) return ;	
+
 	uint32_t dnpc = 0;
 	uint32_t imm;
 	if(inst == 0x8067) {
@@ -181,8 +203,9 @@ void Ftrace_report() {
 
 static long load_memory(const char *filename) {
 	if(filename == NULL) {
-		printf("No img is given\n");
-		exit(0);
+		printf("No img is given, using default img\n");
+		memcpy(pmem, default_img, DEFAULT_IMG_SIZE);
+		return 4096;
 	}
 	FILE *fp = fopen(filename, "rb");
 	assert(fp);
@@ -194,7 +217,7 @@ static long load_memory(const char *filename) {
 	assert(img_size < PMEM_SIZE);
 	
 	fseek(fp, 0, SEEK_SET);
-	int ret = fread(&pmem, img_size, 1, fp);
+	int ret = fread(pmem, img_size, 1, fp);
 	assert(ret == 1);
 
 	fclose(fp);
@@ -204,9 +227,9 @@ static long load_memory(const char *filename) {
 
 static int parse_args(int argc, char *argv[]) {
 	const struct option table[] = {
-		{"ftrace"  , required_argument	, NULL	, 'f'},
-		{"diff"	   , required_argument  , NULL  , 'd'},
-		{0	   ,	0		, NULL	,  0},
+		{"ftrace"  	, required_argument	, NULL	, 'f'},
+		{"diff"	   	, required_argument , NULL  , 'd'},
+		{0	   		,				  0	, NULL	,  0},
 	};
 	int o;
 	while( (o = getopt_long(argc, argv, "-f:d:", table, NULL)) != -1) {

@@ -52,7 +52,7 @@ run: $(DIFF_REF_SO)
 	@mkdir -p $(OBJ_DIR)
 
 	@$(VERILATOR) $(VERILATOR_FLAGS) $(VSRCS) $(CSRCS) -CFLAGS "$(CFLAGS)" -LDFLAGS "$(LDFLAGS)"
-	@$(BIN) $(ARGS) $(IMG) --trace
+	@$(BIN) $(ARGS) $(IMG) #--trace
 
 	@rm -rf $(BUILD_DIR)/logs
 	@mkdir -p $(BUILD_DIR)/logs

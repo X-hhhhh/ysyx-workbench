@@ -29,6 +29,7 @@ void assert_fali_msg() {
 	riscve_reg_display();
 	Mtrace_report();
 	Ftrace_report();
+	printf("Executed instructions: %d\n", inst_num); 
 }
 
 void cpu_exec(uint64_t n) {
@@ -50,7 +51,7 @@ void cpu_exec(uint64_t n) {
 		top->eval();
 		wave_trace();
 		inst_num++;
-		
+	
 		uint32_t inst = inst_get();
 		if(print_inst) {
 #ifdef CONFIG_ITRACE
@@ -81,6 +82,7 @@ void cpu_exec(uint64_t n) {
 				printf("npc: " ANSI_FG_RED "HIT BAD TRAP " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
 			}
 			printf("Executed instructions: %d\n", inst_num); 
+			Ftrace_report();
 			break;
 		case NPC_ABORT:
 			assert_fali_msg();

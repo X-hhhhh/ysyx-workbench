@@ -3,7 +3,7 @@ module top
 	input	wire			sys_clk,
 	input	wire			sys_rst,
 
-	output	wire	[31:0]		pc,
+	output	wire	[31:0]	pc,
 	output	wire			mem_valid
 );
 
@@ -14,7 +14,7 @@ wire	[4:0]		gpr_raddr2;
 
 wire	[31:0]		inst;
 
-wire			gpr_wen;
+wire				gpr_wen;
 wire	[4:0]		gpr_waddr;
 wire	[31:0]		imm;
 wire	[31:0]		gpr_wdata;
@@ -22,15 +22,23 @@ wire	[31:0]		gpr_rdata1_in;
 wire	[31:0]		gpr_rdata2_in;
 wire	[31:0]		gpr_rdata1;
 wire	[31:0]		gpr_rdata2;
-wire			pc_wen;
+wire				pc_wen;
 wire	[31:0]		pc_wdata;
+wire	[11:0]		csr_raddr;
+wire	[11:0]		csr_waddr1;
+wire	[31:0]		csr_wdata1;
+wire				csr_wen1;
+wire	[11:0]		csr_waddr2;
+wire	[31:0]		csr_wdata2;
+wire				csr_wen2;
+wire	[31:0]		csr_rdata_in;
 
 wire	[31:0]		EXU_data;
-wire	[10:0]		EXU_mode;
+wire	[12:0]		EXU_mode;
 
 wire	[31:0]		mem_rdata;
-//wire			mem_valid;
-wire			mem_wen;
+//wire				mem_valid;
+wire				mem_wen;
 wire	[31:0]		mem_raddr;
 wire	[31:0]		mem_waddr;
 wire	[31:0]		mem_wdata;
@@ -56,12 +64,20 @@ IDU	IDU_inst
 	.EXU_data(EXU_data),
 	.pc(pc),
 	.mem_rdata(mem_rdata),
+	.csr_rdata_in(csr_rdata_in),
 
 	.gpr_raddr1(gpr_raddr1),
 	.gpr_raddr2(gpr_raddr2),
 	.gpr_wen(gpr_wen),
 	.gpr_waddr(gpr_waddr),
 	.gpr_wdata(gpr_wdata),
+	.csr_raddr(csr_raddr),
+	.csr_waddr1(csr_waddr1),
+	.csr_wdata1(csr_wdata1),
+	.csr_wen1(csr_wen1),
+	.csr_waddr2(csr_waddr2),
+	.csr_wdata2(csr_wdata2),
+	.csr_wen2(csr_wen2),
 	.imm(imm),	
 	.pc_wen(pc_wen),
 	.pc_wdata(pc_wdata),
@@ -79,6 +95,7 @@ EXU	EXU_inst
 (
 	.gpr_rdata1_in(gpr_rdata1_in),
 	.gpr_rdata2_in(gpr_rdata2_in),
+	.csr_rdata_in(csr_rdata_in),
 	.imm(imm),
 	.EXU_mode(EXU_mode),
 
@@ -108,11 +125,19 @@ WBU	WBU_inst
 	.gpr_waddr(gpr_waddr),
 	.gpr_wdata(gpr_wdata),
 	.gpr_wen(gpr_wen),
+	.csr_raddr(csr_raddr),
+	.csr_waddr1(csr_waddr1),
+	.csr_wdata1(csr_wdata1),
+	.csr_wen1(csr_wen1),
+	.csr_waddr2(csr_waddr2),
+	.csr_wdata2(csr_wdata2),
+	.csr_wen2(csr_wen2),
 	.pc_wen(pc_wen),
 	.pc_wdata(pc_wdata),
 
 	.gpr_rdata1(gpr_rdata1_in),
 	.gpr_rdata2(gpr_rdata2_in),
+	.csr_rdata(csr_rdata_in),
 	.pc(pc)
 );
 
