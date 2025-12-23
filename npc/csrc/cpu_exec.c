@@ -50,6 +50,8 @@ void cpu_exec(uint64_t n) {
 		top->sys_clk = !top->sys_clk;
 		top->eval();
 		wave_trace();
+		
+		//need to modify
 		inst_num++;
 	
 		uint32_t inst = inst_get();
@@ -68,7 +70,10 @@ void cpu_exec(uint64_t n) {
 		bool triggered = scan_wp();
 		if(triggered) {npc_state.state = NPC_STOP;}
 #endif
-		difftest_step(top->pc);
+		uint32_t ifu_state = dpi_ifu_state_get();
+		if(ifu_state == 0x1) {
+			difftest_step(top->pc);
+		}
 	}
 
 	switch(npc_state.state) {

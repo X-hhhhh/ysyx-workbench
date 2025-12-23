@@ -13,6 +13,7 @@ wire	[4:0]		gpr_raddr2;
 /* verilator lint_on UNOPTFLAT */
 
 wire	[31:0]		inst;
+wire				pc_add_en;
 
 wire				gpr_wen;
 wire	[4:0]		gpr_waddr;
@@ -45,13 +46,17 @@ wire	[31:0]		mem_wdata;
 wire	[3:0]		mem_wmask;
 wire	[1:0]		mem_rbyte_num;
 
+wire	[1:0]		ifu_state;
 
 IFU	IFU_inst
 (
+	.sys_clk(sys_clk),
 	.sys_rst(sys_rst),
 	.pc(pc),
 
-	.inst(inst)
+	.inst(inst),
+	.ifu_state(ifu_state),
+	.pc_add_en(pc_add_en)
 );
 
 IDU	IDU_inst
@@ -65,6 +70,7 @@ IDU	IDU_inst
 	.pc(pc),
 	.mem_rdata(mem_rdata),
 	.csr_rdata_in(csr_rdata_in),
+	.ifu_state(ifu_state),
 
 	.gpr_raddr1(gpr_raddr1),
 	.gpr_raddr2(gpr_raddr2),
@@ -105,6 +111,7 @@ EXU	EXU_inst
 LSU	LSU_inst
 (
 	.sys_clk(sys_clk),
+	.sys_rst(sys_rst),
 	.raddr(mem_raddr),
 	.waddr(mem_waddr),
 	.wdata(mem_wdata),
@@ -134,6 +141,7 @@ WBU	WBU_inst
 	.csr_wen2(csr_wen2),
 	.pc_wen(pc_wen),
 	.pc_wdata(pc_wdata),
+	.pc_add_en(pc_add_en),
 
 	.gpr_rdata1(gpr_rdata1_in),
 	.gpr_rdata2(gpr_rdata2_in),

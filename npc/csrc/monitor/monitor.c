@@ -10,7 +10,7 @@ void init_disasm();
 void init_difftest(char *ref_so_file, long img_size, int port);
 
 #define MAX_FUNCNUM 10240
-#define MAX_CALL_RET 10200
+#define MAX_CALL_RET 102
 #define DEFAULT_IMG_SIZE 512
 
 static struct {
@@ -222,6 +222,12 @@ static long load_memory(const char *filename) {
 
 	fclose(fp);
 	fp = NULL;
+
+	/*
+	for(int i = 0; i < img_size / 4; i++) {
+		printf("%x: %x\n", 0x80000000 + 4*i, pmem[i]);
+	}*/
+
 	return img_size;
 }
 

@@ -16,6 +16,8 @@ module	WBU(
 	input	wire			pc_wen,
 	input	wire	[31:0]	pc_wdata,
 
+	input	wire			pc_add_en,
+
 	output	wire	[31:0]	gpr_rdata1,
 	output	wire	[31:0]	gpr_rdata2,
 	output	reg		[31:0]	csr_rdata,
@@ -76,7 +78,7 @@ always@(*) begin
 end
 
 //mcycle, mcycleh
-always@(posedge sys_clk or negedge sys_rst) begin
+always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst == 1'b1) begin
 		csr_mcycle 	<= 32'b0;
 		csr_mcycleh <= 32'b0;
@@ -89,13 +91,13 @@ always@(posedge sys_clk or negedge sys_rst) begin
 end
 
 //mvendorid, marchid
-always@(posedge sys_clk or negedge sys_rst) begin 
+always@(posedge sys_clk or posedge sys_rst) begin 
 	csr_mvendorid 	<= 32'h79737978;		//ysyx(ASCII)
 	csr_marchid 	<= 32'h66666666;		//student ID
 end
 
 //mtvec, mepc, mcause, mstatus
-always@(posedge sys_clk or negedge sys_rst) begin
+always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst == 1'b1) begin
 		csr_mtvec 	<= 32'b0;
 		csr_mepc 	<= 32'b0;
@@ -137,7 +139,7 @@ always@(posedge sys_clk or posedge sys_rst) begin
 		PC <= 'h80000000;
 	end else if(pc_wen == 1'b1) begin
 		PC <= pc_wdata;
-	end else begin
+	end else if(pc_add_en == 1'b1) begin
 		PC <= PC + 4;	
 	end
 end

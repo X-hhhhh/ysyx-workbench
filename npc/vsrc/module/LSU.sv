@@ -1,15 +1,16 @@
 module LSU
 (
 	input	wire				sys_clk,
-	input	wire	[31:0]			raddr,
-	input	wire	[31:0]			waddr,
-	input	wire	[31:0]			wdata,
-	input	wire	[3:0]			wmask,
+	input	wire				sys_rst,
+	input	wire	[31:0]		raddr,
+	input	wire	[31:0]		waddr,
+	input	wire	[31:0]		wdata,
+	input	wire	[3:0]		wmask,
 	input	wire				valid,
 	input	wire				wen,
-	input	wire	[1:0]			rbyte_num,
+	input	wire	[1:0]		rbyte_num,
 
-	output	reg	[31:0]			rdata
+	output	reg		[31:0]		rdata
 );
 
 import "DPI-C" function int pmem_read(int paddr);
@@ -26,7 +27,7 @@ end
 
 always@(*) begin
 	if(valid == 1'b1) begin 	//if valid is 1, read memory
-		case(rbyte_num)		//00: 1byte, 01: 2bytes, 10: 4bytes, 11: 8bytes
+		case(rbyte_num)			//00: 1byte, 01: 2bytes, 10: 4bytes, 11: 8bytes
 			2'b00: rdata = (pmem_read_data0 >> ((raddr & 32'h3) << 3)) & 32'hFF;
 			2'b01: 
 				if(raddr[1:0] == 2'b11) begin

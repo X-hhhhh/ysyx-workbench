@@ -41,7 +41,7 @@ static void welcome() {
 #include <getopt.h>
 
 #define MAX_FUNCNUM 51200
-#define MAX_CALL_RET 102
+#define MAX_CALL_RET 10200
 
 static struct {
 	uint32_t address_b[MAX_FUNCNUM];
