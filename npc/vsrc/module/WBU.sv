@@ -15,16 +15,20 @@ module	WBU(
 	input	wire			csr_wen2,
 	input	wire			pc_wen,
 	input	wire	[31:0]	pc_wdata,
+	//input	wire			pc_add_en,
 
-	input	wire			pc_add_en,
+	input	wire			lsu_valid,
 
 	output	wire	[31:0]	gpr_rdata1,
 	output	wire	[31:0]	gpr_rdata2,
 	output	reg		[31:0]	csr_rdata,
-	output	reg		[31:0] 	pc
+	output	reg		[31:0] 	pc,
+	output	reg				wbu_ready,
+	output	reg				wbu_inst_end
 );
 
 export "DPI-C" function dpi_gpr_read;
+export "DPI-C" function dpi_wbu_inst_end;
 
 function int dpi_gpr_read(input byte addr);
 	if(addr >= 0 && addr <= 15) begin
@@ -33,17 +37,25 @@ function int dpi_gpr_read(input byte addr);
 	return 0;
 endfunction
 
-reg	[31:0]		gpr		[15:0];
-reg	[31:0]		csr_mcycle;
-reg	[31:0]		csr_mcycleh;
-reg	[31:0]		csr_mvendorid;
-reg	[31:0]		csr_marchid;
-reg	[31:0]		csr_mtvec;
-reg	[31:0]		csr_mepc;
-reg	[31:0]		csr_mcause;
-reg	[31:0]		csr_status; 
+function int dpi_wbu_inst_end();
+	return {31'b0, wbu_inst_end};
+endfunction
 
-reg	[31:0]		PC;
+parameter 	IDLE 	= 2'b01,
+			WB		= 2'b10;
+
+reg		[1:0]		wbu_state;
+reg		[31:0]		gpr		[15:0];
+reg		[31:0]		csr_mcycle;
+reg		[31:0]		csr_mcycleh;
+reg		[31:0]		csr_mvendorid;
+reg		[31:0]		csr_marchid;
+reg		[31:0]		csr_mtvec;
+reg		[31:0]		csr_mepc;
+reg		[31:0]		csr_mcause;
+reg		[31:0]		csr_status; 
+
+reg		[31:0]		PC;
 
 integer	i;
 
@@ -51,12 +63,40 @@ assign gpr_rdata1 = gpr[gpr_raddr1[3:0]];
 assign gpr_rdata2 = gpr[gpr_raddr2[3:0]];
 assign pc = PC;
 
+assign wbu_ready = (wbu_state != WB);
+
+always@(posedge sys_clk or posedge sys_rst) begin
+	if(sys_rst) begin
+		wbu_state <= IDLE; 
+	end else begin
+		case(wbu_state)
+			IDLE:
+				if(lsu_valid) begin
+					wbu_state <= WB;
+				end
+			WB:
+				wbu_state <= IDLE;
+			default: wbu_state <= IDLE;
+		endcase
+	end
+end
+
+always@(posedge sys_clk or posedge sys_rst) begin
+	if(sys_rst == 1'b1) begin
+		wbu_inst_end <= 1'b0;
+	end else if(wbu_state == WB) begin
+		wbu_inst_end <= 1'b1;
+	end else begin
+		wbu_inst_end <= 1'b0;
+	end
+end
+
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst == 1'b1) begin
 		for(i = 0; i < 16; i = i + 1) begin
 			gpr[i] <= 32'b0;
 		end	
-	end else if(gpr_wen == 1'b1 && gpr_waddr != 5'b0) begin
+	end else if(wbu_state == WB && gpr_wen == 1'b1 && gpr_waddr != 5'b0) begin
 		gpr[gpr_waddr[3:0]] <= gpr_wdata;
 	end else begin
 		gpr[0] <= 32'b0;
@@ -103,26 +143,13 @@ always@(posedge sys_clk or posedge sys_rst) begin
 		csr_mepc 	<= 32'b0;
 		csr_mcause 	<= 32'b0;
 		csr_status 	<= 32'h1800;		//set status to 0x1800 to pass difftest
-	end else if(csr_wen1 == 1'b1) begin
-		case(csr_waddr1)
-			12'h305: csr_mtvec 	<= csr_wdata1;
-			12'h341: csr_mepc 	<= csr_wdata1;
-			12'h342: csr_mcause <= csr_wdata1;
-			12'h300: csr_status <= csr_wdata1;
-			default: begin
-				csr_mtvec 	<= csr_mtvec;
-				csr_mepc 	<= csr_mepc;
-				csr_mcause 	<= csr_mcause;
-				csr_status	<= csr_status;
-			end
-		endcase
-		//wen2 is valid only when wen1 is valid
-		if(csr_wen2 == 1'b1) begin
-			case(csr_waddr2)
-				12'h305: csr_mtvec 	<= csr_wdata2;
-				12'h341: csr_mepc 	<= csr_wdata2;
-				12'h342: csr_mcause <= csr_wdata2;
-				12'h300: csr_status <= csr_wdata2;
+	end else if(wbu_state == WB) begin
+		if(csr_wen1 == 1'b1) begin
+			case(csr_waddr1)
+				12'h305: csr_mtvec 	<= csr_wdata1;
+				12'h341: csr_mepc 	<= csr_wdata1;
+				12'h342: csr_mcause <= csr_wdata1;
+				12'h300: csr_status <= csr_wdata1;
 				default: begin
 					csr_mtvec 	<= csr_mtvec;
 					csr_mepc 	<= csr_mepc;
@@ -130,6 +157,21 @@ always@(posedge sys_clk or posedge sys_rst) begin
 					csr_status	<= csr_status;
 				end
 			endcase
+			//wen2 is valid only when wen1 is valid
+			if(csr_wen2 == 1'b1) begin
+				case(csr_waddr2)
+					12'h305: csr_mtvec 	<= csr_wdata2;
+					12'h341: csr_mepc 	<= csr_wdata2;
+					12'h342: csr_mcause <= csr_wdata2;
+					12'h300: csr_status <= csr_wdata2;
+					default: begin
+						csr_mtvec 	<= csr_mtvec;
+						csr_mepc 	<= csr_mepc;
+						csr_mcause 	<= csr_mcause;
+						csr_status	<= csr_status;
+					end
+				endcase
+			end
 		end
 	end
 end
@@ -137,10 +179,12 @@ end
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst == 1'b1) begin
 		PC <= 'h80000000;
-	end else if(pc_wen == 1'b1) begin
-		PC <= pc_wdata;
-	end else if(pc_add_en == 1'b1) begin
-		PC <= PC + 4;	
+	end else if(wbu_state == WB) begin
+		if(pc_wen == 1'b1) begin
+			PC <= pc_wdata;
+		end else begin
+			PC <= PC + 4;	
+		end
 	end
 end
 

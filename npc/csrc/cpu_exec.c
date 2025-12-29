@@ -70,8 +70,12 @@ void cpu_exec(uint64_t n) {
 		bool triggered = scan_wp();
 		if(triggered) {npc_state.state = NPC_STOP;}
 #endif
-		uint32_t ifu_state = dpi_ifu_state_get();
-		if(ifu_state == 0x1) {
+
+		svScope wbu_scope = svGetScopeFromName("TOP.top.WBU_inst");
+		assert(wbu_scope);
+		svSetScope(wbu_scope);
+		uint32_t wbu_inst_end = dpi_wbu_inst_end();
+		if(wbu_inst_end == 0x1) {
 			difftest_step(top->pc);
 		}
 	}

@@ -77,7 +77,7 @@ int pmem_rd_t(int paddr) {
 		return pmem_io[(uint32_t)paddr_ >> 2];
 	}
 	out_of_bound(paddr);
-	return 0;
+	return -1;
 }
 
 void pmem_wr_t(int paddr, int wdata, char wmask) {

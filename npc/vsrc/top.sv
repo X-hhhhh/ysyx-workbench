@@ -12,7 +12,7 @@ wire	[4:0]		gpr_raddr1;
 wire	[4:0]		gpr_raddr2;
 /* verilator lint_on UNOPTFLAT */
 
-wire	[31:0]		inst;
+wire	[31:0]		inst_in;
 wire				pc_add_en;
 
 wire				gpr_wen;
@@ -46,31 +46,41 @@ wire	[31:0]		mem_wdata;
 wire	[3:0]		mem_wmask;
 wire	[1:0]		mem_rbyte_num;
 
-wire	[1:0]		ifu_state;
+wire				ifu_valid;
+wire				idu_ready;
+wire				idu_valid;
+wire				exu_valid;
+wire				exu_ready;
+wire				lsu_valid;
+wire				lsu_ready;
+wire				wbu_ready;
+wire				wbu_inst_end;
 
 IFU	IFU_inst
 (
 	.sys_clk(sys_clk),
 	.sys_rst(sys_rst),
 	.pc(pc),
+	.idu_ready(idu_ready),
+	.wbu_inst_end(wbu_inst_end),
 
-	.inst(inst),
-	.ifu_state(ifu_state),
-	.pc_add_en(pc_add_en)
+	.ifu_valid(ifu_valid),
+	.inst(inst_in)
 );
 
 IDU	IDU_inst
 (
 	.sys_clk(sys_clk),
 	.sys_rst(sys_rst),
-	.inst(inst),
+	.inst_in(inst_in),
 	.gpr_rdata1_in(gpr_rdata1_in),
 	.gpr_rdata2_in(gpr_rdata2_in),
 	.EXU_data(EXU_data),
 	.pc(pc),
 	.mem_rdata(mem_rdata),
 	.csr_rdata_in(csr_rdata_in),
-	.ifu_state(ifu_state),
+	.ifu_valid(ifu_valid),
+	.exu_ready(exu_ready),
 
 	.gpr_raddr1(gpr_raddr1),
 	.gpr_raddr2(gpr_raddr2),
@@ -94,18 +104,26 @@ IDU	IDU_inst
 	.mem_waddr(mem_waddr),
 	.mem_wdata(mem_wdata),
 	.mem_wmask(mem_wmask),
-	.mem_rbyte_num(mem_rbyte_num)
+	.mem_rbyte_num(mem_rbyte_num),
+	.idu_ready(idu_ready),
+	.idu_valid(idu_valid)
 );
 
 EXU	EXU_inst
 (
+	.sys_clk(sys_clk),
+	.sys_rst(sys_rst),
 	.gpr_rdata1_in(gpr_rdata1_in),
 	.gpr_rdata2_in(gpr_rdata2_in),
 	.csr_rdata_in(csr_rdata_in),
 	.imm(imm),
 	.EXU_mode(EXU_mode),
+	.idu_valid(idu_valid),
+	.lsu_ready(lsu_ready),
 
-	.EXU_data(EXU_data)
+	.EXU_data(EXU_data),
+	.exu_valid(exu_valid),
+	.exu_ready(exu_ready)
 );
 
 LSU	LSU_inst
@@ -119,8 +137,12 @@ LSU	LSU_inst
 	.valid(mem_valid),
 	.wen(mem_wen),
 	.rbyte_num(mem_rbyte_num),
+	.exu_valid(exu_valid),
+	.wbu_ready(wbu_ready),
 
-	.rdata(mem_rdata)
+	.rdata(mem_rdata),
+	.lsu_valid(lsu_valid),
+	.lsu_ready(lsu_ready)
 );
 
 WBU	WBU_inst
@@ -141,12 +163,14 @@ WBU	WBU_inst
 	.csr_wen2(csr_wen2),
 	.pc_wen(pc_wen),
 	.pc_wdata(pc_wdata),
-	.pc_add_en(pc_add_en),
+	.lsu_valid(lsu_valid),
 
 	.gpr_rdata1(gpr_rdata1_in),
 	.gpr_rdata2(gpr_rdata2_in),
 	.csr_rdata(csr_rdata_in),
-	.pc(pc)
+	.pc(pc),
+	.wbu_ready(wbu_ready),
+	.wbu_inst_end(wbu_inst_end)
 );
 
 endmodule

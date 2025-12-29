@@ -1,4 +1,6 @@
 module 	EXU(
+	input	wire			sys_clk,
+	input	wire			sys_rst,
 	input	wire	[31:0]	gpr_rdata1_in,
 	input	wire	[31:0]	gpr_rdata2_in,
 	input	wire	[31:0]	csr_rdata_in,
@@ -13,17 +15,51 @@ module 	EXU(
 	//bit[12]: 1 for imm and csr
 	input	wire	[12:0]	EXU_mode, 	
 
-	output	reg		[31:0]	EXU_data
+	input	wire			idu_valid,
+	input	wire			lsu_ready,
+
+	output	reg		[31:0]	EXU_data,
+	output	reg				exu_valid,
+	output	reg				exu_ready
 );
+
+parameter	IDLE 		= 2'b01,
+			WAIT_READY	= 2'b10;
+
+reg		[1:0]	exu_state;
 
 reg 	[31:0] 	a;
 reg		[31:0] 	b;
 reg				mode;
-wire	[31:0] 	out;
+reg		[31:0]	out;
+wire	[31:0] 	adder_out;
 wire	       	carry;
 wire			overflow;
 
 wire	[63:0] 	signed_shift_right;
+
+assign exu_valid = (exu_state == WAIT_READY);
+assign exu_ready = (exu_state != WAIT_READY);
+
+always@(posedge sys_clk or posedge sys_rst) begin
+	if(sys_rst) begin
+		exu_state <= IDLE;
+	end else begin
+		case(exu_state)
+			IDLE:
+				if(idu_valid) begin
+					exu_state <= WAIT_READY;
+				end	
+			WAIT_READY:
+				if(lsu_ready) begin
+					exu_state <= IDLE;
+				end
+			default: begin
+					exu_state <= IDLE;
+				end
+		endcase
+	end
+end
 
 assign signed_shift_right = {{32{gpr_rdata1_in[31]}}, gpr_rdata1_in} >> b[4:0];	//only the low 5 bits of b is valid while shifting
 
@@ -94,6 +130,14 @@ always@(*) begin
 	endcase
 end
 
+always@(posedge sys_clk or posedge sys_rst) begin
+	if(sys_rst) begin
+		out <= 32'b0;
+	end else if(exu_state == IDLE && idu_valid) begin
+		out <= adder_out;
+	end
+end
+
 universal_adder 
 #(
 	.DATAWIDTH(32)
@@ -103,7 +147,7 @@ universal_adder_inst
 	.a(a),
 	.b(b),
 	.mode(mode),
-	.out(out),
+	.out(adder_out),
 	.carry(carry),
 	.overflow(overflow)
 );
