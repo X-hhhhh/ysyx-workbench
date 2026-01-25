@@ -15,7 +15,6 @@ module	WBU(
 	input	wire			csr_wen2,
 	input	wire			pc_wen,
 	input	wire	[31:0]	pc_wdata,
-	//input	wire			pc_add_en,
 
 	input	wire			lsu_valid,
 
@@ -54,8 +53,17 @@ reg		[31:0]		csr_mtvec;
 reg		[31:0]		csr_mepc;
 reg		[31:0]		csr_mcause;
 reg		[31:0]		csr_status; 
-
 reg		[31:0]		PC;
+
+reg					gpr_wen_reg;
+reg		[4:0]		gpr_waddr_reg;
+reg		[31:0]		gpr_wdata_reg;		
+reg		[11:0]		csr_waddr1_reg;
+reg		[31:0]		csr_wdata1_reg;
+reg					csr_wen1_reg;
+reg		[11:0]		csr_waddr2_reg;
+reg		[31:0]		csr_wdata2_reg;
+reg					csr_wen2_reg;
 
 integer	i;
 
@@ -64,6 +72,30 @@ assign gpr_rdata2 = gpr[gpr_raddr2[3:0]];
 assign pc = PC;
 
 assign wbu_ready = (wbu_state != WB);
+
+always@(posedge sys_clk or posedge sys_rst) begin
+	if(sys_rst) begin
+        gpr_wen_reg		<= 1'b0;
+        gpr_waddr_reg 	<= 5'b0;
+        gpr_wdata_reg 	<= 32'b0;		
+		csr_waddr1_reg	<= 12'b0;
+		csr_wdata1_reg	<= 32'b0;
+		csr_wen1_reg	<= 1'b0;
+		csr_waddr2_reg	<= 12'b0;
+		csr_wdata2_reg	<= 32'b0;
+		csr_wen2_reg	<= 1'b0;
+	end else if(lsu_valid) begin		//while data is valid, store data
+        gpr_wen_reg		<= gpr_wen;
+        gpr_waddr_reg 	<= gpr_waddr;
+        gpr_wdata_reg	<= gpr_wdata;		
+		csr_waddr1_reg	<= csr_waddr1;
+		csr_wdata1_reg	<= csr_wdata1;
+		csr_wen1_reg	<= csr_wen1;
+		csr_waddr2_reg	<= csr_waddr2;
+		csr_wdata2_reg	<= csr_wdata2;
+		csr_wen2_reg	<= csr_wen2;
+	end
+end
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
@@ -96,8 +128,8 @@ always@(posedge sys_clk or posedge sys_rst) begin
 		for(i = 0; i < 16; i = i + 1) begin
 			gpr[i] <= 32'b0;
 		end	
-	end else if(wbu_state == WB && gpr_wen == 1'b1 && gpr_waddr != 5'b0) begin
-		gpr[gpr_waddr[3:0]] <= gpr_wdata;
+	end else if(wbu_state == WB && gpr_wen_reg == 1'b1 && gpr_waddr_reg != 5'b0) begin
+		gpr[gpr_waddr_reg[3:0]] <= gpr_wdata_reg;
 	end else begin
 		gpr[0] <= 32'b0;
 	end
@@ -144,12 +176,12 @@ always@(posedge sys_clk or posedge sys_rst) begin
 		csr_mcause 	<= 32'b0;
 		csr_status 	<= 32'h1800;		//set status to 0x1800 to pass difftest
 	end else if(wbu_state == WB) begin
-		if(csr_wen1 == 1'b1) begin
-			case(csr_waddr1)
-				12'h305: csr_mtvec 	<= csr_wdata1;
-				12'h341: csr_mepc 	<= csr_wdata1;
-				12'h342: csr_mcause <= csr_wdata1;
-				12'h300: csr_status <= csr_wdata1;
+		if(csr_wen1_reg == 1'b1) begin
+			case(csr_waddr1_reg)
+				12'h305: csr_mtvec 	<= csr_wdata1_reg;
+				12'h341: csr_mepc 	<= csr_wdata1_reg;
+				12'h342: csr_mcause <= csr_wdata1_reg;
+				12'h300: csr_status <= csr_wdata1_reg;
 				default: begin
 					csr_mtvec 	<= csr_mtvec;
 					csr_mepc 	<= csr_mepc;
@@ -159,11 +191,11 @@ always@(posedge sys_clk or posedge sys_rst) begin
 			endcase
 			//wen2 is valid only when wen1 is valid
 			if(csr_wen2 == 1'b1) begin
-				case(csr_waddr2)
-					12'h305: csr_mtvec 	<= csr_wdata2;
-					12'h341: csr_mepc 	<= csr_wdata2;
-					12'h342: csr_mcause <= csr_wdata2;
-					12'h300: csr_status <= csr_wdata2;
+				case(csr_waddr2_reg)
+					12'h305: csr_mtvec 	<= csr_wdata2_reg;
+					12'h341: csr_mepc 	<= csr_wdata2_reg;
+					12'h342: csr_mcause <= csr_wdata2_reg;
+					12'h300: csr_status <= csr_wdata2_reg;
 					default: begin
 						csr_mtvec 	<= csr_mtvec;
 						csr_mepc 	<= csr_mepc;

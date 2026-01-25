@@ -783,7 +783,7 @@ end
 
 always@(*) begin
 	if(idu_state == IDLE) begin
-		csr_waddr2 	= 12'b0;			//write exception number to mcause
+		csr_waddr2 	= 12'b0;
 		csr_wdata2	= 32'd0;
 		csr_wen2	= 1'b0;
 	end else begin

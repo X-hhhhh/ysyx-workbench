@@ -47,12 +47,30 @@ wire	[3:0]		mem_wmask;
 wire	[1:0]		mem_rbyte_num;
 
 wire				ifu_valid;
+wire	[31:0]		ifu_raddr;
+wire				ifu_reqValid;
+wire				ifu_reqReady;
+wire	[31:0]		ifu_rdata;
+wire				ifu_respValid;
+wire				ifu_respReady;
+
 wire				idu_ready;
 wire				idu_valid;
 wire				exu_valid;
 wire				exu_ready;
+
 wire				lsu_valid;
 wire				lsu_ready;
+wire	[31:0]		lsu_rdata;
+wire				lsu_respValid;
+wire				lsu_reqReady;
+wire	[31:0]		lsu_addr;
+wire	[31:0]		lsu_wdata;
+wire				lsu_wen;
+wire	[3:0]		lsu_wmask;
+wire				lsu_reqValid;
+wire				lsu_respReady;
+
 wire				wbu_ready;
 wire				wbu_inst_end;
 
@@ -65,7 +83,14 @@ IFU	IFU_inst
 	.wbu_inst_end(wbu_inst_end),
 
 	.ifu_valid(ifu_valid),
-	.inst(inst_in)
+	.inst(inst_in),
+
+	.ifu_rdata(ifu_rdata),
+	.ifu_respValid(ifu_respValid),
+	.ifu_reqReady(ifu_reqReady),
+	.ifu_raddr(ifu_raddr),
+	.ifu_reqValid(ifu_reqValid),
+	.ifu_respReady(ifu_respReady)
 );
 
 IDU	IDU_inst
@@ -141,8 +166,19 @@ LSU	LSU_inst
 	.wbu_ready(wbu_ready),
 
 	.rdata(mem_rdata),
+
 	.lsu_valid(lsu_valid),
-	.lsu_ready(lsu_ready)
+	.lsu_ready(lsu_ready),
+
+	.lsu_rdata(lsu_rdata),
+	.lsu_respValid(lsu_respValid),
+	.lsu_reqReady(lsu_reqReady),
+	.lsu_addr(lsu_addr),
+	.lsu_wdata(lsu_wdata),
+	.lsu_wen(lsu_wen),
+	.lsu_wmask(lsu_wmask),
+	.lsu_reqValid(lsu_reqValid),
+	.lsu_respReady(lsu_respReady)
 );
 
 WBU	WBU_inst
@@ -171,6 +207,35 @@ WBU	WBU_inst
 	.pc(pc),
 	.wbu_ready(wbu_ready),
 	.wbu_inst_end(wbu_inst_end)
+);
+
+rom rom_inst
+(
+	.sys_clk(sys_clk),
+	.sys_rst(sys_rst),
+	.ifu_raddr(ifu_raddr),
+	.ifu_reqValid(ifu_reqValid),
+	.ifu_respReady(ifu_respReady),
+
+	.ifu_rdata(ifu_rdata),
+	.ifu_respValid(ifu_respValid),
+	.ifu_reqReady(ifu_reqReady)
+);
+
+ram ram_inst
+(
+	.sys_clk(sys_clk),
+	.sys_rst(sys_rst),
+	.lsu_addr(lsu_addr),
+	.lsu_wdata(lsu_wdata),
+	.lsu_wen(lsu_wen),
+	.lsu_wmask(lsu_wmask),
+	.lsu_reqValid(lsu_reqValid),
+	.lsu_respReady(lsu_respReady),
+
+	.lsu_rdata(lsu_rdata),
+	.lsu_respValid(lsu_respValid),
+	.lsu_reqReady(lsu_reqReady)
 );
 
 endmodule

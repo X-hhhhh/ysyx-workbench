@@ -50,9 +50,6 @@ void cpu_exec(uint64_t n) {
 		top->sys_clk = !top->sys_clk;
 		top->eval();
 		wave_trace();
-		
-		//need to modify
-		inst_num++;
 	
 		uint32_t inst = inst_get();
 		if(print_inst) {
@@ -77,6 +74,7 @@ void cpu_exec(uint64_t n) {
 		uint32_t wbu_inst_end = dpi_wbu_inst_end();
 		if(wbu_inst_end == 0x1) {
 			difftest_step(top->pc);
+			inst_num++;
 		}
 	}
 

@@ -22,6 +22,7 @@ VERILATOR_FLAGS += --top-module $(TOPNAME)
 VERILATOR_FLAGS += --cc --exe -o $(abspath $(BIN))
 VERILATOR_FLAGS += --Wno-UNUSEDSIGNAL
 VERILATOR_FLAGS += --build
+VERILATOR_FLAGS += --timing
 
 CFLAGS = -O2 -MMD -Wall -Werror
 CFLAGS += -I$(NPC_HOME)/csrc/include
