@@ -190,7 +190,7 @@ always@(posedge sys_clk or posedge sys_rst) begin
 				end
 			endcase
 			//wen2 is valid only when wen1 is valid
-			if(csr_wen2 == 1'b1) begin
+			if(csr_wen2_reg == 1'b1) begin
 				case(csr_waddr2_reg)
 					12'h305: csr_mtvec 	<= csr_wdata2_reg;
 					12'h341: csr_mepc 	<= csr_wdata2_reg;

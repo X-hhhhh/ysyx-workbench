@@ -782,25 +782,19 @@ always@(*) begin
 end
 
 always@(*) begin
-	if(idu_state == IDLE) begin
-		csr_waddr2 	= 12'b0;
-		csr_wdata2	= 32'd0;
-		csr_wen2	= 1'b0;
-	end else begin
-		case(inst)
-			//ecall
-			32'h00000073: begin
-				csr_waddr2 	= CSR_MCAUSE;			//write exception number to mcause
-				csr_wdata2	= 32'd8;
-				csr_wen2	= 1'b1;
-			end
-			default: begin
-				csr_waddr2 	= 12'b0;
-				csr_wdata2	= 32'b0;
-				csr_wen2	= 1'b0;
-			end
-		endcase
-	end
+	case(inst)
+		//ecall
+		32'h00000073: begin
+			csr_waddr2 	= CSR_MCAUSE;			//write exception number to mcause
+			csr_wdata2	= 32'd8;
+			csr_wen2	= 1'b1;
+		end
+		default: begin
+			csr_waddr2 	= 12'b0;
+			csr_wdata2	= 32'b0;
+			csr_wen2	= 1'b0;
+		end
+	endcase
 end
 
 //EXU_mode control
