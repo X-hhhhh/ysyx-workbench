@@ -82,6 +82,7 @@ int pmem_rd_t(int paddr) {
 
 void pmem_wr_t(int paddr, int wdata, char wmask) {
 	Mtrace(paddr, 4, 1);
+	if(paddr == 0 || paddr == 4) return ;
 	if(in_pmem(paddr)) {
 		uint32_t paddr_ = paddr - PMEM_BASE;
 		uint32_t mask = 0;

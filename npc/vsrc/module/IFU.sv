@@ -7,19 +7,33 @@ module IFU(
 
 	output	reg				ifu_valid,
 	output	reg		[31:0]	inst,
-	//signals between cpu and rom
-	input	wire	[31:0]	ifu_rdata,
-	input	wire			ifu_respValid,
-	input	wire			ifu_reqReady,
+	//AXI4-Lite interface
+	input	wire			axi_arready,
+	output	wire			axi_arvalid,
+	output	reg		[31:0]	axi_araddr,
 
-	output	reg		[31:0] 	ifu_raddr,
-	output	reg				ifu_reqValid,
-	output	wire			ifu_respReady
+	input	wire	[31:0]	axi_rdata,
+	input	wire	[2:0]	axi_rresp,
+	input	wire			axi_rvalid,
+	output	reg				axi_rready,
+
+	input	wire			axi_awready,
+	output	wire			axi_awvalid,
+	output	wire	[31:0]	axi_awaddr,
+
+	input	wire			axi_wready,
+	output	wire	[31:0]	axi_wdata,
+	output	wire	[3:0]	axi_wstrb,
+	output	wire			axi_wvalid,
+
+	input	wire	[2:0]	axi_bresp,
+	input	wire			axi_bvalid,
+	output	wire			axi_bready
 );
 
 parameter 	IDLE			= 3'b001,		//set raddr status
-			WAIT_REQREADY	= 3'b010,		//wait for reqready
-			WAIT_READY		= 3'b100;		//wait until idu is ready
+			WAIT_ARREADY	= 3'b010,		//wait for arready
+			WAIT_RRESP		= 3'b100;		//wait until rresp is valid and idu is ready
 
 export "DPI-C" function dpi_inst_get;
 export "DPI-C" function dpi_ifu_state_get;
@@ -38,8 +52,15 @@ reg				startup_reg;
 wire			startup_rise;
 
 assign startup_rise = startup && ~startup_reg;
+assign axi_rready = (ifu_state == WAIT_RRESP);
 
-assign ifu_respReady = (ifu_state == WAIT_READY);
+//no need to write
+assign	axi_awvalid	= 1'b0;
+assign	axi_awaddr	= 32'b0;
+assign	axi_wdata	= 32'b0;
+assign	axi_wstrb	= 4'b0;
+assign	axi_wvalid	= 1'b0;
+assign	axi_bready	= 1'b0;
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst == 1'b1) begin
@@ -58,14 +79,14 @@ always@(posedge sys_clk or posedge sys_rst) begin
 		case(ifu_state)
 			IDLE:
 				if(wbu_inst_end || startup_rise) begin
-					ifu_state <= WAIT_REQREADY;
+					ifu_state <= WAIT_ARREADY;
 				end
-			WAIT_REQREADY:
-				if(ifu_reqReady) begin
-					ifu_state <= WAIT_READY;
+			WAIT_ARREADY:
+				if(axi_arready) begin
+					ifu_state <= WAIT_RRESP;
 				end
-			WAIT_READY: 
-				if(idu_ready && ifu_respValid) begin
+			WAIT_RRESP: 
+				if(idu_ready && axi_rvalid && axi_rresp == 3'b000) begin
 					ifu_state <= IDLE;
 				end
 			default: ifu_state <= IDLE;
@@ -75,37 +96,30 @@ end
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
-		ifu_raddr <= 32'b0;
+		axi_araddr <= 32'b0;
+		axi_arvalid <= 1'b0;
 	end else if(ifu_state == IDLE && (wbu_inst_end || startup_rise)) begin
-		ifu_raddr <= pc;
-	end else if(ifu_state == WAIT_REQREADY && ifu_reqReady) begin
-		//while reqReady is valid, rom has received data, set data invalid
-		ifu_raddr <= 32'b0;
-	end
-end
-
-always@(posedge sys_clk or posedge sys_rst) begin
-	if(sys_rst) begin
-		ifu_reqValid <= 1'b0;
-	end else if(ifu_state == IDLE && wbu_inst_end || startup_rise) begin
-		ifu_reqValid <= 1'b1;
-	end else if(ifu_reqReady) begin
-		ifu_reqValid <= 1'b0;
+		axi_araddr <= pc;
+		axi_arvalid <= 1'b1;
+	end else if(ifu_state == WAIT_ARREADY && axi_arready) begin
+		//while rready is valid, rom has received data, set data invalid
+		axi_araddr <= 32'b0;
+		axi_arvalid <= 1'b0;
 	end
 end
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		inst <= 32'h80000000;
-	end	else if(ifu_respValid) begin
-		inst <= ifu_rdata;
+	end	else if(ifu_state == WAIT_RRESP && axi_rvalid && axi_rresp == 3'b000) begin
+		inst <= axi_rdata;
 	end 
 end
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		ifu_valid <= 1'b0;
-	end else if(ifu_state == WAIT_READY && ifu_respValid && idu_ready) begin
+	end else if(ifu_state == WAIT_RRESP && axi_rvalid && axi_rresp == 3'b000 && idu_ready) begin
 		ifu_valid <= 1'b1;
 	end else begin
 		ifu_valid <= 1'b0;

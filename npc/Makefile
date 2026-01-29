@@ -16,15 +16,17 @@ OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
 
 #compilation options
+VERILATOR_FLAGS += -O2 -Wall
 VERILATOR_FLAGS += --Mdir $(OBJ_DIR)
 VERILATOR_FLAGS += --trace-fst
 VERILATOR_FLAGS += --top-module $(TOPNAME)
 VERILATOR_FLAGS += --cc --exe -o $(abspath $(BIN))
 VERILATOR_FLAGS += --Wno-UNUSEDSIGNAL
+VERILATOR_FLAGS += --Wno-PINCONNECTEMPTY
 VERILATOR_FLAGS += --build
 VERILATOR_FLAGS += --timing
 
-CFLAGS = -O2 -MMD -Wall -Werror
+CFLAGS = -O2 -MMD -Wall
 CFLAGS += -I$(NPC_HOME)/csrc/include
 LDFLAGS = -lreadline -ldl
 

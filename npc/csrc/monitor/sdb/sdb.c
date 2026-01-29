@@ -6,7 +6,7 @@
 #include <reg.h>
 #include <sdb.h>
 
-#define SET_BATCH_MODE 0
+#define SET_BATCH_MODE 1
 
 static int cmd_c(char *args) {
 	cpu_exec(-1);

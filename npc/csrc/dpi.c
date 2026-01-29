@@ -1,6 +1,8 @@
+#include <common.h>
 #include <svdpi.h>
 #include <Vtop__Dpi.h>
 #include <assert.h>
+#include <sys/time.h>
 
 extern int dpi_gpr_read(char addr);
 extern int dpi_inst_get();
@@ -19,4 +21,10 @@ uint32_t inst_get() {
 	return dpi_inst_get();
 }
 
+//this function is called by LFSR_adv
+int dpi_gettime() {
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec;
+}
 
