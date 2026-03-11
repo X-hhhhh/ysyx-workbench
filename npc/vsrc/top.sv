@@ -94,31 +94,59 @@ wire				lsu_axi_bready;
 wire				wbu_ready;
 wire				wbu_inst_end;
 
-wire				ifu_axi_arvalid_d;
-wire	[31:0]		ifu_axi_araddr_d;
-wire				ifu_axi_arready_d;
-wire				ifu_axi_rready_d;
-wire	[31:0]		ifu_axi_rdata_d;
-wire	[2:0]		ifu_axi_rresp_d;
-wire				ifu_axi_rvalid_d;
+wire				mem_axi_arready;
+wire				mem_axi_arvalid;
+wire	[31:0]		mem_axi_araddr;
+wire	[31:0]		mem_axi_rdata;
+wire	[2:0]		mem_axi_rresp;
+wire				mem_axi_rvalid;
+wire				mem_axi_rready;
+wire				mem_axi_awready;
+wire				mem_axi_awvalid;
+wire	[31:0]		mem_axi_awaddr;
+wire				mem_axi_wready;
+wire	[31:0]		mem_axi_wdata;
+wire	[3:0]		mem_axi_wstrb;
+wire				mem_axi_wvalid;
+wire	[2:0]		mem_axi_bresp;
+wire				mem_axi_bvalid;
+wire				mem_axi_bready;
 
-wire				lsu_axi_arready_d;
-wire				lsu_axi_arvalid_d;
-wire	[31:0]		lsu_axi_araddr_d;
-wire	[31:0]		lsu_axi_rdata_d;
-wire	[2:0]		lsu_axi_rresp_d;
-wire				lsu_axi_rvalid_d;
-wire				lsu_axi_rready_d;
-wire				lsu_axi_awready_d;
-wire				lsu_axi_awvalid_d;
-wire	[31:0]		lsu_axi_awaddr_d;
-wire				lsu_axi_wready_d;
-wire	[31:0]		lsu_axi_wdata_d;
-wire	[3:0]		lsu_axi_wstrb_d;
-wire				lsu_axi_wvalid_d;
-wire	[2:0]		lsu_axi_bresp_d;
-wire				lsu_axi_bvalid_d;
-wire				lsu_axi_bready_d;
+wire				uart_axi_arready;
+wire				uart_axi_arvalid;
+wire	[31:0]		uart_axi_araddr;
+wire	[31:0]		uart_axi_rdata;
+wire	[2:0]		uart_axi_rresp;
+wire				uart_axi_rvalid;
+wire				uart_axi_rready;
+wire				uart_axi_awready;
+wire				uart_axi_awvalid;
+wire	[31:0]		uart_axi_awaddr;
+wire				uart_axi_wready;
+wire	[31:0]		uart_axi_wdata;
+wire	[3:0]		uart_axi_wstrb;
+wire				uart_axi_wvalid;
+wire	[2:0]		uart_axi_bresp;
+wire				uart_axi_bvalid;
+wire				uart_axi_bready;
+
+wire				clint_axi_arready;
+wire				clint_axi_arvalid;
+wire	[31:0]		clint_axi_araddr;
+wire	[31:0]		clint_axi_rdata;
+wire	[2:0]		clint_axi_rresp;
+wire				clint_axi_rvalid;
+wire				clint_axi_rready;
+wire				clint_axi_awready;
+wire				clint_axi_awvalid;
+wire	[31:0]		clint_axi_awaddr;
+wire				clint_axi_wready;
+wire	[31:0]		clint_axi_wdata;
+wire	[3:0]		clint_axi_wstrb;
+wire				clint_axi_wvalid;
+wire	[2:0]		clint_axi_bresp;
+wire				clint_axi_bvalid;
+wire				clint_axi_bready;
 
 IFU	IFU_inst
 (
@@ -133,15 +161,11 @@ IFU	IFU_inst
 
 	.axi_arvalid(ifu_axi_arvalid),
 	.axi_araddr(ifu_axi_araddr),
-	//.axi_arready(ifu_axi_arready),
-	.axi_arready(ifu_axi_arready_d),
+	.axi_arready(ifu_axi_arready),
 	.axi_rready(ifu_axi_rready),
-	//.axi_rdata(ifu_axi_rdata),
-	//.axi_rresp(ifu_axi_rresp),
-	//.axi_rvalid(ifu_axi_rvalid),
-	.axi_rdata(ifu_axi_rdata_d),
-	.axi_rresp(ifu_axi_rresp_d),
-	.axi_rvalid(ifu_axi_rvalid_d),
+	.axi_rdata(ifu_axi_rdata),
+	.axi_rresp(ifu_axi_rresp),
+	.axi_rvalid(ifu_axi_rvalid),
 	.axi_awvalid(ifu_axi_awvalid),
 	.axi_awaddr(ifu_axi_awaddr),
 	.axi_awready(ifu_axi_awready),
@@ -153,47 +177,6 @@ IFU	IFU_inst
 	.axi_bresp(ifu_axi_bresp),
 	.axi_bvalid(ifu_axi_bvalid)
 );
-
-LFSR_adv
-#(
-	.MAX_DELAY(5),
-	.WIDTH_12(32),
-	.WIDTH_13(1),
-	.WIDTH_21(1)
-)LFSR_adv_ifu1(
-	.sys_clk(sys_clk),
-	.sys_rst(sys_rst),
-	.signal1_1(ifu_axi_arvalid),
-	.signal1_2(ifu_axi_araddr),
-	.signal1_3(1'b0),
-	.signal2_1(ifu_axi_arready),
-
-	.signal1_1_d(ifu_axi_arvalid_d),
-	.signal1_2_d(ifu_axi_araddr_d),
-	.signal1_3_d(),
-	.signal2_1_d(ifu_axi_arready_d)
-);
-
-LFSR_adv
-#(
-	.MAX_DELAY(5),
-	.WIDTH_12(32),
-	.WIDTH_13(3),
-	.WIDTH_21(1)
-)LFSR_adv_ifu2(
-	.sys_clk(sys_clk),
-	.sys_rst(sys_rst),
-	.signal1_1(ifu_axi_rvalid),
-	.signal1_2(ifu_axi_rdata),
-	.signal1_3(ifu_axi_rresp),
-	.signal2_1(ifu_axi_rready),
-
-	.signal1_1_d(ifu_axi_rvalid_d),
-	.signal1_2_d(ifu_axi_rdata_d),
-	.signal1_3_d(ifu_axi_rresp_d),
-	.signal2_1_d(ifu_axi_rready_d)
-);
-
 
 IDU	IDU_inst
 (
@@ -272,131 +255,23 @@ LSU	LSU_inst
 	.lsu_valid(lsu_valid),
 	.lsu_ready(lsu_ready),
 
-	//.axi_arready(lsu_axi_arready),
-	.axi_arready(lsu_axi_arready_d),
+	.axi_arready(lsu_axi_arready),
 	.axi_arvalid(lsu_axi_arvalid),
 	.axi_araddr(lsu_axi_araddr),
-	//.axi_rdata(lsu_axi_rdata),
-	//.axi_rresp(lsu_axi_rresp),
-	//.axi_rvalid(lsu_axi_rvalid),
-	.axi_rdata(lsu_axi_rdata_d),
-	.axi_rresp(lsu_axi_rresp_d),
-	.axi_rvalid(lsu_axi_rvalid_d),
+	.axi_rdata(lsu_axi_rdata),
+	.axi_rresp(lsu_axi_rresp),
+	.axi_rvalid(lsu_axi_rvalid),
 	.axi_rready(lsu_axi_rready),
-	//.axi_awready(lsu_axi_awready),
-	.axi_awready(lsu_axi_awready_d),
+	.axi_awready(lsu_axi_awready),
 	.axi_awvalid(lsu_axi_awvalid),
 	.axi_awaddr(lsu_axi_awaddr),
-	//.axi_wready(lsu_axi_wready),
-	.axi_wready(lsu_axi_wready_d),
+	.axi_wready(lsu_axi_wready),
 	.axi_wdata(lsu_axi_wdata),
 	.axi_wstrb(lsu_axi_wstrb),
 	.axi_wvalid(lsu_axi_wvalid),
-	//.axi_bresp(lsu_axi_bresp),
-	//.axi_bvalid(lsu_axi_bvalid),
-	.axi_bresp(lsu_axi_bresp_d),
-	.axi_bvalid(lsu_axi_bvalid_d),
+	.axi_bresp(lsu_axi_bresp),
+	.axi_bvalid(lsu_axi_bvalid),
 	.axi_bready(lsu_axi_bready)
-);
-
-LFSR_adv
-#(
-	.MAX_DELAY(5),
-	.WIDTH_12(32),
-	.WIDTH_13(1),
-	.WIDTH_21(1)
-)LFSR_adv_lsu1(
-	.sys_clk(sys_clk),
-	.sys_rst(sys_rst),
-	.signal1_1(lsu_axi_arvalid),
-	.signal1_2(lsu_axi_araddr),
-	.signal1_3(1'b0),
-	.signal2_1(lsu_axi_arready),
-
-	.signal1_1_d(lsu_axi_arvalid_d),
-	.signal1_2_d(lsu_axi_araddr_d),
-	.signal1_3_d(),
-	.signal2_1_d(lsu_axi_arready_d)
-);
-
-LFSR_adv
-#(
-	.MAX_DELAY(5),
-	.WIDTH_12(3),
-	.WIDTH_13(32),
-	.WIDTH_21(1)
-)LFSR_adv_lsu2(
-	.sys_clk(sys_clk),
-	.sys_rst(sys_rst),
-	.signal1_1(lsu_axi_rvalid),
-	.signal1_2(lsu_axi_rresp),
-	.signal1_3(lsu_axi_rdata),
-	.signal2_1(lsu_axi_rready),
-
-	.signal1_1_d(lsu_axi_rvalid_d),
-	.signal1_2_d(lsu_axi_rresp_d),
-	.signal1_3_d(lsu_axi_rdata_d),
-	.signal2_1_d(lsu_axi_rready_d)
-);
-
-LFSR_adv
-#(
-	.MAX_DELAY(5),
-	.WIDTH_12(32),
-	.WIDTH_13(1),
-	.WIDTH_21(1)
-)LFSR_adv_lsu3(
-	.sys_clk(sys_clk),
-	.sys_rst(sys_rst),
-	.signal1_1(lsu_axi_awvalid),
-	.signal1_2(lsu_axi_awaddr),
-	.signal1_3(1'b0),
-	.signal2_1(lsu_axi_awready),
-
-	.signal1_1_d(lsu_axi_awvalid_d),
-	.signal1_2_d(lsu_axi_awaddr_d),
-	.signal1_3_d(),
-	.signal2_1_d(lsu_axi_awready_d)
-);
-
-LFSR_adv
-#(
-	.MAX_DELAY(5),
-	.WIDTH_12(32),
-	.WIDTH_13(4),
-	.WIDTH_21(1)
-)LFSR_adv_lsu4(
-	.sys_clk(sys_clk),
-	.sys_rst(sys_rst),
-	.signal1_1(lsu_axi_wvalid),
-	.signal1_2(lsu_axi_wdata),
-	.signal1_3(lsu_axi_wstrb),
-	.signal2_1(lsu_axi_wready),
-
-	.signal1_1_d(lsu_axi_wvalid_d),
-	.signal1_2_d(lsu_axi_wdata_d),
-	.signal1_3_d(lsu_axi_wstrb_d),
-	.signal2_1_d(lsu_axi_wready_d)
-);
-
-LFSR_adv
-#(
-	.MAX_DELAY(5),
-	.WIDTH_12(3),
-	.WIDTH_13(1),
-	.WIDTH_21(1)
-)LFSR_adv_lsu5(
-	.sys_clk(sys_clk),
-	.sys_rst(sys_rst),
-	.signal1_1(lsu_axi_bvalid),
-	.signal1_2(lsu_axi_bresp),
-	.signal1_3(1'b0),
-	.signal2_1(lsu_axi_bready),
-
-	.signal1_1_d(lsu_axi_bvalid_d),
-	.signal1_2_d(lsu_axi_bresp_d),
-	.signal1_3_d(),
-	.signal2_1_d(lsu_axi_bready_d)
 );
 
 WBU	WBU_inst
@@ -427,63 +302,169 @@ WBU	WBU_inst
 	.wbu_inst_end(wbu_inst_end)
 );
 
-rom rom_inst
+xbar xbar_inst
 (
 	.sys_clk(sys_clk),
 	.sys_rst(sys_rst),
-	//.axi_arvalid(ifu_axi_arvalid),
-	.axi_arvalid(ifu_axi_arvalid_d),
-	//.axi_araddr(ifu_axi_araddr),
-	.axi_araddr(ifu_axi_araddr_d),
-	.axi_arready(ifu_axi_arready),
-	//.axi_rready(ifu_axi_rready),
-	.axi_rready(ifu_axi_rready_d),
-	.axi_rdata(ifu_axi_rdata),
-	.axi_rresp(ifu_axi_rresp),
-	.axi_rvalid(ifu_axi_rvalid),
-	.axi_awvalid(ifu_axi_awvalid),
-	.axi_awaddr(ifu_axi_awaddr),
-	.axi_awready(ifu_axi_awready),
-	.axi_wdata(ifu_axi_wdata),
-	.axi_wstrb(ifu_axi_wstrb),
-	.axi_wvalid(ifu_axi_wvalid),
-	.axi_wready(ifu_axi_wready),
-	.axi_bready(ifu_axi_bready),
-	.axi_bresp(ifu_axi_bresp),
-	.axi_bvalid(ifu_axi_bvalid)
+	//ifu
+	.ifu_axi_arvalid(ifu_axi_arvalid),
+	.ifu_axi_araddr(ifu_axi_araddr),
+	.ifu_axi_arready(ifu_axi_arready),
+	.ifu_axi_rready(ifu_axi_rready),
+	.ifu_axi_rdata(ifu_axi_rdata),
+	.ifu_axi_rresp(ifu_axi_rresp),
+	.ifu_axi_rvalid(ifu_axi_rvalid),
+	.ifu_axi_awvalid(ifu_axi_awvalid),
+	.ifu_axi_awaddr(ifu_axi_awaddr),
+	.ifu_axi_awready(ifu_axi_awready),
+	.ifu_axi_wdata(ifu_axi_wdata),
+	.ifu_axi_wstrb(ifu_axi_wstrb),
+	.ifu_axi_wvalid(ifu_axi_wvalid),
+	.ifu_axi_wready(ifu_axi_wready),
+	.ifu_axi_bready(ifu_axi_bready),
+	.ifu_axi_bresp(ifu_axi_bresp),
+	.ifu_axi_bvalid(ifu_axi_bvalid),
+	//lsu
+	.lsu_axi_arvalid(lsu_axi_arvalid),
+	.lsu_axi_araddr(lsu_axi_araddr),
+	.lsu_axi_arready(lsu_axi_arready),
+	.lsu_axi_rready(lsu_axi_rready),
+	.lsu_axi_rdata(lsu_axi_rdata),
+	.lsu_axi_rresp(lsu_axi_rresp),
+	.lsu_axi_rvalid(lsu_axi_rvalid),
+	.lsu_axi_awvalid(lsu_axi_awvalid),
+	.lsu_axi_awaddr(lsu_axi_awaddr),
+	.lsu_axi_awready(lsu_axi_awready),
+	.lsu_axi_wdata(lsu_axi_wdata),
+	.lsu_axi_wstrb(lsu_axi_wstrb),
+	.lsu_axi_wvalid(lsu_axi_wvalid),
+	.lsu_axi_wready(lsu_axi_wready),
+	.lsu_axi_bready(lsu_axi_bready),
+	.lsu_axi_bresp(lsu_axi_bresp),
+	.lsu_axi_bvalid(lsu_axi_bvalid),
+	//sram
+	.mem_axi_arready(mem_axi_arready),
+	.mem_axi_arvalid(mem_axi_arvalid),
+	.mem_axi_araddr(mem_axi_araddr),
+	.mem_axi_rdata(mem_axi_rdata),
+	.mem_axi_rresp(mem_axi_rresp),
+	.mem_axi_rvalid(mem_axi_rvalid),
+	.mem_axi_rready(mem_axi_rready),
+	.mem_axi_awready(mem_axi_awready),
+	.mem_axi_awvalid(mem_axi_awvalid),
+	.mem_axi_awaddr(mem_axi_awaddr),
+	.mem_axi_wready(mem_axi_wready),
+	.mem_axi_wdata(mem_axi_wdata),
+	.mem_axi_wstrb(mem_axi_wstrb),
+	.mem_axi_wvalid(mem_axi_wvalid),
+	.mem_axi_bresp(mem_axi_bresp),
+	.mem_axi_bvalid(mem_axi_bvalid),
+	.mem_axi_bready(mem_axi_bready),
+	//uart
+	.uart_axi_arready(uart_axi_arready),
+	.uart_axi_arvalid(uart_axi_arvalid),
+	.uart_axi_araddr(uart_axi_araddr),
+	.uart_axi_rdata(uart_axi_rdata),
+	.uart_axi_rresp(uart_axi_rresp),
+	.uart_axi_rvalid(uart_axi_rvalid),
+	.uart_axi_rready(uart_axi_rready),
+	.uart_axi_awready(uart_axi_awready),
+	.uart_axi_awvalid(uart_axi_awvalid),
+	.uart_axi_awaddr(uart_axi_awaddr),
+	.uart_axi_wready(uart_axi_wready),
+	.uart_axi_wdata(uart_axi_wdata),
+	.uart_axi_wstrb(uart_axi_wstrb),
+	.uart_axi_wvalid(uart_axi_wvalid),
+	.uart_axi_bresp(uart_axi_bresp),
+	.uart_axi_bvalid(uart_axi_bvalid),
+	.uart_axi_bready(uart_axi_bready),
+	//clint
+	.clint_axi_arready(clint_axi_arready),
+	.clint_axi_arvalid(clint_axi_arvalid),
+	.clint_axi_araddr(clint_axi_araddr),
+	.clint_axi_rdata(clint_axi_rdata),
+	.clint_axi_rresp(clint_axi_rresp),
+	.clint_axi_rvalid(clint_axi_rvalid),
+	.clint_axi_rready(clint_axi_rready),
+	.clint_axi_awready(clint_axi_awready),
+	.clint_axi_awvalid(clint_axi_awvalid),
+	.clint_axi_awaddr(clint_axi_awaddr),
+	.clint_axi_wready(clint_axi_wready),
+	.clint_axi_wdata(clint_axi_wdata),
+	.clint_axi_wstrb(clint_axi_wstrb),
+	.clint_axi_wvalid(clint_axi_wvalid),
+	.clint_axi_bresp(clint_axi_bresp),
+	.clint_axi_bvalid(clint_axi_bvalid),
+	.clint_axi_bready(clint_axi_bready)
 );
 
 ram ram_inst
 (
 	.sys_clk(sys_clk),
 	.sys_rst(sys_rst),
+	.axi_arvalid(mem_axi_arvalid),
+	.axi_arready(mem_axi_arready),
+	.axi_araddr(mem_axi_araddr),
+	.axi_rdata(mem_axi_rdata),
+	.axi_rresp(mem_axi_rresp),
+	.axi_rvalid(mem_axi_rvalid),
+	.axi_rready(mem_axi_rready),
+	.axi_awready(mem_axi_awready),
+	.axi_awvalid(mem_axi_awvalid),
+	.axi_awaddr(mem_axi_awaddr),
+	.axi_wready(mem_axi_wready),
+	.axi_wdata(mem_axi_wdata),
+	.axi_wstrb(mem_axi_wstrb),
+	.axi_wvalid(mem_axi_wvalid),
+	.axi_bresp(mem_axi_bresp),
+	.axi_bvalid(mem_axi_bvalid),
+	.axi_bready(mem_axi_bready)
+);
 
-	//.axi_arvalid(lsu_axi_arvalid),
-	.axi_arready(lsu_axi_arready),
-	.axi_arvalid(lsu_axi_arvalid_d),
-	//.axi_araddr(lsu_axi_araddr),
-	.axi_araddr(lsu_axi_araddr_d),
-	.axi_rdata(lsu_axi_rdata),
-	.axi_rresp(lsu_axi_rresp),
-	.axi_rvalid(lsu_axi_rvalid),
-	//.axi_rready(lsu_axi_rready),
-	.axi_rready(lsu_axi_rready_d),
-	.axi_awready(lsu_axi_awready),
-	//.axi_awvalid(lsu_axi_awvalid),
-	//.axi_awaddr(lsu_axi_awaddr),
-	.axi_awvalid(lsu_axi_awvalid_d),
-	.axi_awaddr(lsu_axi_awaddr_d),
-	.axi_wready(lsu_axi_wready),
-	//.axi_wdata(lsu_axi_wdata),
-	//.axi_wstrb(lsu_axi_wstrb),
-	//.axi_wvalid(lsu_axi_wvalid),
-	.axi_wdata(lsu_axi_wdata_d),
-	.axi_wstrb(lsu_axi_wstrb_d),
-	.axi_wvalid(lsu_axi_wvalid_d),
-	.axi_bresp(lsu_axi_bresp),
-	.axi_bvalid(lsu_axi_bvalid),
-	//.axi_bready(lsu_axi_bready)
-	.axi_bready(lsu_axi_bready_d)
+uart_ctrl uart_ctrl_inst
+(
+	.sys_clk(sys_clk),
+	.sys_rst(sys_rst),
+	.axi_arvalid(uart_axi_arvalid),
+	.axi_araddr(uart_axi_araddr),
+	.axi_arready(uart_axi_arready),
+	.axi_rready(uart_axi_rready),
+	.axi_rdata(uart_axi_rdata),
+	.axi_rresp(uart_axi_rresp),
+	.axi_rvalid(uart_axi_rvalid),
+	.axi_awvalid(uart_axi_awvalid),
+	.axi_awaddr(uart_axi_awaddr),
+	.axi_awready(uart_axi_awready),
+	.axi_wdata(uart_axi_wdata),
+	.axi_wstrb(uart_axi_wstrb),
+	.axi_wvalid(uart_axi_wvalid),
+	.axi_wready(uart_axi_wready),
+	.axi_bready(uart_axi_bready),
+	.axi_bresp(uart_axi_bresp),
+	.axi_bvalid(uart_axi_bvalid)
+);
+
+clint clint_inst
+(
+	.sys_clk(sys_clk),
+	.sys_rst(sys_rst),
+	.axi_arvalid(clint_axi_arvalid),
+	.axi_araddr(clint_axi_araddr),
+	.axi_arready(clint_axi_arready),
+	.axi_rready(clint_axi_rready),
+	.axi_rdata(clint_axi_rdata),
+	.axi_rresp(clint_axi_rresp),
+	.axi_rvalid(clint_axi_rvalid),
+	.axi_awvalid(clint_axi_awvalid),
+	.axi_awaddr(clint_axi_awaddr),
+	.axi_awready(clint_axi_awready),
+	.axi_wdata(clint_axi_wdata),
+	.axi_wstrb(clint_axi_wstrb),
+	.axi_wvalid(clint_axi_wvalid),
+	.axi_wready(clint_axi_wready),
+	.axi_bready(clint_axi_bready),
+	.axi_bresp(clint_axi_bresp),
+	.axi_bvalid(clint_axi_bvalid)
 );
 
 endmodule

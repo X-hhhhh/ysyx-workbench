@@ -1,4 +1,4 @@
-module rom(
+module	clint(
 	input	wire				sys_clk,
 	input	wire				sys_rst,
 	//AXI4-Lite interface
@@ -21,15 +21,13 @@ module rom(
 	output	wire				axi_wready,
 
 	input	wire				axi_bready,
-	output	wire	[2:0]		axi_bresp,
-	output	wire				axi_bvalid
+	output	reg		[2:0]		axi_bresp,
+	output	reg					axi_bvalid
 );
 
-import "DPI-C" function int pmem_read(input int paddr);
-
-parameter	IDLE 				= 3'b001,
+parameter	IDLE				= 3'b001,
 			WAIT_ARVALID_FALL	= 3'b010,
-			WAIT_RREADY			= 3'b100;	
+			WAIT_RREADY			= 3'b100;
 
 wire			axi_arvalid_fall;
 
@@ -37,22 +35,38 @@ reg		[2:0]	state;
 reg				axi_arvalid_reg;
 reg		[31:0]	axi_araddr_reg;
 
+reg		[31:0]	mtime	[1:0];
+
 assign axi_arready = (state == IDLE);
 
-assign axi_awready = 1'b0;
-assign axi_wready = 1'b0;
-assign axi_bresp = 3'b0;
-assign axi_bvalid = 1'b0;
-
 assign axi_arvalid_fall = ~axi_arvalid && axi_arvalid_reg;
+
+//can not write
+assign axi_awready	= 1'b0;
+assign axi_wready 	= 1'b0;
+assign axi_bresp	= 3'b0;
+assign axi_bvalid 	= 1'b0;
+
+always@(posedge sys_clk or posedge sys_rst) begin
+	if(sys_rst) begin
+		mtime[0] <= 32'b0;
+		mtime[1] <= 32'b0;
+	end else if(mtime[0] == 32'hFFFFFFFF) begin
+		mtime[0] <= mtime[0] + 1'b1;
+		mtime[1] <= mtime[1] + 1'b1;
+	end else begin
+		//every clock cycle counts by one
+		mtime[0] <= mtime[0] + 1'b1;
+	end
+end
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		axi_arvalid_reg <= 1'b0;
-		axi_araddr_reg <= 32'b0;
-	end else begin
+		axi_araddr_reg <= 32'b0;	
+	end	else begin
 		axi_arvalid_reg <= axi_arvalid;
-		axi_araddr_reg <= axi_araddr;
+		axi_araddr_reg <= axi_araddr;	
 	end
 end
 
@@ -61,7 +75,7 @@ always@(posedge sys_clk or posedge sys_rst) begin
 		state <= IDLE;
 	end else begin
 		case(state)
-			IDLE: 
+			IDLE:
 				if(axi_arvalid) begin
 					state <= WAIT_ARVALID_FALL;
 				end
@@ -83,8 +97,8 @@ always@(posedge sys_clk or posedge sys_rst) begin
 		axi_rdata <= 32'b0;
 		axi_rresp <= 3'b0;
 		axi_rvalid <= 1'b0;
-	end	else if(state == WAIT_ARVALID_FALL && axi_arvalid_fall) begin
-		axi_rdata <= pmem_read(axi_araddr_reg);
+	end else if(state == WAIT_ARVALID_FALL && axi_arvalid_fall) begin
+		axi_rdata <= mtime[axi_araddr_reg[2]][31:0];
 		axi_rresp <= 3'b0;
 		axi_rvalid <= 1'b1;
 	end else if(state == WAIT_RREADY && axi_rready) begin
