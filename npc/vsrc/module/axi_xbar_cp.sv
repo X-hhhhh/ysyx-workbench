@@ -1,4 +1,4 @@
-module xbar(
+module axi_xbar_cp(
 	input	wire			sys_clk,
 	input	wire			sys_rst,
 	//ifu

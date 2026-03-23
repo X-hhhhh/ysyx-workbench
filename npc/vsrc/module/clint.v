@@ -8,7 +8,7 @@ module	clint(
 
 	input	wire				axi_rready,
 	output	reg		[31:0]		axi_rdata,
-	output	reg		[2:0]		axi_rresp,
+	output	reg		[1:0]		axi_rresp,
 	output	reg					axi_rvalid,
 
 	input	wire				axi_awvalid,
@@ -21,7 +21,7 @@ module	clint(
 	output	wire				axi_wready,
 
 	input	wire				axi_bready,
-	output	reg		[2:0]		axi_bresp,
+	output	reg		[1:0]		axi_bresp,
 	output	reg					axi_bvalid
 );
 
@@ -44,7 +44,7 @@ assign axi_arvalid_fall = ~axi_arvalid && axi_arvalid_reg;
 //can not write
 assign axi_awready	= 1'b0;
 assign axi_wready 	= 1'b0;
-assign axi_bresp	= 3'b0;
+assign axi_bresp	= 2'b0;
 assign axi_bvalid 	= 1'b0;
 
 always@(posedge sys_clk or posedge sys_rst) begin
@@ -95,15 +95,15 @@ end
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		axi_rdata <= 32'b0;
-		axi_rresp <= 3'b0;
+		axi_rresp <= 2'b0;
 		axi_rvalid <= 1'b0;
 	end else if(state == WAIT_ARVALID_FALL && axi_arvalid_fall) begin
 		axi_rdata <= mtime[axi_araddr_reg[2]][31:0];
-		axi_rresp <= 3'b0;
+		axi_rresp <= 2'b0;
 		axi_rvalid <= 1'b1;
 	end else if(state == WAIT_RREADY && axi_rready) begin
 		axi_rdata <= 32'b0;
-		axi_rresp <= 3'b0;
+		axi_rresp <= 2'b0;
 		axi_rvalid <= 1'b0;
 	end
 end

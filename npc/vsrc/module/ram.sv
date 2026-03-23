@@ -9,7 +9,7 @@ module	ram
 
 	input	wire				axi_rready,
 	output	reg		[31:0]		axi_rdata,
-	output	reg		[2:0]		axi_rresp,
+	output	reg		[1:0]		axi_rresp,
 	output	reg					axi_rvalid,
 
 	input	wire				axi_awvalid,
@@ -22,7 +22,7 @@ module	ram
 	output	wire				axi_wready,
 
 	input	wire				axi_bready,
-	output	reg		[2:0]		axi_bresp,
+	output	reg		[1:0]		axi_bresp,
 	output	reg					axi_bvalid
 );
 
@@ -145,15 +145,15 @@ end
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		axi_rdata <= 32'b0;
-		axi_rresp <= 3'b0;
+		axi_rresp <= 2'b0;
 		axi_rvalid <= 1'b0;
 	end else if(rstate == WAIT_AR_AW_WVALID_FALL && axi_arvalid_fall) begin
 		axi_rdata <= pmem_read(raddr_reg);
-		axi_rresp <= 3'b0;
+		axi_rresp <= 2'b0;
 		axi_rvalid <= 1'b1;
 	end else if(rstate == WAIT_RREADY && axi_rready) begin
 		axi_rdata <= 32'b0;
-		axi_rresp <= 3'b0;
+		axi_rresp <= 2'b0;
 		axi_rvalid <= 1'b0;
 	end
 end
@@ -166,13 +166,13 @@ end
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
-		axi_bresp <= 3'b0;
+		axi_bresp <= 2'b0;
 		axi_bvalid <= 1'b0;
 	end else if(wstate == WAIT_BREADY && axi_bready) begin
-		axi_bresp <= 3'b0;
+		axi_bresp <= 2'b0;
 		axi_bvalid <= 1'b1;
 	end else begin
-		axi_bresp <= 3'b0;
+		axi_bresp <= 2'b0;
 		axi_bvalid <= 1'b0;
 	end
 end

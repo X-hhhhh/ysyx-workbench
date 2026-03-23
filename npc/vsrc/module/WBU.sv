@@ -28,6 +28,7 @@ module	WBU(
 
 export "DPI-C" function dpi_gpr_read;
 export "DPI-C" function dpi_wbu_inst_end;
+export "DPI-C" function dpi_get_pc;
 
 function int dpi_gpr_read(input byte addr);
 	if(addr >= 0 && addr <= 15) begin
@@ -38,6 +39,10 @@ endfunction
 
 function int dpi_wbu_inst_end();
 	return {31'b0, wbu_inst_end};
+endfunction
+
+function int dpi_get_pc();
+	return pc;
 endfunction
 
 parameter 	IDLE 	= 2'b01,

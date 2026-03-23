@@ -1,34 +1,46 @@
 module IFU(
-	input	wire			sys_clk,
-	input	wire			sys_rst,
-	input 	wire	[31:0]	pc,
-	input	wire			idu_ready,
-	input	wire			wbu_inst_end,
+	input	wire				sys_clk,
+	input	wire				sys_rst,
+	input 	wire	[31:0]		pc,
+	input	wire				idu_ready,
+	input	wire				wbu_inst_end,
 
-	output	reg				ifu_valid,
-	output	reg		[31:0]	inst,
+	output	reg					ifu_valid,
+	output	reg		[31:0]		inst,
 	//AXI4-Lite interface
-	input	wire			axi_arready,
-	output	wire			axi_arvalid,
-	output	reg		[31:0]	axi_araddr,
+	input	wire				axi_arready,
+	output	wire				axi_arvalid,
+	output	reg		[31:0]		axi_araddr,
+	output	wire	[3:0]		axi_arid,
+	output	wire	[7:0]		axi_arlen,
+	output	wire	[2:0]		axi_arsize,
+	output	wire	[1:0]		axi_arburst,
 
-	input	wire	[31:0]	axi_rdata,
-	input	wire	[2:0]	axi_rresp,
-	input	wire			axi_rvalid,
-	output	reg				axi_rready,
+	input	wire	[31:0]		axi_rdata,
+	input	wire	[1:0]		axi_rresp,
+	input	wire				axi_rvalid,
+	input	wire	[3:0]		axi_rid,
+	input	wire				axi_rlast,
+	output	wire				axi_rready,
 
-	input	wire			axi_awready,
-	output	wire			axi_awvalid,
-	output	wire	[31:0]	axi_awaddr,
+	input	wire				axi_awready,
+	output	reg					axi_awvalid,
+	output	reg		[31:0]		axi_awaddr,
+	output	wire	[3:0]		axi_awid,
+	output	wire	[7:0]		axi_awlen,
+	output	wire	[2:0]		axi_awsize,
+	output	wire	[1:0]		axi_awburst,
 
-	input	wire			axi_wready,
-	output	wire	[31:0]	axi_wdata,
-	output	wire	[3:0]	axi_wstrb,
-	output	wire			axi_wvalid,
+	input	wire				axi_wready,
+	output	reg		[31:0]		axi_wdata,
+	output	reg		[3:0]		axi_wstrb,
+	output	reg					axi_wvalid,
+	output	wire				axi_wlast,
 
-	input	wire	[2:0]	axi_bresp,
-	input	wire			axi_bvalid,
-	output	wire			axi_bready
+	input	wire	[1:0]		axi_bresp,
+	input	wire				axi_bvalid,
+	input	wire	[3:0]		axi_bid,
+	output	wire				axi_bready
 );
 
 parameter 	IDLE			= 3'b001,		//set raddr status
@@ -50,6 +62,17 @@ reg		[2:0]	ifu_state;
 reg				startup;
 reg				startup_reg;
 wire			startup_rise;
+
+assign axi_arid		= 4'b0;
+assign axi_arlen	= 8'b0;			//1 transfer per transaction
+assign axi_arsize	= 3'b010;       //4 bytes per transfer
+assign axi_arburst 	= 2'b0;         //fixed burst
+
+assign axi_awid 	= 4'b0;
+assign axi_awlen 	= 8'b0;			//1 transfer per transaction
+assign axi_awsize 	= 3'b010;		//4 bytes per transfer
+assign axi_awburst	= 2'b0;			//fixed burst
+assign axi_wlast	= 1'b0;
 
 assign startup_rise = startup && ~startup_reg;
 assign axi_rready = (ifu_state == WAIT_RRESP);
@@ -86,7 +109,7 @@ always@(posedge sys_clk or posedge sys_rst) begin
 					ifu_state <= WAIT_RRESP;
 				end
 			WAIT_RRESP: 
-				if(idu_ready && axi_rvalid && axi_rresp == 3'b000) begin
+				if(idu_ready && axi_rvalid && axi_rresp == 2'b00) begin
 					ifu_state <= IDLE;
 				end
 			default: ifu_state <= IDLE;
@@ -111,7 +134,7 @@ end
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		inst <= 32'h80000000;
-	end	else if(ifu_state == WAIT_RRESP && axi_rvalid && axi_rresp == 3'b000) begin
+	end	else if(ifu_state == WAIT_RRESP && axi_rvalid && axi_rresp == 2'b00) begin
 		inst <= axi_rdata;
 	end 
 end
@@ -119,7 +142,7 @@ end
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		ifu_valid <= 1'b0;
-	end else if(ifu_state == WAIT_RRESP && axi_rvalid && axi_rresp == 3'b000 && idu_ready) begin
+	end else if(ifu_state == WAIT_RRESP && axi_rvalid && axi_rresp == 2'b00 && idu_ready) begin
 		ifu_valid <= 1'b1;
 	end else begin
 		ifu_valid <= 1'b0;

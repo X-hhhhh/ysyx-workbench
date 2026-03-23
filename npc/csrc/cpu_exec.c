@@ -1,8 +1,10 @@
-#include <Vtop.h>
+//#include <Vtop.h>
+#include <VysyxSoCFull.h>
 #include <common.h>
 #include <wave_trace.h>
 #include "svdpi.h"
-#include "Vtop__Dpi.h"
+//#include "Vtop__Dpi.h"
+#include "VysyxSoCFull__Dpi.h"
 #include <sdb.h>
 #include <dpi.h>
 #include <disasm.h>
@@ -21,7 +23,7 @@ static bool print_inst = false;
 //This function is called by dpi interface
 void npc_trap() {
 	npc_state.state = NPC_END;
-	npc_state.halt_pc = top->pc;
+	npc_state.halt_pc = get_pc();
 	npc_state.halt_ret = gpr_read(10);
 }
 
@@ -44,36 +46,45 @@ void cpu_exec(uint64_t n) {
 
 	while(n-- && npc_state.state == NPC_RUNNING) {
 		//execute an instruction
-		top->sys_clk = !top->sys_clk;
+		/*top->sys_clk = !top->sys_clk;
 		top->eval();
 		wave_trace();
 		top->sys_clk = !top->sys_clk;
 		top->eval();
+		wave_trace(); */
+
+		top->clock = !top->clock;
+		top->eval();
 		wave_trace();
+		top->clock = !top->clock;
+		top->eval();
+		wave_trace();
+
 	
 		uint32_t inst = inst_get();
 		if(print_inst) {
 #ifdef CONFIG_ITRACE
 			char buf[256];
-			int ret = snprintf(buf, 256, "0x%x: %x\t", top->pc, inst);
-			disassemble(buf + ret, 256 - ret, top->pc, (uint8_t*)&inst, 4);
+			int ret = snprintf(buf, 256, "0x%x: %x\t", get_pc(), inst);
+			disassemble(buf + ret, 256 - ret, get_pc(), (uint8_t*)&inst, 4);
 			printf("%s\n", buf);
 #endif
 		}
 
-		Ftrace(top->pc, inst);
+		Ftrace(get_pc(), inst);
 
 #ifdef CONFIG_WATCHPOINT_SCAN
 		bool triggered = scan_wp();
 		if(triggered) {npc_state.state = NPC_STOP;}
 #endif
 
-		svScope wbu_scope = svGetScopeFromName("TOP.top.WBU_inst");
+		//svScope wbu_scope = svGetScopeFromName("TOP.top.WBU_inst");
+		svScope wbu_scope = svGetScopeFromName("TOP.ysyxSoCFull.asic.cpu.cpu.WBU_inst");
 		assert(wbu_scope);
 		svSetScope(wbu_scope);
 		uint32_t wbu_inst_end = dpi_wbu_inst_end();
 		if(wbu_inst_end == 0x1) {
-			difftest_step(top->pc);
+			difftest_step(get_pc());
 			inst_num++;
 		}
 	}

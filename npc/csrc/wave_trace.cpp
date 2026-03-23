@@ -1,4 +1,5 @@
-#include <Vtop.h>
+//#include <Vtop.h>
+#include <VysyxSoCFull.h>
 #include <macro.h>
 
 #if CONFIG_FST_WAVE_TRACE
@@ -7,7 +8,8 @@ VerilatedFstC *tfp = new VerilatedFstC;
 #endif
 
 VerilatedContext* contextp = new VerilatedContext;
-Vtop* top = new Vtop{contextp};
+//Vtop* top = new Vtop{contextp};
+VysyxSoCFull* top = new VysyxSoCFull{contextp};
 
 void wave_trace_init(int argc, char* argv[]) {
 	contextp->commandArgs(argc, argv);

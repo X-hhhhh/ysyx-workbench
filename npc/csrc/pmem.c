@@ -1,9 +1,12 @@
-#include <Vtop.h>
+//#include <Vtop.h>
+#include <VysyxSoCFull.h>
 #include <common.h>
 #include <wave_trace.h>
 #include <svdpi.h>
-#include <Vtop__Dpi.h>
+//#include <Vtop__Dpi.h>
+#include <VysyxSoCFull__Dpi.h>
 #include <device.h>
+#include <dpi.h>
 
 #define MAX_Mtrace 1000
 
@@ -55,7 +58,7 @@ bool in_mmio(uint32_t addr) {
 }
 
 static void out_of_bound(uint32_t addr) {
-	Assert(0, "address = 0x%x is out of bound at pc = %x", addr, top->pc);
+	Assert(0, "address = 0x%x is out of bound at pc = %x", addr, get_pc());
 }
 
 int pmem_rd_t(int paddr) {

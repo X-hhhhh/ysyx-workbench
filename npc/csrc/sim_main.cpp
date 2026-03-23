@@ -1,16 +1,20 @@
-#include <Vtop.h>
+//#include <Vtop.h>
+#include <VysyxSoCFull.h>
 #include <stdio.h>
 #include <sdb.h>
 #include <macro.h>
 #include <wave_trace.h>
 
+extern "C" void flash_read(int32_t addr, int32_t *data) {assert(0);}
+extern "C" void mrom_read(int32_t addr, int32_t *data) {assert(0);}
+
 static void reset(int n){
-	top -> sys_rst = 1;
+	top->reset = 1;
 	while(n-- > 0){
-		top -> sys_clk = 1; top -> eval(); wave_trace();
-		top -> sys_clk = 0; top -> eval(); wave_trace();
+		top->clock = 1; top -> eval(); wave_trace();
+		top->clock = 0; top -> eval(); wave_trace();
 	}
-	top -> sys_rst = 0;
+	top->reset = 0;
 }
 
 int main(int argc, char* argv[]){
@@ -24,6 +28,7 @@ int main(int argc, char* argv[]){
 	init_monitor(argc, argv);
 	printf("Welcome to " ANSI_FG_YELLOW ANSI_BG_RED "NPC!" ANSI_NONE "\n");
 
+	Verilated::commandArgs(argc, argv);
 	top -> eval(); wave_trace();
 	top -> eval(); wave_trace();
 
