@@ -38,9 +38,9 @@ typedef uint32_t paddr_t;
 		if(!(cond)) { \
 			fflush(stdout); \
 			fprintf(stderr, ANSI_FG_RED format ANSI_NONE "\n", ##__VA_ARGS__); \
-			extern void assert_fali_msg(); \
+			extern void assert_fail_msg(); \
 			extern void wave_trace_end(); \
-			assert_fali_msg(); \
+			assert_fail_msg(); \
 			wave_trace_end(); \
 			assert(cond); \
 		} \

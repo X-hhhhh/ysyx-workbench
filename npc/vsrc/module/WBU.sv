@@ -215,7 +215,7 @@ end
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst == 1'b1) begin
-		PC <= 'h80000000;
+		PC <= 'h2000_0000;
 	end else if(wbu_state == WB) begin
 		if(pc_wen == 1'b1) begin
 			PC <= pc_wdata;

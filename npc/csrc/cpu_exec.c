@@ -27,7 +27,7 @@ void npc_trap() {
 	npc_state.halt_ret = gpr_read(10);
 }
 
-void assert_fali_msg() {
+void assert_fail_msg() {
 	riscve_reg_display();
 	Mtrace_report();
 	Ftrace_report();
@@ -96,14 +96,14 @@ void cpu_exec(uint64_t n) {
 			if(npc_state.halt_ret == 0) {
 				printf("npc: " ANSI_FG_GREEN "HIT GOOD TRAP " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
 			}else {
-				assert_fali_msg();
+				assert_fail_msg();
 				printf("npc: " ANSI_FG_RED "HIT BAD TRAP " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
 			}
 			printf("Executed instructions: %d\n", inst_num); 
 			Ftrace_report();
 			break;
 		case NPC_ABORT:
-			assert_fali_msg();
+			assert_fail_msg();
 			printf("npc: " ANSI_FG_RED "ABORT " ANSI_NONE "at pc = %x\n", npc_state.halt_pc);
 			printf("Executed instructions: %d\n", inst_num); 
 			wave_trace_end();

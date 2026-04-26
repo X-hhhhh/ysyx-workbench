@@ -5,8 +5,18 @@
 #include <macro.h>
 #include <wave_trace.h>
 
+#include <pmem.h>
+#include <dpi.h>
+
 extern "C" void flash_read(int32_t addr, int32_t *data) {assert(0);}
-extern "C" void mrom_read(int32_t addr, int32_t *data) {assert(0);}
+extern "C" void mrom_read(int32_t addr, int32_t *data) {
+	if(addr >= 0x20000000 && addr < 0x20001000) {
+		*data = pmem[(uint32_t)(addr - 0x20000000) >> 2];
+	} else {
+		printf("address = 0x%x is out of bound at pc = %x", addr, get_pc());
+		assert(0);
+	}
+}
 
 static void reset(int n){
 	top->reset = 1;

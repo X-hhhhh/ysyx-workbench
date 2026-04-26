@@ -128,13 +128,13 @@ module axi_xbar(
 );
 
 //also define in macro.c
-parameter	SRAM_ADDR	= 32'h80000000,
-			SRAM_SIZE	= 32'h8000000,
-			TIMER_ADDR	= 32'h10000040,
-			TIMER_SIZE	= 32'h8;
+parameter	//SRAM_ADDR	= 32'h80000000,
+			//SRAM_SIZE	= 32'h8000000,
+			CLINT_ADDR	= 32'h02000000,
+			CLINT_SIZE	= 32'h10000;
 
-parameter	IFU_ACC 		= 4'b0001,
-			LSU_ACC_SRAM 	= 4'b0010,
+parameter	IFU_ACC_MEM 	= 4'b0001,
+			LSU_ACC_MEM 	= 4'b0010,
 			LSU_ACC_CLINT	= 4'b0100,
 			ADDR_ERROR		= 4'b1000;	
 
@@ -142,20 +142,21 @@ reg		[3:0]	state;
 
 always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
-		state <= IFU_ACC;
+		state <= IFU_ACC_MEM;
 	end else if(lsu_axi_arvalid || lsu_axi_awvalid || lsu_axi_wvalid) begin
-		if((lsu_axi_araddr >= SRAM_ADDR) && (lsu_axi_araddr < SRAM_ADDR + SRAM_SIZE) ||
-				(lsu_axi_awaddr >= SRAM_ADDR) && (lsu_axi_awaddr < SRAM_ADDR + SRAM_SIZE)) begin
-			state <= LSU_ACC_SRAM;
-		end else if((lsu_axi_araddr >= TIMER_ADDR) && (lsu_axi_araddr < TIMER_ADDR + TIMER_SIZE) ||
-				(lsu_axi_awaddr >= TIMER_ADDR) && (lsu_axi_awaddr < TIMER_ADDR + TIMER_SIZE)) begin
+		//if((lsu_axi_araddr >= SRAM_ADDR) && (lsu_axi_araddr < SRAM_ADDR + SRAM_SIZE) ||
+		//		(lsu_axi_awaddr >= SRAM_ADDR) && (lsu_axi_awaddr < SRAM_ADDR + SRAM_SIZE)) begin
+		if((lsu_axi_araddr >= CLINT_ADDR) && (lsu_axi_araddr < CLINT_ADDR + CLINT_SIZE) ||
+			(lsu_axi_awaddr >= CLINT_ADDR) && (lsu_axi_awaddr < CLINT_ADDR + CLINT_SIZE)) begin
 			state <= LSU_ACC_CLINT;
 		end else begin
-			state <= ADDR_ERROR;
-		end
+			state <= LSU_ACC_MEM;
+		end 
 	end else if(ifu_axi_arvalid || ifu_axi_awvalid || ifu_axi_wvalid) begin
-		if((ifu_axi_araddr >= SRAM_ADDR) && (ifu_axi_araddr < SRAM_ADDR + SRAM_SIZE)) begin
-			state <= IFU_ACC;
+		if( !((lsu_axi_araddr >= CLINT_ADDR) && (lsu_axi_araddr < CLINT_ADDR + CLINT_SIZE) ||
+			(lsu_axi_awaddr >= CLINT_ADDR) && (lsu_axi_awaddr < CLINT_ADDR + CLINT_SIZE)) ) begin
+			//ifu can only access mem, not clint
+			state <= IFU_ACC_MEM;
 		end else begin
 			state <= ADDR_ERROR;
 		end
@@ -195,7 +196,7 @@ always@(*) begin
 end
 
 always@(*) begin
-	if(state == IFU_ACC) begin
+	if(state == IFU_ACC_MEM) begin
         mem_axi_arvalid = ifu_axi_arvalid;
         mem_axi_araddr	= ifu_axi_araddr;
 		mem_axi_arid	= ifu_axi_arid;
@@ -218,7 +219,7 @@ always@(*) begin
 		mem_axi_wlast 	= ifu_axi_wlast;
 
         mem_axi_bready	= ifu_axi_bready;
-	end else if(state == LSU_ACC_SRAM) begin
+	end else if(state == LSU_ACC_MEM) begin
         mem_axi_arvalid = lsu_axi_arvalid;
         mem_axi_araddr	= lsu_axi_araddr;
 		mem_axi_arid	= lsu_axi_arid;
@@ -264,7 +265,7 @@ always@(*) begin
 end
 
 always@(*) begin
-	if(state == IFU_ACC) begin						//ifu accesses sram
+	if(state == IFU_ACC_MEM) begin					//ifu accesses sram
 		ifu_axi_arready	= mem_axi_arready;
 
         ifu_axi_rdata	= mem_axi_rdata;
@@ -316,7 +317,7 @@ always@(*) begin
 end
 
 always@(*) begin
-	if(state == LSU_ACC_SRAM) begin					//lsu accesses sram
+	if(state == LSU_ACC_MEM) begin					//lsu accesses sram
 		lsu_axi_arready	= mem_axi_arready;
                        
         lsu_axi_rdata	= mem_axi_rdata;
@@ -347,18 +348,6 @@ always@(*) begin
 
         lsu_axi_bresp	= clint_axi_bresp;
         lsu_axi_bvalid	= clint_axi_bvalid;
-		lsu_axi_bid		= 4'b0;
-	end else if(state == ADDR_ERROR) begin
-		lsu_axi_arready = 1'b0;
-        lsu_axi_rdata	= 32'b0;
-        lsu_axi_rresp	= 2'b11;	//DECERR
-		lsu_axi_rvalid  = 1'b0;	
-		lsu_axi_rid		= 4'b0;
-		lsu_axi_rlast	= 1'b0;
-        lsu_axi_awready	= 1'b0;
-        lsu_axi_wready	= 1'b0;
-        lsu_axi_bresp	= 2'b11;	//DECERR
-        lsu_axi_bvalid	= 1'b0;
 		lsu_axi_bid		= 4'b0;
 	end else begin
 		lsu_axi_arready = 1'b0;

@@ -239,8 +239,9 @@ static long load_memory(const char *filename) {
 	fp = NULL;
 
 	/*
-	for(int i = 0; i < img_size / 4; i++) {
-		printf("%x: %x\n", 0x80000000 + 4*i, pmem[i]);
+	for(int i = 0; i < 1000; i++) {
+		if(i % 4 == 0) {printf("\n");}
+		printf("0x%x: %x ", i*4 + 0x20000000, pmem[i]);
 	}*/
 
 	return img_size;

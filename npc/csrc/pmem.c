@@ -124,3 +124,13 @@ void pmem_write(int paddr, int wdata, char wmask) {
 	pmem_wr_t(paddr, wdata, wmask);
 }
 
+/*
+extern "C" void flash_read(int32_t addr, int32_t *data) {assert(0);}
+extern "C" void mrom_read(int32_t addr, int32_t *data) {
+	if(addr >= 0x20000000 && addr < 0x20001000) {
+		*data = pmem[addr - 0x20000000];
+	} else {
+		Assert(0, "address = 0x%x is out of bound at pc = %x", addr, get_pc());
+	}
+}*/
+

@@ -176,9 +176,14 @@ always@(posedge sys_clk or posedge sys_rst) begin
 				end
 				//else ... can add some error handling
 			WAIT_AW_WREADY:
-				if(waddr_sended && wdata_sended) begin
+			//	if(waddr_sended && wdata_sended) begin
+			//		lsu_state <= WAIT_BRESP;
+			//	end
+				if(axi_awready && axi_awvalid && axi_wready && axi_wvalid || 
+					axi_awready && axi_awvalid && wdata_sended ||
+					axi_wready && axi_wvalid && waddr_sended) begin
 					lsu_state <= WAIT_BRESP;
-				end	
+				end
 			WAIT_BRESP:
 				//while data is wrote(when bresp is 0x00)
 				if(axi_bvalid && axi_bresp == 2'b00) begin
@@ -190,6 +195,7 @@ always@(posedge sys_clk or posedge sys_rst) begin
 						lsu_state <= IDLE;
 					end
 				end
+				//else ... can add some error handling
 			default: lsu_state <= IDLE;
 		endcase
 	end

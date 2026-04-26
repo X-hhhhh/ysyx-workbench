@@ -28,6 +28,7 @@ VERILATOR_FLAGS += --Wno-UNUSEDSIGNAL
 VERILATOR_FLAGS += --Wno-PINCONNECTEMPTY
 VERILATOR_FLAGS += --build
 VERILATOR_FLAGS += --timescale "1ns/1ns" --no-timing
+VERILATOR_FLAGS += --autoflush
 
 #include verilog files
 VERILATOR_FLAGS += -I$(SOC_HOME)/perip/uart16550/rtl
