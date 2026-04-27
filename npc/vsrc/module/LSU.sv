@@ -58,23 +58,25 @@ parameter 	IDLE 			= 5'b00001,
 			WAIT_AW_WREADY 	= 5'b01000,
 			WAIT_BRESP		= 5'b10000;
 
-reg	[4:0]	lsu_state;
-reg	[31:0]	pmem_read_data0;
-reg	[31:0]	pmem_read_data1;
+reg	[4:0]		lsu_state;
+reg	[31:0]		pmem_read_data0;
+reg	[31:0]		pmem_read_data1;
 
-reg			rw_across;			//this means to read or write memory 2 times(across words)
+reg				rw_across;			//this means to read or write memory 2 times(across words)
+reg				waddr_sended;
+reg				wdata_sended;
+wire	[2:0]	awsize_t;
 
-reg			waddr_sended;
-reg			wdata_sended;
+assign awsize_t = {2'b0, wmask[0]} + {2'b0, wmask[1]} + {2'b0, wmask[2]} + {2'b0, wmask[3]};
 
 assign axi_arid		= 4'b0;
 assign axi_arlen	= 8'b0;			//1 transfer per transaction
-assign axi_arsize	= 3'b010;       //4 bytes per transfer
+//assign axi_arsize	= 3'b010;       //4 bytes per transfer
 assign axi_arburst 	= 2'b0;         //fixed burst
 
 assign axi_awid 	= 4'b0;
 assign axi_awlen 	= 8'b0;			//1 transfer per transaction
-assign axi_awsize 	= 3'b010;		//4 bytes per transfer
+//assign axi_awsize 	= 3'b010;		//4 bytes per transfer
 assign axi_awburst	= 2'b0;			//fixed burst
 
 assign lsu_ready = (lsu_state == IDLE);
@@ -237,15 +239,19 @@ always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		axi_araddr <= 32'b0;
 		axi_arvalid <= 1'b0;
+		axi_arsize <= 3'b0;
 	end else if(lsu_state == IDLE && exu_valid && valid) begin
 		axi_araddr <= raddr;
 		axi_arvalid <= 1'b1;
+		axi_arsize <= {1'b0, rbyte_num};
 	end else if(axi_rvalid && rw_across) begin	//set arvalid to read the second time(across word)
 		axi_araddr <= raddr + 4;
 		axi_arvalid <= 1'b1;
+		axi_arsize <= {1'b0, rbyte_num};
 	end else if(lsu_state == WAIT_ARREADY && axi_arready) begin
 		axi_araddr <= 32'b0;
 		axi_arvalid <= 1'b0;
+		axi_arsize <= 3'b0;
 	end
 end
 
@@ -253,15 +259,19 @@ always@(posedge sys_clk or posedge sys_rst) begin
 	if(sys_rst) begin
 		axi_awaddr <= 32'b0;
 		axi_awvalid <= 1'b0;
+		axi_awsize <= 3'b0; 
 	end else if(lsu_state == IDLE && exu_valid && wen) begin
 		axi_awaddr <= waddr;
 		axi_awvalid <= 1'b1;
+		axi_awsize <= awsize_t;
 	end else if(axi_bvalid && rw_across) begin
 		axi_awaddr <= waddr + 4;
 		axi_awvalid <= 1'b1;
+		axi_awsize <= awsize_t;
 	end else if(lsu_state == WAIT_AW_WREADY && axi_awready) begin
 		axi_awaddr <= 32'b0;
 		axi_awvalid <= 1'b0;
+		axi_awsize <= 3'b0;
 	end
 end
 		
