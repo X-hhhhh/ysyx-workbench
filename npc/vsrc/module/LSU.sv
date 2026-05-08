@@ -71,12 +71,10 @@ assign awsize_t = {2'b0, wmask[0]} + {2'b0, wmask[1]} + {2'b0, wmask[2]} + {2'b0
 
 assign axi_arid		= 4'b0;
 assign axi_arlen	= 8'b0;			//1 transfer per transaction
-//assign axi_arsize	= 3'b010;       //4 bytes per transfer
 assign axi_arburst 	= 2'b0;         //fixed burst
 
 assign axi_awid 	= 4'b0;
 assign axi_awlen 	= 8'b0;			//1 transfer per transaction
-//assign axi_awsize 	= 3'b010;		//4 bytes per transfer
 assign axi_awburst	= 2'b0;			//fixed burst
 
 assign lsu_ready = (lsu_state == IDLE);
@@ -178,8 +176,6 @@ always@(posedge sys_clk or posedge sys_rst) begin
 				end
 				//else ... can add some error handling
 			WAIT_AW_WREADY:
-			//	if(waddr_sended && wdata_sended) begin
-			//		lsu_state <= WAIT_BRESP;
 			//	end
 				if(axi_awready && axi_awvalid && axi_wready && axi_wvalid || 
 					axi_awready && axi_awvalid && wdata_sended ||

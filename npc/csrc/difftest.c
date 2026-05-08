@@ -49,7 +49,7 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 	//initialize difftest function of ref(nemu)
 	ref_difftest_init(port);
 	//copy the memory of npc to ref(nemu)
-	ref_difftest_memcpy(PMEM_BASE, pmem, img_size, DIFFTEST_TO_REF);
+	ref_difftest_memcpy(MROM_BASE, pmem, img_size, DIFFTEST_TO_REF);
 	//copy cpu state to ref(nemu)
 	cpu_state dut;
 	for(int i = 0 ; i < 16; i++) {
@@ -59,7 +59,7 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 	for(int i = 16 ; i < 32; i++) {
 		dut.gpr[i] = 0;
 	}
-	dut.pc = top->pc;
+	dut.pc = get_pc();
 	ref_difftest_regcpy(&dut, DIFFTEST_TO_REF);
 }
 

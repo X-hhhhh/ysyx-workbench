@@ -45,21 +45,12 @@ void cpu_exec(uint64_t n) {
 	}
 
 	while(n-- && npc_state.state == NPC_RUNNING) {
-		//execute an instruction
-		/*top->sys_clk = !top->sys_clk;
-		top->eval();
-		wave_trace();
-		top->sys_clk = !top->sys_clk;
-		top->eval();
-		wave_trace(); */
-
 		top->clock = !top->clock;
 		top->eval();
 		wave_trace();
 		top->clock = !top->clock;
 		top->eval();
 		wave_trace();
-
 	
 		uint32_t inst = inst_get();
 		if(print_inst) {

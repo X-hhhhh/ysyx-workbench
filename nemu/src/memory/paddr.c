@@ -18,13 +18,26 @@
 #include <device/mmio.h>
 #include <isa.h>
 
+#define MAX_Mtrace 1000
+
+//base of sram:0x0F000000, size: 8K
+#define SRAM_BASE 0x0F000000
+#define SRAM_SIZE 0x2000
+#define SRAM_LEFT ((paddr_t)SRAM_BASE)
+#define SRAM_RIGHT ((paddr_t)SRAM_BASE + SRAM_SIZE - 1)
+
 #if   defined(CONFIG_PMEM_MALLOC)
-static uint8_t *pmem = NULL;
+static uint8_t *pmem = NULL;		//serve as mrom
+static uint8_t *sram = NULL;		//sram
 #else // CONFIG_PMEM_GARRAY
 static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
+static uint8_t sram[SRAM_SIZE] PG_ALIGN = {};
 #endif
 
-#define MAX_Mtrace 1000
+static inline bool in_sram(paddr_t addr) {
+	return addr - SRAM_BASE < SRAM_SIZE;
+}
+
 #ifdef CONFIG_MTRACE
 static struct Mtrace_info {
 	paddr_t mem_buf[MAX_Mtrace];
@@ -65,13 +78,24 @@ void Mtrace_report() {
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }
 paddr_t host_to_guest(uint8_t *haddr) { return haddr - pmem + CONFIG_MBASE; }
 
+uint8_t* guest_to_host_sram(paddr_t paddr) { return sram + paddr - SRAM_BASE; }
+
 static word_t pmem_read(paddr_t addr, int len) {
   word_t ret = host_read(guest_to_host(addr), len);
   return ret;
 }
 
+static word_t sram_read(paddr_t addr, int len) {
+  word_t ret = host_read(guest_to_host_sram(addr), len);
+  return ret;
+}
+
 static void pmem_write(paddr_t addr, int len, word_t data) {
   host_write(guest_to_host(addr), len, data);
+}
+
+static void sram_write(paddr_t addr, int len, word_t data) {
+  host_write(guest_to_host_sram(addr), len, data);
 }
 
 static void out_of_bound(paddr_t addr) {
@@ -83,9 +107,13 @@ void init_mem() {
 #if   defined(CONFIG_PMEM_MALLOC)
   pmem = malloc(CONFIG_MSIZE);
   assert(pmem);
+  sram = malloc(SRAM_SIZE)
+  assert(sram);
 #endif
   IFDEF(CONFIG_MEM_RANDOM, memset(pmem, rand(), CONFIG_MSIZE));
+  IFDEF(CONFIG_MEM_RANDOM, memset(sram, rand(), SRAM_SIZE));
   Log("physical memory area [" FMT_PADDR ", " FMT_PADDR "]", PMEM_LEFT, PMEM_RIGHT);
+  Log("sram area [" FMT_PADDR ", " FMT_PADDR "]", SRAM_LEFT, SRAM_RIGHT);
 }
 
 word_t paddr_read(paddr_t addr, int len) {
@@ -94,6 +122,7 @@ word_t paddr_read(paddr_t addr, int len) {
 #endif
 
   if (likely(in_pmem(addr))) return pmem_read(addr, len);
+  if (likely(in_sram(addr))) return sram_read(addr, len);
   IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
   out_of_bound(addr);
   return 0;
@@ -105,6 +134,7 @@ void paddr_write(paddr_t addr, int len, word_t data) {
 #endif
 
   if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
+  if (likely(in_sram(addr))) { sram_write(addr, len, data); return; }
   IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
   out_of_bound(addr);
 }

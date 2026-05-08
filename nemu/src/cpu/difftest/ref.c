@@ -21,13 +21,13 @@
 #define DIFFTEST_TO_REF false
 #define DIFFTEST_TO_DUT true
 
-#define DUT_MBASE 0x80000000
+#define DUT_MROM_BASE 0x20000000
 
 __EXPORT void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
-	assert(addr - DUT_MBASE + CONFIG_MBASE + n - 1 <= PMEM_RIGHT);
+	assert(addr - DUT_MROM_BASE + CONFIG_MBASE + n - 1 <= PMEM_RIGHT);
 	if(direction == DIFFTEST_TO_REF) {
 		for(int i = 0; i < n; i++) {
-			paddr_write(addr - DUT_MBASE + CONFIG_MBASE + i, 1, *((uint8_t*)buf + i));
+			paddr_write(addr - DUT_MROM_BASE + CONFIG_MBASE + i, 1, *((uint8_t*)buf + i));
 		}
 	}else {
   		assert(0);

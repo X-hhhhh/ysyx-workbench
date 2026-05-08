@@ -229,7 +229,7 @@ static long load_memory(const char *filename) {
 	long img_size = ftell(fp);
 
 	printf("Img is %s, size = %ld\n", filename, img_size);
-	assert(img_size < PMEM_SIZE);
+	assert(img_size < MROM_SIZE);
 	
 	fseek(fp, 0, SEEK_SET);
 	int ret = fread(pmem, img_size, 1, fp);

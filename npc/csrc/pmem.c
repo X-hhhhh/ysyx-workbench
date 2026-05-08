@@ -1,9 +1,7 @@
-//#include <Vtop.h>
 #include <VysyxSoCFull.h>
 #include <common.h>
 #include <wave_trace.h>
 #include <svdpi.h>
-//#include <Vtop__Dpi.h>
 #include <VysyxSoCFull__Dpi.h>
 #include <device.h>
 #include <dpi.h>
@@ -46,11 +44,11 @@ void Mtrace_report() {
 #endif
 }
 
-uint32_t pmem[PMEM_SIZE] = {0};
+uint32_t pmem[MROM_SIZE] = {0};
 static uint32_t pmem_io[MMIO_SIZE] = {0};
 
 bool in_pmem(uint32_t addr) {
-	return addr >= PMEM_BASE && addr < PMEM_BASE + PMEM_SIZE;
+	return addr >= MROM_BASE && addr < MROM_BASE + MROM_SIZE;
 }
 
 bool in_mmio(uint32_t addr) {
@@ -66,7 +64,7 @@ int pmem_rd_t(int paddr) {
 
 	if(paddr == 0 || paddr == 4) return 1;
 	if(in_pmem(paddr)) {
-		uint32_t paddr_ = paddr - PMEM_BASE;
+		uint32_t paddr_ = paddr - MROM_BASE;
 		return pmem[(uint32_t)paddr_ >> 2];
 	}
 	if(in_mmio(paddr)) {
@@ -87,7 +85,7 @@ void pmem_wr_t(int paddr, int wdata, char wmask) {
 	Mtrace(paddr, 4, 1);
 	if(paddr == 0 || paddr == 4) return ;
 	if(in_pmem(paddr)) {
-		uint32_t paddr_ = paddr - PMEM_BASE;
+		uint32_t paddr_ = paddr - MROM_BASE;
 		uint32_t mask = 0;
 		for(int i = 0; i < 4; i++) {
 			if(((wmask >> i) & 0x1) == 1) {

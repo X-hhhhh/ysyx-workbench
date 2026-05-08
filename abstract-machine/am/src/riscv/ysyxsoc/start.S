@@ -13,7 +13,7 @@ _s1:
 	lw a5, 0(t0)
 	sw a5, 0(t1)
 	addi t0, t0, 4
-	addi t1, t0, 4
+	addi t1, t1, 4
 	blt t1, t2, _s1
 
 _s2:

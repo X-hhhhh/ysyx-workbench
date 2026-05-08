@@ -14,7 +14,7 @@ SECTIONS {
 	_etext = .;
 	.rodata : {
 		*(.rodata*)
-	} > ROM
+	} > ROM AT> ROM
 	.data : {
 		_data_start = .;
 		*(.data*)

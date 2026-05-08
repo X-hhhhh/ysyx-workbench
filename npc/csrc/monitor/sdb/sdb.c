@@ -67,7 +67,9 @@ static int cmd_x(char *args) {
 		if(in_pmem(paddr)) {
 			printf("0x%x: 0x%x\n", paddr, pmem_rd(paddr));
 		}else {
-			printf("paddr:[%x, %x] out of range [%x, %x)\n", paddr, paddr + 4, PMEM_BASE, PMEM_BASE + PMEM_SIZE * 4);
+			//printf("paddr:[%x, %x] out of range [%x, %x)\n", paddr, paddr + 4, PMEM_BASE, PMEM_BASE + PMEM_SIZE * 4);
+			//can only scan mrom
+			printf("paddr:[%x, %x] out of range [%x, %x)\n", paddr, paddr + 4, MROM_BASE, MROM_BASE + MROM_SIZE * 4);
 			break;
 		}
 	}
